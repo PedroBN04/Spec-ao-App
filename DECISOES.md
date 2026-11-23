@@ -49,7 +49,8 @@ Regra geral (CLAUDE.md): na dúvida, a opção mais simples.
 17. **Raio-X** mostra o tipo do pandas (`object`, `int64`...) com uma legenda em português logo abaixo.
 18. **Gráfico de coluna** abre na primeira coluna que não é o alvo (o alvo já tem gráfico ao lado).
 
-## Pendências da spec (decidir antes do M6)
-
-- **Teste do N09:** na amostra, N09 remove 19,5% das linhas e a seção 14 pede ≥ 20%. Proposta: baixar o
-  limite do teste para ≥ 15% (o bloco e a amostra não mudam).
+19. **Base original em `st.cache_resource`** (uma cópia na memória, compartilhada por todas as sessões),
+    em vez de `cache_data` (que entrega uma cópia nova a cada chamada). A spec pede "carregada uma vez
+    e nunca alterada": o executor sempre roda sobre `df.copy()` e nenhuma tela altera a original.
+20. **Licenças não puderam ser conferidas:** o kaggle.com está fora da rede permitida do ambiente de
+    desenvolvimento. Os textos de licença ficam marcados "conferir" até a organização confirmar.

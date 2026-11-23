@@ -66,13 +66,17 @@ def escolher_tema(tema_id: str) -> None:
     st.session_state.tema_pendente = None
 
 
-@st.cache_data(show_spinner="Carregando a base...")
+@st.cache_resource(show_spinner="Carregando a base...")
 def _ler_csv(caminho: str) -> pd.DataFrame:
     return pd.read_csv(RAIZ / caminho)
 
 
 def carregar_base(tema: Theme) -> pd.DataFrame:
-    """Base original do tema. O cache devolve uma cópia nova a cada chamada; a original nunca muda."""
+    """Base original do tema, carregada uma vez e compartilhada entre as sessões.
+
+    NUNCA altere este DataFrame: o executor sempre trabalha sobre `df.copy()`.
+    (cache_resource evita uma cópia por sessão; ver DECISOES.md.)
+    """
     return _ler_csv(tema.arquivo)
 
 

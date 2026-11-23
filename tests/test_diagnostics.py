@@ -78,3 +78,8 @@ def test_distribuicao_com_percentual_e_vazios():
     dist = dg.distribuicao(pd.Series(["a", "a", None, "b"]))
     assert dist.set_index("valor")["%"].to_dict() == {"a": 50.0, "(vazio)": 25.0, "b": 25.0}
     assert len(dg.distribuicao(base("hotel")["country"], top=15)) == 15
+
+
+def test_telco_distribuicao_do_alvo_26_5_porcento():
+    dist = dg.distribuicao(base("telco")["Churn"]).set_index("valor")["%"]
+    assert dist["Yes"] == 26.5 and dist["No"] == 73.5
