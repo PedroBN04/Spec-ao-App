@@ -197,3 +197,69 @@ def test_checklist_sem_pendencias_com_boas_praticas():
     _avancar(at)
     assert not _botao(at, "Avançar →").disabled
     assert any(m.value == "100/100" for m in at.metric)
+
+
+# --- Etapas 5 e 6 ------------------------------------------------------------
+
+
+def _ate_spec(blocos, justificar=None):
+    at = _ate_tratamento("telco")
+    for b in blocos:
+        _aplicar(at, b)
+    _avancar(at)
+    for cid, texto in (justificar or {}).items():
+        at.radio(key=f"w_dec_{cid}").set_value("manter").run()
+        at.text_area(key=f"w_just_{cid}").input(texto).run()
+    _avancar(at)
+    assert at.session_state.etapa == 5
+    return at
+
+
+def _preview(at) -> str:
+    return next(m.value for m in at.markdown if m.value.startswith("# SPEC — "))
+
+
+def test_jornada_completa_telco_ate_exportar():
+    # 2 boas práticas, 1 armadilha (T10), 1 "depende" (T04) e um alerta justificado
+    at = _ate_spec(["T01", "T02", "T07", "T10", "T04"])
+    assert not _botao(at, "Avançar →").disabled  # defaults do tema preenchem os obrigatórios
+    # preview acompanha cada campo
+    at.text_area(key="w_spec_problema").input("Problema editado pela equipe para o teste").run()
+    assert "Problema editado pela equipe para o teste" in _preview(at)
+    at.text_area(key="w_spec_problema").input("").run()
+    assert _botao(at, "Avançar →").disabled
+    assert any("passo 1: Problema" in c.value for c in at.caption)
+    at.text_area(key="w_spec_problema").input("Reduzir cancelamentos de clientes novos").run()
+    for _ in range(7):
+        _botao(at, "Próximo passo ▶").click().run()
+        _sem_erros(at)
+    at.text_area(key="w_spec_roteiro").input("Problema → dados → demo").run()
+    assert "Roteiro: Problema → dados → demo" in _preview(at)
+    _botao(at, "◀ Passo anterior").click().run()
+    at.text_area(key="w_spec_criterios_aceitacao").input("").run()
+    assert _botao(at, "Avançar →").disabled
+    at.text_area(key="w_spec_criterios_aceitacao").input("O app abre sem erros").run()
+    _avancar(at)
+    assert at.session_state.etapa == 6
+    assert any("Leia SPEC.md e construa" in c.value for c in at.code)
+
+
+def test_spec_reflete_justificativa_do_checklist():
+    at = _ate_spec(["T01"], justificar={"G04": "Vou tratar os vazios no app final"})
+    texto = _preview(at)
+    assert "Justificativa da equipe: Vou tratar os vazios no app final" in texto
+    assert "1. Converter `TotalCharges` para número — Boa prática" in texto
+
+
+def test_respostas_sobrevivem_a_ida_e_volta():
+    at = _ate_spec(["T01", "T02"])
+    at.text_input(key="w_spec_nome_solucao").input("Radar de Churn").run()
+    _botao(at, "Próximo passo ▶").click().run()
+    at.checkbox(key="w_spec_aprofundamentos_0").check().run()
+    _avancar(at)
+    _botao(at, "← Voltar").click().run()
+    _botao(at, "← Voltar").click().run()
+    _avancar(at)
+    assert at.session_state.spec["nome_solucao"] == "Radar de Churn"
+    assert "# SPEC — Radar de Churn" in _preview(at)
+    assert at.session_state.spec["aprofundamentos"] == [at.session_state.spec["aprofundamentos"][0]]

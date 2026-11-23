@@ -84,3 +84,32 @@ Regra geral (CLAUDE.md): na dúvida, a opção mais simples.
     justificativa com ≥ 15 caracteres (sem contar espaços nas pontas). Justificativas ficam guardadas por
     regra; se a regra passar depois, a justificativa é ignorada.
 33. **Regra com defeito** (exceção dentro da função) aparece como não verificada, sem derrubar a tela.
+
+## Marco M5 — Assistente da SPEC e exportação
+
+34. **Nome da solução** (`{nome_da_solucao}` do template): campo opcional no passo 1, com padrão
+    "Painel — <nome do desafio>".
+35. **Listas** (funcionalidades, regras, critérios, fora do escopo) são caixas de texto com **um item por
+    linha**, já preenchidas com os `spec_defaults`; marcadores "-", "*" e "•" no início são ignorados.
+36. **Passo 3 (Dados):** só o **significado** é editável; coluna e tipo vêm do DataFrame real (seção 10).
+    Tipos aparecem em português ("texto", "número inteiro"...). Colunas criadas por blocos têm descrição
+    própria (`Theme.dicionario_extra`) ou "Criada pelo bloco X: título". Colunas cujo tipo foi mudado
+    por um bloco ganham "ATENÇÃO: valores convertidos pelo bloco T07 (...)". Só os significados
+    editados pela equipe são guardados; os demais acompanham a base.
+37. **Aviso de colunas inexistentes:** nos passos 4, 5 e 7, se o texto cita uma coluna conhecida do tema
+    que não está na base final (ex.: critério com `customerID` depois do T08), aparece um aviso.
+38. **3.1:** "título — categoria — primeira frase do feedback". **3.2:** só erros/alertas que continuam
+    falhando e foram mantidos com justificativa válida. **3.3:** colunas de vazamento presentes
+    (`colunas_vazamento` + `vazamento_derivado`) e observações do tema (`Theme.observacoes`), mostradas
+    só se a coluna existir.
+39. **Alvo na seção 3:** primeiro nome aceito presente (ex.: `faltou`), senão o alvo original; se não
+    existir, aparece "(ausente na base tratada)".
+40. **Data da SPEC** no formato dd/mm/aaaa.
+41. **Datas no CSV:** colunas de data com fuso (N03 gera UTC) são convertidas para UTC sem fuso;
+    `AAAA-MM-DD` se todas as horas forem 00:00, senão `AAAA-MM-DD HH:MM:SS`.
+42. **Nomes dos arquivos:** equipe sem acentos, minúsculas, espaços → `_`, demais símbolos removidos
+    ("Equipe Ação Já!" → `equipe_acao_ja`). A etapa 6 orienta renomear para `dados_tratados.csv` e
+    `SPEC.md`, que são os nomes citados no prompt e na SPEC.
+43. **Etapa 6** mostra aviso (sem bloquear o download) se o checklist ou a SPEC ficaram com pendências
+    depois de a equipe voltar e mudar o tratamento.
+44. **Prévia da SPEC:** formatada por padrão; botão "Ver como texto" alterna para `st.code`.
