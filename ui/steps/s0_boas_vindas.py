@@ -41,7 +41,9 @@ def render() -> None:
         "**Como funciona**\n\n"
         "Os blocos de tratamento misturam **boas práticas** e **armadilhas** — de propósito. "
         "O app não vai te impedir de errar: ele executa o que você escolher e depois mostra a consequência. "
-        "Leia a explicação de cada bloco, pense no seu objetivo e decida. Qualquer passo pode ser desfeito."
+        "Leia a explicação de cada bloco, pense no seu objetivo e decida. Qualquer passo pode ser desfeito.\n\n"
+        "⚠️ **Não recarregue a página (F5) nem feche a aba** até baixar os arquivos: o app não salva nada "
+        "no servidor e, ao recarregar a página, recomeça do zero."
     )
 
     equipe_ok = bool(st.session_state.equipe.strip())

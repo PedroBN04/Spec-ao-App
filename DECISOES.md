@@ -154,3 +154,17 @@ Regra geral (CLAUDE.md): na dúvida, a opção mais simples.
     "Running" no canto) continuam em inglês; não há configuração para traduzi-los.
 59. **Deploy:** Python 3.12 no Streamlit Community Cloud; `requirements.txt` com faixas de versão
     testadas (instalação limpa conferida: streamlit 1.67.0, pandas 2.3.3, numpy 2.5.5, plotly 6.9.0).
+
+## Auditoria final
+
+60. **Recarregar a página recomeça do zero.** É consequência direta de "nada é salvo no servidor" (seção
+    11) e de cada sessão viver em `st.session_state`. Em vez de persistir dados, a etapa 0 avisa:
+    "Não recarregue a página (F5) nem feche a aba até baixar os arquivos".
+61. **Capacidade (teste de carga):** 10 sessões simultâneas no tema hotel, cada uma aplicando 9 blocos
+    e indo até a exportação: o servidor foi de 77 MB para um pico de 471 MB (~28 MB por sessão ativa).
+    Estimativa para 25 sessões: ~780 MB — cabe em 1 GB, mas com pouca folga. O T11 (one-hot do telco)
+    sozinho ocupa ~96 MB por sessão que o aplicar; o código do bloco não pode mudar. Recomendação:
+    uma sessão por equipe (não por participante).
+62. **"Barra de progresso fixa no topo"** foi interpretada como "presente no topo de toda tela" (não
+    grudada na rolagem), para evitar CSS complexo (seção 11).
+63. **Selo "Depende do objetivo"** usa a cor laranja: o `st.badge` do Streamlit não tem amarelo.
