@@ -98,7 +98,7 @@ Regra geral (CLAUDE.md): na dúvida, a opção mais simples.
     editados pela equipe são guardados; os demais acompanham a base.
 37. **Aviso de colunas inexistentes:** nos passos 4, 5 e 7, se o texto cita uma coluna conhecida do tema
     que não está na base final (ex.: critério com `customerID` depois do T08), aparece um aviso.
-38. **3.1:** "título — categoria — primeira frase do feedback". **3.2:** só erros/alertas que continuam
+38. **3.1:** "título — categoria — feedback do bloco" (feedback completo; ver item 51). **3.2:** só erros/alertas que continuam
     falhando e foram mantidos com justificativa válida. **3.3:** colunas de vazamento presentes
     (`colunas_vazamento` + `vazamento_derivado`) e observações do tema (`Theme.observacoes`), mostradas
     só se a coluna existir.
