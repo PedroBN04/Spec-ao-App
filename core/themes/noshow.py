@@ -312,6 +312,13 @@ THEME = Theme(
     regras_checklist=REGRAS,
     spec_defaults=SPEC_DEFAULTS,
     emoji="🏥",
+    area_cliente="Secretaria Municipal de Saúde — Atenção Básica",
+    solicitante="Coordenação de Atenção Básica",
+    missao=(
+        "Olá, time de dados! Cerca de 1 em cada 5 consultas agendadas nas nossas unidades termina em falta, "
+        "e esses horários poderiam atender outros pacientes. Queremos saber quem falta mais e em que "
+        "situações, para priorizar lembretes. Os dados vieram direto do sistema de agendamento, sem tratamento."
+    ),
     alvos_aceitos=("faltou", "no_show_original"),
     vazamento_derivado=(),
     dicionario_extra={

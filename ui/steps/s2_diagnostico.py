@@ -3,145 +3,123 @@ import plotly.express as px
 import streamlit as st
 
 from core import diagnostics as dg
-from ui.components import campo_persistente, carregar_base, por_que_importa, rodape, salvar_campo, tema_atual
+from ui.components import cabecalho, campo_persistente, carregar_base, dica, fmt_int, rodape, salvar_campo, tema_atual
 
-LEGENDA_TIPOS = (
-    "Tipos: `object` = texto · `int64` = número inteiro · `float64` = número com casas decimais "
-    "(uma coluna de inteiros com vazios também vira `float64`) · `bool` = verdadeiro/falso."
-)
+MIN_ANOTACAO = 30
 
 
 @st.cache_data(show_spinner="Analisando a base...")
-def _diagnostico(tema_id: str, _df: pd.DataFrame, dicionario: dict, vazamento: tuple):
-    """Cache por tema (o DataFrame original nunca muda, então não precisa ser comparado)."""
-    df = _df
-    return dg.metricas(df), dg.alertas_base(df, vazamento), dg.raio_x(df, dicionario, vazamento)
+def _resumo(tema_id: str, _df: pd.DataFrame, dicionario: dict):
+    return dg.metricas(_df), dg.raio_x_v2(_df, dicionario)
 
 
-def _fmt(n: int) -> str:
-    return f"{n:,}".replace(",", ".")
-
-
-def _grafico_alvo(df: pd.DataFrame, alvo: str):
-    dist = dg.distribuicao(df[alvo])
-    fig = px.bar(
-        dist,
-        x="valor",
-        y="quantidade",
-        text=dist["%"].map(lambda p: f"{p:.1f}%".replace(".", ",")),
-        labels={"valor": alvo, "quantidade": "Quantidade de linhas"},
-    )
-    fig.update_layout(height=320, margin=dict(t=30, b=10), xaxis_type="category")
+def _grafico_distribuicao(df: pd.DataFrame, coluna: str):
+    s = df[coluna]
+    if dg.eh_numerica(s):
+        fig = px.histogram(df, x=coluna, nbins=40)
+        fig.update_layout(yaxis_title="Quantidade de linhas", bargap=0.05)
+    else:
+        dist = dg.distribuicao(s, top=15)
+        fig = px.bar(dist.iloc[::-1], x="quantidade", y="valor", orientation="h",
+                     text=dist.iloc[::-1]["%"].map(lambda p: f"{p:.1f}%".replace(".", ",")),
+                     labels={"valor": coluna, "quantidade": "Quantidade de linhas"})
+        fig.update_layout(yaxis_type="category")
+    fig.update_layout(height=340, margin=dict(t=10, b=10, l=10, r=10))
     return fig
 
 
-def _grafico_coluna(df: pd.DataFrame, coluna: str):
-    serie = df[coluna]
-    if dg.eh_numerica(serie):
-        fig = px.histogram(df, x=coluna, nbins=40, labels={coluna: coluna, "count": "Quantidade"})
-        fig.update_layout(yaxis_title="Quantidade de linhas")
-        legenda = "Histograma: mostra quantas linhas caem em cada faixa de valores."
-    else:
-        dist = dg.distribuicao(serie, top=15)
-        fig = px.bar(
-            dist.iloc[::-1],
-            x="quantidade",
-            y="valor",
-            orientation="h",
-            text=dist.iloc[::-1]["%"].map(lambda p: f"{p:.1f}%".replace(".", ",")),
-            labels={"valor": coluna, "quantidade": "Quantidade de linhas"},
-        )
-        fig.update_layout(yaxis_type="category")
-        legenda = "Barras: os 15 valores mais frequentes (o número na barra é a % da base)."
-    fig.update_layout(height=380, margin=dict(t=30, b=10))
-    return fig, legenda
+def _grafico_alvo(tabela: pd.DataFrame, coluna: str, rotulo: str):
+    fig = px.bar(tabela, x=coluna, y="taxa", text=tabela["taxa"].map(lambda v: f"{v * 100:.1f}%".replace(".", ",")),
+                 hover_data={"linhas": True}, labels={"taxa": rotulo.replace("`", ""), coluna: coluna})
+    fig.update_layout(height=340, margin=dict(t=10, b=10, l=10, r=10), xaxis_type="category")
+    fig.update_yaxes(tickformat=".0%")
+    return fig
 
 
 def render() -> None:
     tema = tema_atual()
     if tema is None:
-        st.warning("Escolha um desafio na etapa 1 antes do diagnóstico.")
+        st.warning("Escolha uma missão antes do diagnóstico.")
         rodape(pode_avancar=False)
         return
-
     df = carregar_base(tema)
-    met, alertas, tabela = _diagnostico(tema.id, df, tema.dicionario, tema.colunas_vazamento)
+    met, tabela = _resumo(tema.id, df, tema.dicionario)
 
-    st.header("2. Diagnóstico da base")
-    st.caption(f"{tema.emoji} {tema.nome} — base original, antes de qualquer tratamento.")
-    st.write(tema.descricao_base)
+    cabecalho(
+        "Diagnóstico da base",
+        "A base veio direto do sistema, sem tratamento. Investigue antes de mexer: o que você descobrir aqui "
+        "orienta a sua pipeline.",
+    )
 
-    # Métricas -----------------------------------------------------------------
     c = st.columns(5)
-    c[0].metric("Linhas", _fmt(met["linhas"]), help="Cada linha é um registro (um cliente, uma reserva, uma consulta).")
+    c[0].metric("Linhas", fmt_int(met["linhas"]), help="Cada linha é um registro.")
     c[1].metric("Colunas", met["colunas"], help="Cada coluna é uma informação sobre o registro.")
-    c[2].metric(
-        "Células nulas",
-        f"{met['pct_nulos']:.1f}%".replace(".", ","),
-        help="Nulo = célula vazia, sem valor. A % considera todas as células da tabela.",
-    )
-    c[3].metric(
-        "Linhas duplicadas",
-        _fmt(met["duplicadas"]),
-        help="Linhas exatamente iguais a outra linha, em todas as colunas.",
-    )
-    c[4].metric(
-        "Numéricas × texto",
-        f"{met['numericas']} × {met['texto']}",
-        help="Quantas colunas o pandas leu como número e quantas leu como texto.",
-    )
+    c[2].metric("Células vazias", f"{met['pct_nulos']:.1f}%".replace(".", ","),
+                help="Porcentagem de células sem valor, considerando a tabela inteira.")
+    c[3].metric("Linhas repetidas", fmt_int(met["duplicadas"]), help="Linhas iguais a outra em todas as colunas.")
+    c[4].metric("Numéricas / texto", f"{met['numericas']} / {met['texto']}",
+                help="Quantas colunas o computador leu como número e quantas como texto.")
 
-    # Alertas ------------------------------------------------------------------
-    st.subheader(f"🚨 Alertas automáticos ({len(alertas)})")
-    if alertas:
-        with st.container(border=True):
-            for a in alertas:
-                alvo_txt = f"**`{a.coluna}`** — " if a.coluna else "**Base inteira** — "
-                st.markdown(f"{a.icone} {alvo_txt}{a.mensagem}")
-    else:
-        st.success("Nenhum alerta automático nesta base.")
-    st.caption("Alerta não é erro: é um sinal para investigar. Você decide o que fazer na etapa de tratamento.")
+    with st.container(border=True):
+        st.markdown("**Roteiro de investigação**")
+        st.caption("Use o Raio-X e o explorador abaixo para responder. Anote o que encontrar no fim da página.")
+        r1, r2 = st.columns(2)
+        metade = (len(dg.ROTEIRO) + 1) // 2
+        for col, perguntas, inicio in ((r1, dg.ROTEIRO[:metade], 1), (r2, dg.ROTEIRO[metade:], metade + 1)):
+            col.markdown("\n".join(f"{i}. {q}" for i, q in enumerate(perguntas, start=inicio)))
 
-    # Raio-X -------------------------------------------------------------------
-    st.subheader("🩻 Raio-X das colunas")
-    st.dataframe(tabela, hide_index=True, width="stretch")
-    st.caption(LEGENDA_TIPOS)
+    st.subheader("Raio-X das colunas", anchor=False)
+    st.dataframe(tabela, hide_index=True, width="stretch", height=420,
+                 column_config={"Significado": st.column_config.TextColumn(width="large"),
+                                "% vazios": st.column_config.NumberColumn(format="%.1f")})
+    st.caption("Significado = documentação da base publicada no Kaggle. Tipo = como o computador leu a coluna.")
 
-    # Gráficos -----------------------------------------------------------------
-    st.subheader("📊 Gráficos")
-    g1, g2 = st.columns(2)
-    with g1:
-        st.markdown(f"**Distribuição do alvo: `{tema.alvo}`**")
-        st.caption("Alvo = a coluna com o resultado que queremos entender ou prever.")
-        st.plotly_chart(_grafico_alvo(df, tema.alvo), width="stretch")
-    with g2:
-        colunas = list(df.columns)
-        padrao = next((i for i, c in enumerate(colunas) if c != tema.alvo), 0)
-        coluna = st.selectbox("Escolha uma coluna para ver a distribuição", colunas, index=padrao)
-        fig, legenda = _grafico_coluna(df, coluna)
-        st.plotly_chart(fig, width="stretch")
-        st.caption(legenda)
+    st.subheader("Explorar uma coluna", anchor=False)
+    colunas = list(df.columns)
+    padrao = next((i for i, c in enumerate(colunas) if df[c].nunique() < len(df) * 0.5), 0)
+    coluna = st.selectbox("Coluna", colunas, index=padrao, key="diag_coluna")
+    serie = df[coluna]
+    a, b = st.columns([1, 2], gap="large")
+    with a, st.container(border=True):
+        st.markdown(f"**`{coluna}`**")
+        if tema.dicionario.get(coluna):
+            st.caption(tema.dicionario[coluna])
+        for k, v in dg.estatisticas(serie).items():
+            st.markdown(f"<span class='muted'>{k}</span> &nbsp; **{v}**", unsafe_allow_html=True)
+    with b:
+        aba1, aba2, aba3 = st.tabs(["Distribuição", "Relação com o alvo", "Valores mais frequentes"])
+        with aba1:
+            st.plotly_chart(_grafico_distribuicao(df, coluna), width="stretch", key="g_dist")
+        with aba2:
+            rel = dg.relacao_com_alvo(df, coluna, tema.alvo)
+            if rel is None:
+                st.caption(f"Escolha uma coluna diferente do alvo (`{tema.alvo}`) para ver a relação.")
+            else:
+                tab, rotulo = rel
+                st.caption(f"Para cada valor (ou faixa) de `{coluna}`: {rotulo}. Passe o mouse para ver quantas linhas.")
+                st.plotly_chart(_grafico_alvo(tab, coluna, rotulo), width="stretch", key="g_alvo")
+        with aba3:
+            st.dataframe(dg.distribuicao(serie, top=20), hide_index=True, width="stretch", height=340)
 
-    # Amostra ------------------------------------------------------------------
-    st.subheader("🔎 Amostra: as 20 primeiras linhas")
+    st.subheader("Amostra da base", anchor=False)
     st.dataframe(df.head(20), width="stretch")
 
-    por_que_importa(
-        "Tratar sem diagnosticar é como receitar remédio sem examinar o paciente.  \n"
-        "O diagnóstico mostra onde estão os vazios, os tipos errados e as colunas perigosas.  \n"
-        "Anote os problemas: cada bloco da próxima etapa resolve (ou cria!) um deles.",
-        titulo="💡 Por que diagnosticar antes de tratar?",
-    )
-
-    st.checkbox(
-        "Li o diagnóstico e anotei os problemas que encontrei",
-        key=campo_persistente("diagnostico_lido"),
+    st.subheader("Suas anotações", anchor=False)
+    st.text_area(
+        "O que você encontrou? Que problemas ou cuidados você viu nos dados?",
+        key=campo_persistente("notas_diag"),
         on_change=salvar_campo,
-        args=("diagnostico_lido",),
+        args=("notas_diag",),
+        height=150,
+        placeholder="Escreva uma observação por linha. Ex.: a coluna X tem vazios; a coluna Y parece número mas é texto...",
+        help="Suas anotações ficam visíveis na pipeline e na SPEC. Clique fora do campo para salvar.",
     )
-    salvar_campo("diagnostico_lido")
-
-    rodape(
-        pode_avancar=bool(st.session_state.diagnostico_lido),
-        motivo="Marque a caixa acima para confirmar que leu o diagnóstico.",
+    salvar_campo("notas_diag")
+    dica(
+        "Tratar sem diagnosticar é como receitar remédio sem examinar o paciente. Cada decisão da pipeline "
+        "deveria responder a algo que você anotou aqui.",
+        titulo="Por que diagnosticar antes de tratar?",
     )
+    faltam = MIN_ANOTACAO - len((st.session_state.notas_diag or "").strip())
+    rodape(pode_avancar=faltam <= 0,
+           motivo=f"Escreva suas anotações para avançar (faltam {max(faltam, 0)} caracteres).")

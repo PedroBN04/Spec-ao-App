@@ -1,4 +1,4 @@
-# Configuração do Streamlit para o minicurso.
+# Configuração do Streamlit — Da Spec ao App (v2).
 [client]
 # Esconde o menu de desenvolvedor e o botão "Deploy" (em inglês) para os participantes.
 toolbarMode = "viewer"
@@ -10,3 +10,24 @@ gatherUsageStats = false
 
 [theme]
 base = "light"
+primaryColor = "#4338CA"
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#F4F5F9"
+textColor = "#1F2433"
+borderColor = "#E2E5EE"
+linkColor = "#4338CA"
+font = "Inter:https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+headingFont = "Inter:https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+codeFont = "'JetBrains Mono':https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap"
+baseFontSize = 15
+baseRadius = "0.6rem"
+buttonRadius = "0.5rem"
+metricValueFontSize = "1.6rem"
+showWidgetBorder = true
+showSidebarBorder = true
+dataframeHeaderBackgroundColor = "#F4F5F9"
+chartCategoricalColors = ["#4338CA", "#0EA5E9", "#F59E0B", "#10B981", "#EF4444", "#8B5CF6", "#64748B"]
+
+[theme.sidebar]
+backgroundColor = "#F7F8FB"
+secondaryBackgroundColor = "#EEF0F6"

@@ -119,46 +119,103 @@ def motivo_desabilitado(
 # ---------------------------------------------------------------------------
 
 
+# ---------------------------------------------------------------------------
+# Passos do fluxo (v2)
+#
+# Um passo é o id de um bloco do catálogo (texto, ex.: "T01") ou um dicionário:
+#   {"uid": "P3", "tipo": "catalogo", "id": "T01", "nota": "..."}
+#   {"uid": "P4", "tipo": "livre", "acao": "preencher_vazios", "params": {...}, "nota": "..."}
+# ---------------------------------------------------------------------------
+
+Passo = str | dict
+
+
+def uid(passo: Passo) -> str:
+    return passo if isinstance(passo, str) else passo["uid"]
+
+
+def eh_catalogo(passo: Passo) -> bool:
+    return isinstance(passo, str) or passo.get("tipo") == "catalogo"
+
+
+def id_catalogo(passo: Passo) -> str | None:
+    if isinstance(passo, str):
+        return passo
+    return passo.get("id") if passo.get("tipo") == "catalogo" else None
+
+
+def bloco_do_passo(tema: Theme, passo: Passo, df: pd.DataFrame | None = None) -> Block:
+    """Block do catálogo ou bloco personalizado gerado a partir dos parâmetros."""
+    if eh_catalogo(passo):
+        return tema.bloco(id_catalogo(passo))
+    from core.blocos_livres import gerar_bloco
+
+    return gerar_bloco(passo["uid"], passo["acao"], passo.get("params", {}), df)
+
+
 @dataclass
 class Pipeline:
     df: pd.DataFrame
-    passos: list[str] = field(default_factory=list)
-    resultados: dict[str, StepResult] = field(default_factory=dict)
-    removidos: list[tuple[str, str]] = field(default_factory=list)  # (id, motivo)
+    passos: list = field(default_factory=list)  # mesmos objetos recebidos (texto ou dicionário)
+    resultados: dict[str, StepResult] = field(default_factory=dict)  # uid -> resultado
+    blocos: dict[str, Block] = field(default_factory=dict)  # uid -> bloco efetivamente executado
+    removidos: list[tuple[str, str]] = field(default_factory=list)  # (uid, motivo)
+
+    def ids_catalogo(self) -> list[str]:
+        return [i for i in (id_catalogo(p) for p in self.passos) if i]
 
 
-def reexecutar(df_original: pd.DataFrame, tema: Theme, ids: list[str]) -> Pipeline:
+def reexecutar(df_original: pd.DataFrame, tema: Theme, passos: list[Passo]) -> Pipeline:
     """Reaplica os passos, em ordem, a partir da base original.
 
-    Passos que ficaram inválidos (faltou coluna ou bloco pré-requisito) ou que deram erro
-    são removidos e listados em `removidos`.
+    Passos que ficaram inválidos (faltou coluna ou bloco pré-requisito, parâmetro que não serve mais)
+    ou que deram erro são removidos e listados em `removidos`.
     """
+    from core.blocos_livres import ParametroInvalido
+
     colunas_originais = list(df_original.columns)
     pipe = Pipeline(df=df_original)
-    for block_id in ids:
-        bloco = tema.bloco(block_id)
-        motivo = motivo_desabilitado(tema, bloco, pipe.df, pipe.passos, colunas_originais)
+    for passo in passos:
+        chave = uid(passo)
+        try:
+            bloco = bloco_do_passo(tema, passo, pipe.df)
+        except ParametroInvalido as erro:
+            pipe.removidos.append((chave, f"Os parâmetros não servem mais para a base neste ponto: {erro}"))
+            continue
+        motivo = motivo_desabilitado(tema, bloco, pipe.df, pipe.ids_catalogo(), colunas_originais)
         if motivo:
-            pipe.removidos.append((block_id, motivo))
+            pipe.removidos.append((chave, motivo))
             continue
         novo, resultado = aplicar(pipe.df, bloco)
         if resultado.erro:
-            pipe.removidos.append((block_id, f"O bloco deu erro ao ser reaplicado ({resultado.erro})."))
+            pipe.removidos.append((chave, f"O bloco deu erro ao ser reaplicado ({resultado.erro})."))
             continue
         pipe.df = novo
-        pipe.passos.append(block_id)
-        pipe.resultados[block_id] = resultado
+        pipe.passos.append(passo)
+        pipe.resultados[chave] = resultado
+        pipe.blocos[chave] = bloco
     if not pipe.passos:
         pipe.df = df_original.copy()
     return pipe
 
 
-def desfazer(df_original: pd.DataFrame, tema: Theme, ids: list[str], block_id: str) -> Pipeline:
+def desfazer(df_original: pd.DataFrame, tema: Theme, passos: list[Passo], chave: str) -> Pipeline:
     """Remove o passo e reexecuta os demais a partir da base original (seção 7.2)."""
-    return reexecutar(df_original, tema, [i for i in ids if i != block_id])
+    return reexecutar(df_original, tema, [p for p in passos if uid(p) != chave])
 
 
-def codigo_completo(tema: Theme, ids: list[str]) -> str:
-    partes = [f"# {i}. {tema.bloco(b).id} — {tema.bloco(b).titulo.replace('`', '')}\n{tema.bloco(b).codigo}"
-              for i, b in enumerate(ids, start=1)]
+def mover(passos: list[Passo], chave: str, deslocamento: int) -> list[Passo]:
+    """Nova lista com o passo deslocado (−1 sobe, +1 desce). Não reexecuta."""
+    lista = list(passos)
+    i = next(n for n, p in enumerate(lista) if uid(p) == chave)
+    j = max(0, min(len(lista) - 1, i + deslocamento))
+    lista.insert(j, lista.pop(i))
+    return lista
+
+
+def codigo_completo(tema: Theme, passos: list[Passo], blocos: dict[str, Block] | None = None) -> str:
+    partes = []
+    for n, passo in enumerate(passos, start=1):
+        bloco = (blocos or {}).get(uid(passo)) or bloco_do_passo(tema, passo)
+        partes.append(f"# {n}. {bloco.titulo.replace('`', '')}\n{bloco.codigo}")
     return "\n\n".join(partes)

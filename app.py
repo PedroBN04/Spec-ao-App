@@ -2,33 +2,25 @@
 
 import streamlit as st
 
-from ui.components import barra_progresso, iniciar_estado
-from ui.steps import (
-    s0_boas_vindas,
-    s1_desafio,
-    s2_diagnostico,
-    s3_tratamento,
-    s4_checklist,
-    s5_spec,
-    s6_exportar,
-)
+from ui.components import aplicar_estilo, barra_lateral, iniciar_estado
+from ui.steps import s0_inicio, s1_missao, s2_diagnostico, s3_pipeline, s4_revisao, s5_spec, s6_exportar, s7_gabarito
 
-ETAPAS = [s0_boas_vindas, s1_desafio, s2_diagnostico, s3_tratamento, s4_checklist, s5_spec, s6_exportar]
+ETAPAS = [s0_inicio, s1_missao, s2_diagnostico, s3_pipeline, s4_revisao, s5_spec, s6_exportar, s7_gabarito]
 
-st.set_page_config(page_title="Da Spec ao App", page_icon="🧪", layout="wide")
+st.set_page_config(page_title="Da Spec ao App", page_icon=":material/schema:", layout="wide",
+                   initial_sidebar_state="expanded")
 
-# Esconde a dica "Press Enter to apply" (em inglês) dos campos de texto; o app orienta em português.
-st.html("<style>[data-testid='InputInstructions']{display:none}</style>")
-
+aplicar_estilo()
 iniciar_estado()
-barra_progresso()
+barra_lateral()
 
 try:
     ETAPAS[st.session_state.etapa].render()
 except Exception as erro:  # nenhuma exceção técnica deve aparecer crua para o participante
     st.error(
-        "Ops! Algo deu errado nesta tela. Tente voltar para a etapa anterior. "
-        "Se o problema continuar, chame a organização."
+        "Algo deu errado nesta tela. Tente voltar para a etapa anterior. "
+        "Se o problema continuar, chame a organização.",
+        icon=":material/error:",
     )
     with st.expander("Detalhes técnicos (para a organização)"):
         st.code(f"{type(erro).__name__}: {erro}", language="text")

@@ -326,6 +326,14 @@ THEME = Theme(
     regras_checklist=REGRAS,
     spec_defaults=SPEC_DEFAULTS,
     emoji="🏨",
+    area_cliente="Diretoria Comercial da rede hoteleira",
+    solicitante="Diretoria Comercial",
+    missao=(
+        "Olá, time de dados! Nossos dois hotéis em Portugal perdem muita receita com reservas canceladas — "
+        "algo perto de 4 em cada 10. Queremos entender quais reservas têm mais risco de cancelamento para "
+        "rever a política de depósito e de overbooking. Segue uma extração do sistema de reservas, sem "
+        "nenhum tratamento."
+    ),
     alvos_aceitos=(),
     vazamento_derivado=("status_",),
     dicionario_extra={

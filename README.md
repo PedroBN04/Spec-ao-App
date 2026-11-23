@@ -5,11 +5,12 @@ Laboratório guiado de dados e especificação, feito para o minicurso + hackath
 > **Projeto educacional, sem fins comerciais.** As bases de dados em `data/` são usadas apenas para fins
 > educativos, com atribuição às fontes (ver [Créditos e licenças das bases](#créditos-e-licenças-das-bases)).
 
-O participante escolhe um desafio com uma base de dados real, faz um diagnóstico visual, trata os dados
-clicando em blocos (boas práticas e **armadilhas** misturadas de propósito), passa por um checklist de
-qualidade e responde a um assistente que monta uma `SPEC.md`. No fim, baixa dois arquivos —
-`dados_tratados.csv` e `SPEC.md` — que entrega a um agente de código (Claude Code) para construir a
-solução do hackathon.
+O participante atua como analista de dados: aceita uma **missão** (uma solicitação de uma área cliente),
+investiga a base num **diagnóstico** guiado, monta uma **pipeline** de tratamento em blocos, no estilo de um
+fluxo do n8n (com blocos prontos e blocos configuráveis), **revisa** o resultado e escreve a **SPEC** por conta
+própria, com perguntas-guia. No fim, baixa `dados_tratados.csv` e `SPEC.md`, que entrega a um agente de
+código (Claude Code) para construir o painel do hackathon. Depois da exportação, uma etapa de **revisão
+com o facilitador** mostra o gabarito: quais blocos eram boas práticas, armadilhas ou "depende".
 
 > **Importante para quem for mexer no código:** os blocos de categoria "armadilha" e "depende" são errados
 > ou discutíveis **de propósito**. O código de cada bloco é cópia literal da seção 8 da `APP_SPEC.md` e um

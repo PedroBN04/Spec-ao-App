@@ -203,3 +203,43 @@ suposições sobre dados ou regras.
     (tiramos "euros"); só 8 segmentos hotel × depósito × canal têm ≥ 100 reservas, então a
     funcionalidade fala em "ranking dos segmentos (até 10)".
 70. **README** passou a descrever a amostra do hotel como ela é (6 linhas raras sempre incluídas).
+
+## Versão 2 (pedido da organização após o deploy)
+
+A organização pediu um app menos "mastigado", com mais liberdade, para públicos de níveis diferentes, e um
+visual mais profissional. Decisões tomadas com a organização:
+
+71. **Gabarito só no final:** categoria, feedback, pergunta de reflexão e sugestão de bloco não aparecem
+    durante a jornada. Depois da exportação, a etapa "Revisão com o facilitador" mostra: a categoria e o
+    feedback de cada passo, as boas práticas não usadas, as regras de qualidade (G01–G06 + regras do tema)
+    e uma SPEC de referência (os `spec_defaults`).
+72. **Missões:** `Theme.area_cliente`, `solicitante` e `missao` (mensagem da área cliente, sem nomes de
+    pessoas). A tela deixa claro que dá para priorizar, deixar de fora com justificativa ou ir além.
+73. **Diagnóstico sem alertas:** a lista de alertas automáticos e a coluna "Alerta" saíram da tela (as
+    funções continuam em `core/diagnostics.py`). Entraram o roteiro de 8 perguntas genéricas, o Raio-X
+    factual (mín./máx.), o explorador de colunas com estatísticas e a relação com o alvo, e anotações
+    obrigatórias (≥ 30 caracteres), que reaparecem na pipeline e na SPEC.
+74. **Pipeline estilo n8n, nativa do Streamlit** (sem componente de arrastar e soltar): nós ligados de
+    entrada a saída, com subir/descer/remover, código e "por que este passo?" (vai para a SPEC 3.1). Toda
+    mudança de ordem reexecuta o fluxo a partir da base original; passos que deixam de fazer sentido saem
+    com aviso neutro.
+75. **Blocos personalizados** (`core/blocos_livres.py`): 11 ações (remover colunas, preencher vazios,
+    remover linhas com vazios, converter tipo, filtrar linhas, substituir valor, criar faixas, criar coluna
+    0/1, calcular coluna, renomear, remover repetidas). O código é gerado a partir de escolhas em listas e
+    de valores convertidos em literais Python (`repr`), então nenhum texto digitado é executado como
+    código. Categoria "livre".
+76. **Os 41 blocos da seção 8 continuam com o código literal** (teste mantido). Um bloco do catálogo entra
+    no fluxo uma vez; blocos personalizados podem se repetir.
+77. **Revisão factual** (`core/revisao.py`): antes × depois de linhas, colunas, vazios, repetidas, texto
+    que parece número e presença da coluna de resultado original, mais comparativo por coluna. Sem nota.
+    Observações opcionais (vão para a SPEC 3.2) e confirmação "Revisei o resultado".
+78. **SPEC em branco:** todos os campos começam vazios (escopo marca os pedidos da área desmarcados);
+    perguntas-guia por passo e um exemplo de outro domínio (biblioteca municipal) sob demanda. Automáticos
+    continuam só os fatos dos dados: tabela da seção 3 (significado da documentação da base, editável),
+    passos aplicados (sem categoria) e números de referência. Nome padrão: "Solução — <equipe>".
+79. **Visual:** tema próprio no `.streamlit/config.toml` (Inter, índigo, cantos arredondados), navegação
+    lateral por etapas (dá para voltar a qualquer etapa já visitada), glossário na barra lateral, ícones
+    Material no lugar de emojis e pouco CSS.
+80. **Itens da v1 substituídos:** a nota de qualidade, as justificativas obrigatórias do checklist, os selos
+    durante o tratamento e os avisos de "colunas que parecem números" na tela deixam de existir na
+    jornada (decisões 4, 26–33 e 36–38 valem só para o gabarito ou foram superadas).

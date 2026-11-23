@@ -1,8 +1,9 @@
+"""Etapa 5 — SPEC (v2): a equipe escreve a especificação; o app só guia e monta o documento."""
+
 import streamlit as st
 
-from core import checklist as ck
 from core import spec_builder as sb
-from ui.components import carregar_base, df_atual, por_que_importa, rodape, tema_atual
+from ui.components import cabecalho, df_atual, dica, rodape, tema_atual
 
 PREFIXO = "w_spec_"
 
@@ -12,17 +13,15 @@ def estado_spec() -> sb.EstadoSpec:
     tema = tema_atual()
     if not st.session_state.spec:
         st.session_state.spec = sb.respostas_iniciais(tema)
-    df = df_atual(tema)
-    checks = ck.avaliar(tema, carregar_base(tema), df, st.session_state.passos)
     return sb.EstadoSpec(
         tema=tema,
         equipe=st.session_state.equipe,
-        df=df,
+        df=df_atual(tema),
         passos=list(st.session_state.passos),
+        blocos=st.session_state.blocos,
         resultados=st.session_state.resultados,
-        checks=checks,
-        justificativas=st.session_state.justificativas,
         respostas=st.session_state.spec,
+        notas_revisao=st.session_state.get("notas_revisao", ""),
     )
 
 
@@ -31,34 +30,34 @@ def estado_spec() -> sb.EstadoSpec:
 # ---------------------------------------------------------------------------
 
 
-def _k(campo: str) -> str:
-    chave = PREFIXO + campo
-    if chave not in st.session_state:
-        st.session_state[chave] = st.session_state.spec.get(campo)
-    return chave
-
-
-def _salvar(campo: str) -> None:
-    st.session_state.spec = {**st.session_state.spec, campo: st.session_state[PREFIXO + campo]}
+def _guardar(campo: str, valor) -> None:
+    st.session_state.spec = {**st.session_state.spec, campo: valor}
 
 
 def _texto(campo: str, rotulo: str, area: bool = False, **kw) -> None:
-    widget = st.text_area if area else st.text_input
-    widget(rotulo, key=_k(campo), on_change=_salvar, args=(campo,), **kw)
-    _salvar(campo)
+    chave = PREFIXO + campo
+    if chave not in st.session_state:
+        st.session_state[chave] = st.session_state.spec.get(campo) or ""
+    (st.text_area if area else st.text_input)(rotulo, key=chave, **kw)
+    _guardar(campo, st.session_state[chave])
 
 
 def _checkboxes(campo: str, opcoes: list[str], rotulo: str) -> None:
     st.markdown(rotulo)
-    marcados = set(st.session_state.spec.get(campo, []))
-    escolhidos = []
-    for i, opcao in enumerate(opcoes):
-        chave = f"{PREFIXO}{campo}_{i}"
-        if chave not in st.session_state:
-            st.session_state[chave] = opcao in marcados
-        if st.checkbox(opcao, key=chave):
-            escolhidos.append(opcao)
-    st.session_state.spec = {**st.session_state.spec, campo: escolhidos}
+    marcados = set(st.session_state.spec.get(campo) or [])
+    escolhidos = [op for i, op in enumerate(opcoes)
+                  if st.checkbox(op, value=op in marcados, key=f"{PREFIXO}{campo}_{i}")]
+    _guardar(campo, escolhidos)
+
+
+def _aviso_colunas(estado: sb.EstadoSpec, campo: str) -> None:
+    ausentes = sb.colunas_citadas_ausentes(st.session_state.spec.get(campo) or "", estado.tema, estado.df)
+    if ausentes:
+        st.warning(
+            "Este texto cita coluna(s) que não existem na sua base tratada: "
+            + ", ".join(f"`{c}`" for c in ausentes) + ". Ajuste o texto ou o fluxo.",
+            icon=":material/warning:",
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -66,131 +65,106 @@ def _checkboxes(campo: str, opcoes: list[str], rotulo: str) -> None:
 # ---------------------------------------------------------------------------
 
 
-def _passo_problema(estado: sb.EstadoSpec) -> None:
-    _texto(
-        "nome_solucao",
-        "Nome da solução (opcional)",
-        help="Aparece no título da SPEC. Ex.: \"Radar de Cancelamentos\".",
-    )
-    _texto("problema", "Problema *", area=True, height=110)
-    st.radio(
-        "Usuário principal *",
-        options=list(sb.USUARIOS),
-        format_func=sb.USUARIOS.get,
-        key=_k("usuario"),
-        on_change=_salvar,
-        args=("usuario",),
-        horizontal=True,
-        help="Quem vai usar a aplicação no dia a dia.",
-    )
-    _salvar("usuario")
-    if st.session_state.spec.get("usuario") == "outro":
+def _p_problema(estado):
+    _texto("nome_solucao", "Nome da solução (opcional)", placeholder="Ex.: Radar de Cancelamentos")
+    _texto("problema", "Problema *", area=True, height=120)
+    atual = st.session_state.spec.get("usuario")
+    opcoes = list(sb.USUARIOS)
+    escolha = st.radio("Usuário principal *", opcoes, format_func=sb.USUARIOS.get, horizontal=True,
+                       index=opcoes.index(atual) if atual in opcoes else None, key=f"{PREFIXO}usuario")
+    _guardar("usuario", escolha)
+    if escolha == "outro":
         _texto("usuario_outro", "Qual usuário? *", placeholder="Ex.: equipe de marketing")
 
 
-def _passo_escopo(estado: sb.EstadoSpec) -> None:
-    _checkboxes("proposta_itens", estado.tema.proposta_inicial, "**Itens da proposta inicial \\*** (desmarque o que não vai entrar)")
-    _checkboxes("aprofundamentos", estado.tema.aprofundamentos, "**Aprofundamentos escolhidos** (opcional)")
-    _texto(
-        "fora_escopo",
-        "Fora do escopo (um item por linha)",
-        area=True,
-        height=90,
-        placeholder="Ex.: login de usuários\nprevisão com inteligência artificial",
-    )
+def _p_escopo(estado):
+    pedidos = list(estado.tema.proposta_inicial) + list(estado.tema.aprofundamentos)
+    _checkboxes("escopo_pedido", pedidos, "**Dos pedidos da área cliente, o que entra?** (marque o que você vai atender)")
+    _texto("escopo_proprio", "Itens seus, além do pedido (um por linha)", area=True, height=90)
+    _texto("fora_escopo", "Fora do escopo (um por linha)", area=True, height=90)
 
 
-def _passo_dados(estado: sb.EstadoSpec) -> None:
+def _p_dados(estado):
     st.caption(
-        f"Gerado automaticamente da sua base tratada: {len(estado.df):,} linhas e {estado.df.shape[1]} colunas. ".replace(",", ".")
-        + "Você só pode editar o **significado**; nome, tipo e valores reais vêm dos dados."
+        f"Gerado da sua base tratada: {len(estado.df):,} linhas e {estado.df.shape[1]} colunas. ".replace(",", ".")
+        + "Nome, tipo e valores reais vêm dos dados; o significado vem da documentação da base e pode ser editado."
     )
-    origem = sb.origem_das_colunas(estado.tema, estado.passos, estado.resultados)
-    transformadas = sb.transformacoes(estado.passos, estado.resultados)
+    uids = [p if isinstance(p, str) else p["uid"] for p in estado.passos]
+    origem = sb.origem_das_colunas(uids, estado.resultados)
+    transf = sb.transformacoes(uids, estado.resultados)
     salvos = st.session_state.spec.get("significados", {})
-    tabela = sb.tabela_dados(estado.tema, estado.df, salvos, origem, transformadas)
-    chave = f"{PREFIXO}dados_{abs(hash(tuple(tabela['Coluna']))) % 10**8}"
+    tabela = sb.tabela_dados(estado.tema, estado.df, salvos, origem, transf, estado.blocos)
     editada = st.data_editor(
         tabela,
-        key=chave,
-        hide_index=True,
-        width="stretch",
-        height=min(38 * (len(tabela) + 1), 420),
+        key=f"{PREFIXO}dados_{abs(hash(tuple(tabela['Coluna']))) % 10**8}",
+        hide_index=True, width="stretch", height=min(38 * (len(tabela) + 1), 380),
         disabled=["Coluna", "Tipo", "Valores reais"],
         column_order=["Coluna", "Significado", "Tipo", "Valores reais"],
-        column_config={
-            "Coluna": st.column_config.TextColumn("Coluna", width="medium"),
-            "Tipo": st.column_config.TextColumn("Tipo", width="small"),
-            "Valores reais": st.column_config.TextColumn("Valores reais", width="medium"),
-            "Significado": st.column_config.TextColumn("Significado (editável)", width="large"),
-        },
+        column_config={"Significado": st.column_config.TextColumn("Significado (editável)", width="large")},
     )
-    # Guarda só o que a equipe mudou; o resto continua vindo do padrão (que acompanha a base).
-    padrao = sb.tabela_dados(estado.tema, estado.df, {}, origem, transformadas).set_index("Coluna")["Significado"]
-    mudados = {
-        col: sig for col, sig in zip(editada["Coluna"], editada["Significado"].fillna("")) if sig != padrao.get(col, "")
-    }
-    st.session_state.spec = {**st.session_state.spec, "significados": {**salvos, **mudados}}
-    vazios = int((editada["Significado"].fillna("").str.strip() == "").sum())
-    if vazios:
-        st.warning(f"{vazios} coluna(s) sem significado. Preencha para o agente não ter que adivinhar.")
+    padrao = sb.tabela_dados(estado.tema, estado.df, {}, origem, transf, estado.blocos).set_index("Coluna")["Significado"]
+    mudados = {c: s for c, s in zip(editada["Coluna"], editada["Significado"].fillna("")) if s != padrao.get(c, "")}
+    _guardar("significados", {**salvos, **mudados})
+    if (st.session_state.notas_diag or "").strip():
+        with st.expander("Suas anotações do diagnóstico", icon=":material/edit_note:"):
+            st.text(st.session_state.notas_diag)
+    _texto("cuidados", "Cuidados com os dados (um por linha)", area=True, height=110)
 
 
-def _passo_lista(estado: sb.EstadoSpec, campo: str, rotulo: str, exemplo: str) -> None:
-    _texto(campo, f"{rotulo} * (um item por linha)", area=True, height=180, placeholder=exemplo)
-    n = len(sb.linhas(st.session_state.spec.get(campo)))
-    st.caption(f"{n} item(ns). Já vem com sugestões do desafio: edite, apague ou acrescente linhas.")
-    ausentes = sb.colunas_citadas_ausentes(st.session_state.spec.get(campo) or "", estado.tema, estado.df)
-    if ausentes:
-        st.warning(
-            "Este texto cita coluna(s) que **não existem** na sua base tratada: "
-            + ", ".join(f"`{c}`" for c in ausentes)
-            + ". O agente não vai conseguir cumprir. Ajuste o texto ou volte ao tratamento."
-        )
+def _p_lista(estado, campo, rotulo):
+    _texto(campo, f"{rotulo} * (um item por linha)", area=True, height=170)
+    st.caption(f"{len(sb.linhas(st.session_state.spec.get(campo)))} item(ns).")
+    _aviso_colunas(estado, campo)
 
 
-def _passo_funcionalidades(estado):
-    _passo_lista(estado, "funcionalidades", "Funcionalidades", "Ex.: Filtrar o painel por tipo de contrato")
+def _p_funcionalidades(estado):
+    _p_lista(estado, "funcionalidades", "Funcionalidades")
 
 
-def _passo_regras(estado):
-    _passo_lista(estado, "regras_negocio", "Regras de negócio", "Ex.: Taxa = casos com alvo 1 ÷ total do filtro")
+def _p_regras(estado):
+    _p_lista(estado, "regras_negocio", "Regras de negócio")
 
 
-def _passo_arquitetura(estado):
-    _texto("stack", "Stack (tecnologias)", help="Padrão: Python + Streamlit + pandas + plotly.")
-    _checkboxes("restricoes", sb.RESTRICOES_PADRAO, "**Restrições**")
+def _p_arquitetura(estado):
+    _texto("stack", "Stack (tecnologias)", placeholder=f"Ex.: {sb.STACK_EXEMPLO}")
+    _checkboxes("restricoes", sb.RESTRICOES, "**Restrições para o agente** (marque as que valem)")
 
 
-def _passo_criterios(estado):
-    _passo_lista(
-        estado,
-        "criterios_aceitacao",
-        "Critérios de aceitação",
-        "Ex.: Dado que nenhum filtro está ativo, quando abro o painel, então vejo a taxa geral",
-    )
-    _texto("metrica_sucesso", "Métrica de sucesso do negócio", help="Como o negócio vai saber que a solução ajudou.")
+def _p_criterios(estado):
+    _p_lista(estado, "criterios_aceitacao", "Critérios de aceitação")
+    st.caption(sb.numeros_de_referencia(estado.tema, estado.df))
+    _texto("metrica_sucesso", "Métrica de sucesso do negócio")
 
 
-def _passo_apresentacao(estado):
-    _texto("formato", "Formato")
+def _p_apresentacao(estado):
+    _texto("formato", "Formato", placeholder="Ex.: pitch de 3 minutos")
     _texto("roteiro", "Roteiro", area=True, height=90)
 
 
-DESENHO = (
-    _passo_problema,
-    _passo_escopo,
-    _passo_dados,
-    _passo_funcionalidades,
-    _passo_regras,
-    _passo_arquitetura,
-    _passo_criterios,
-    _passo_apresentacao,
-)
+DESENHO = (_p_problema, _p_escopo, _p_dados, _p_funcionalidades, _p_regras, _p_arquitetura, _p_criterios,
+           _p_apresentacao)
 
 
 def _ir_passo(i: int) -> None:
     st.session_state.spec_passo = max(0, min(i, len(sb.PASSOS) - 1))
+
+
+CAMPOS_TEXTO = ("nome_solucao", "problema", "usuario_outro", "escopo_proprio", "fora_escopo", "cuidados",
+                "funcionalidades", "regras_negocio", "stack", "criterios_aceitacao", "metrica_sucesso", "formato",
+                "roteiro", "usuario")
+
+
+def _sincronizar() -> None:
+    """Leva para as respostas o que já foi digitado, antes de desenhar a navegação (marcadores em dia)."""
+    novos = {c: st.session_state[PREFIXO + c] for c in CAMPOS_TEXTO if PREFIXO + c in st.session_state}
+    if novos:
+        st.session_state.spec = {**st.session_state.spec, **novos}
+
+
+def _navegar(chave: str) -> None:
+    escolhido = st.session_state.get(chave)
+    if escolhido is not None:
+        _ir_passo(escolhido)
 
 
 def _alternar_texto() -> None:
@@ -200,52 +174,52 @@ def _alternar_texto() -> None:
 def render() -> None:
     tema = tema_atual()
     if tema is None:
-        st.warning("Escolha um desafio na etapa 1 antes de escrever a SPEC.")
+        st.warning("Escolha uma missão antes de escrever a SPEC.")
         rodape(pode_avancar=False)
         return
 
     estado = estado_spec()
-    st.header("5. Assistente da SPEC")
-    st.caption(
-        "Responda os 8 passos. As sugestões já vêm preenchidas a partir do desafio: leia, ajuste e complete. "
-        "À direita você vê a SPEC.md sendo montada. Depois de digitar, clique fora do campo "
-        "(ou tecle Ctrl+Enter) para a prévia atualizar."
+    _sincronizar()
+    cabecalho(
+        "Escreva a SPEC",
+        "A especificação é sua: em cada passo há perguntas para guiar o raciocínio. Os campos começam vazios. "
+        "À direita, o documento vai sendo montado.",
     )
-
     i = st.session_state.spec_passo
     passo = sb.PASSOS[i]
     esquerda, direita = st.columns([11, 9], gap="large")
     with esquerda:
         faltando = sb.faltando_por_passo(st.session_state.spec)
-        marcas = " · ".join(
-            (f"**:blue[{n + 1}]**" if n == i else (f"{n + 1}⚠️" if n in faltando else f"{n + 1}✓"))
-            for n in range(len(sb.PASSOS))
+        nomes = [p.titulo.split(". ", 1)[1] for p in sb.PASSOS]
+        st.segmented_control(
+            "Passos da SPEC", options=list(range(len(sb.PASSOS))), default=i, key=f"spec_nav_{i}",
+            format_func=lambda n: f"{n + 1}" + (" •" if n in faltando else ""), label_visibility="collapsed",
+            on_change=_navegar, args=(f"spec_nav_{i}",),
         )
-        st.markdown(f"Passo {i + 1} de {len(sb.PASSOS)} — {marcas}")
+        st.caption("• = campo obrigatório ainda vazio")
         with st.container(border=True):
-            st.subheader(passo.titulo)
+            st.subheader(passo.titulo, anchor=False)
             st.markdown(f"**{passo.pergunta}**")
+            st.markdown("\n".join(f"- {g}" for g in passo.guia))
             DESENHO[i](estado)
-        por_que_importa(passo.porque)
+            with st.expander("Travou? Veja um exemplo de outro contexto (biblioteca municipal)", icon=":material/lightbulb:"):
+                st.text(passo.exemplo)
+        dica(passo.porque)
         a, b = st.columns(2)
-        a.button("◀ Passo anterior", on_click=_ir_passo, args=(i - 1,), disabled=i == 0, width="stretch")
-        b.button(
-            "Próximo passo ▶",
-            on_click=_ir_passo,
-            args=(i + 1,),
-            disabled=i == len(sb.PASSOS) - 1,
-            type="primary",
-            width="stretch",
-        )
+        a.button(f"Anterior: {nomes[i - 1]}" if i else "Anterior", icon=":material/chevron_left:",
+                 on_click=_ir_passo, args=(i - 1,), disabled=i == 0, width="stretch")
+        b.button(f"Próximo: {nomes[i + 1]}" if i < len(nomes) - 1 else "Próximo", icon=":material/chevron_right:",
+                 icon_position="right", on_click=_ir_passo, args=(i + 1,), disabled=i == len(sb.PASSOS) - 1,
+                 type="primary", width="stretch")
 
-    estado = estado_spec()  # respostas atualizadas pelos widgets acima
-    texto = sb.montar_spec(estado)
+    texto = sb.montar_spec(estado_spec())
     with direita:
-        topo, botao = st.columns([3, 2])
-        topo.markdown("**👀 Prévia da SPEC.md**")
+        topo, botao = st.columns([3, 2], vertical_alignment="center")
+        topo.markdown("**Prévia da SPEC.md**")
         como_texto = st.session_state.get("spec_como_texto", False)
-        botao.button("Ver formatado" if como_texto else "Ver como texto", on_click=_alternar_texto, width="stretch")
-        with st.container(height=640, border=True):
+        botao.button("Ver formatado" if como_texto else "Ver como texto", on_click=_alternar_texto, width="stretch",
+                     icon=":material/article:" if como_texto else ":material/code:")
+        with st.container(height=680, border=True, key="previa"):
             if como_texto:
                 st.code(texto, language="markdown")
             else:
@@ -254,6 +228,6 @@ def render() -> None:
     faltando = sb.faltando_por_passo(st.session_state.spec)
     motivo = ""
     if faltando:
-        itens = "; ".join(f"passo {n + 1}: {', '.join(c)}" for n, c in sorted(faltando.items()))
-        motivo = f"Preencha os campos obrigatórios (*) — {itens}."
+        motivo = "Campos obrigatórios vazios — " + "; ".join(
+            f"passo {n + 1}: {', '.join(c)}" for n, c in sorted(faltando.items()))
     rodape(pode_avancar=not faltando, motivo=motivo)
