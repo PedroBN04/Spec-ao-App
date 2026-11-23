@@ -1,0 +1,12 @@
+# Configuração do Streamlit para o minicurso.
+[client]
+# Esconde o menu de desenvolvedor e o botão "Deploy" (em inglês) para os participantes.
+toolbarMode = "viewer"
+# Nunca mostrar traceback técnico; o app já mostra mensagens em português.
+showErrorDetails = "none"
+
+[browser]
+gatherUsageStats = false
+
+[theme]
+base = "light"
