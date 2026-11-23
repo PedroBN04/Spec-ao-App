@@ -379,7 +379,10 @@ THEME = Theme(
     dominio="Telecomunicações",
     arquivo="data/telco_churn.csv",
     fonte="https://www.kaggle.com/datasets/blastchar/telco-customer-churn",
-    licenca="Base de exemplo da IBM publicada no Kaggle; licença não informada na página (conferir antes de redistribuir).",
+    licenca=(
+        "Data files © Original Authors (como informado no Kaggle): sem licença aberta. Base de exemplo da IBM, "
+        "usada aqui para fins educacionais, com atribuição à fonte."
+    ),
     alvo="Churn",
     descricao_base=(
         "Clientes de uma operadora de telecomunicações: dados de cadastro, serviços contratados, "

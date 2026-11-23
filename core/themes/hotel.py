@@ -298,8 +298,8 @@ THEME = Theme(
     arquivo="data/hotel_bookings.csv",
     fonte="https://www.kaggle.com/datasets/jessemostipak/hotel-booking-demand",
     licenca=(
-        "Dados do artigo de Antonio, Almeida e Nunes (Data in Brief, 2019), publicado em acesso aberto "
-        "(CC BY 4.0 — conferir na página do Kaggle)."
+        "CC BY 4.0 (Attribution 4.0 International). Dados de Antonio, Almeida e Nunes, "
+        "Hotel booking demand datasets, Data in Brief 22 (2019)."
     ),
     alvo="is_canceled",
     descricao_base=(

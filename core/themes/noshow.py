@@ -286,7 +286,7 @@ THEME = Theme(
     dominio="Saúde pública",
     arquivo="data/noshow_consultas.csv",
     fonte="https://www.kaggle.com/datasets/joniarroba/noshowappointments",
-    licenca="CC BY-NC-SA 4.0 (uso não comercial, com atribuição — conferir na página do Kaggle).",
+    licenca="CC BY-NC-SA 4.0: uso não comercial, com atribuição e compartilhamento pela mesma licença.",
     alvo="No-show",
     descricao_base=(
         "Consultas agendadas em unidades de saúde de Vitória-ES em 2016. "
