@@ -114,7 +114,7 @@ BLOCOS = (
         id='H10',
         titulo='Remover diárias (`adr`) negativas ou acima de 1.000',
         grupo='Outliers',
-        explicacao='Apaga as reservas com diária média (`adr`) negativa ou acima de 1.000 euros.',
+        explicacao='Apaga as reservas com diária média (`adr`) negativa ou acima de 1.000.',
         codigo='df = df[(df["adr"] >= 0) & (df["adr"] <= 1000)]',
         requer_colunas=('adr',),
         categoria='boa_pratica',
@@ -236,7 +236,7 @@ SPEC_DEFAULTS = {
         "Ver a taxa de cancelamento por faixa de antecedência da reserva (`lead_time`)",
         "Ver a taxa de cancelamento por tipo de depósito (`deposit_type`) e canal de venda (`distribution_channel`)",
         "Filtrar todos os gráficos por hotel e por ano de chegada",
-        "Ver o ranking dos 10 segmentos com maior taxa de cancelamento",
+        "Ver o ranking dos segmentos (até 10) com maior taxa de cancelamento",
     ],
     "regras_negocio": [
         "Taxa de cancelamento = soma de `is_canceled` (0/1) ÷ nº de reservas do filtro",
@@ -258,7 +258,7 @@ SPEC_DEFAULTS = {
 
 DICIONARIO = {
     "hotel": "Tipo de hotel (Resort Hotel = resort, City Hotel = hotel urbano)",
-    "is_canceled": "Alvo: a reserva foi cancelada? (1 = sim, 0 = não)",
+    "is_canceled": "Alvo: a reserva foi cancelada? (1 = cancelada ou hóspede não compareceu, 0 = hóspede veio)",
     "lead_time": "Antecedência: dias entre a reserva e a data de chegada",
     "arrival_date_year": "Ano de chegada",
     "arrival_date_month": "Mês de chegada (nome em inglês)",
@@ -284,7 +284,7 @@ DICIONARIO = {
     "company": "Código da empresa que fez/pagou a reserva (vazio = não foi empresa)",
     "days_in_waiting_list": "Dias na lista de espera até a confirmação",
     "customer_type": "Tipo de cliente (Transient = avulso, Contract = contrato, Group = grupo, Transient-Party = avulso ligado a outra reserva)",
-    "adr": "Diária média (average daily rate), em euros",
+    "adr": "Diária média (average daily rate); a base não informa a moeda",
     "required_car_parking_spaces": "Vagas de estacionamento pedidas",
     "total_of_special_requests": "Número de pedidos especiais (ex.: andar alto, cama de casal)",
     "reservation_status": "Situação final da reserva (Canceled, Check-Out, No-Show) — só conhecida depois do desfecho",
@@ -333,7 +333,7 @@ THEME = Theme(
         "total_noites": "Total de noites da reserva (fim de semana + dias úteis)",
     },
     observacoes=(
-        ("is_canceled", "`is_canceled` = 1 significa reserva CANCELADA; 0 significa que o hóspede veio (ou não avisou)."),
+        ("is_canceled", "`is_canceled` = 1 significa reserva cancelada OU hóspede que não apareceu (no-show); 0 significa que o hóspede veio (check-out)."),
         ("adr", "`adr` = 0 é válido: cortesias, pacotes e reservas de funcionários."),
         ("agent", "`agent` vazio ou \"Sem agente\" = reserva feita sem agência (não é erro)."),
         ("company", "`company` vazia = a reserva não foi feita por empresa (não é erro)."),

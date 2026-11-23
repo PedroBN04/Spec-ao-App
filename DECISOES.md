@@ -193,3 +193,13 @@ precisou de 5 suposições. Melhorias:
 
 Resultado da 2ª rodada: 4/4 critérios + 2 conferências extras (ordenação e só clientes ativos), sem
 suposições sobre dados ou regras.
+
+## Revisão dos textos (após o deploy)
+
+68. **Uso educacional:** o repositório continua público; o README abre com o aviso "Projeto educacional,
+    sem fins comerciais" e a etapa 1 mostra que as bases são usadas só para fins educativos.
+69. **Correções de texto no hotel** (conferidas nos dados): `is_canceled = 1` inclui cancelamentos **e**
+    no-shows (as 291 reservas "No-Show" têm `is_canceled = 1`); a base não informa a moeda de `adr`
+    (tiramos "euros"); só 8 segmentos hotel × depósito × canal têm ≥ 100 reservas, então a
+    funcionalidade fala em "ranking dos segmentos (até 10)".
+70. **README** passou a descrever a amostra do hotel como ela é (6 linhas raras sempre incluídas).

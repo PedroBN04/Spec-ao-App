@@ -63,5 +63,6 @@ def render() -> None:
         st.markdown("\n".join(f"- {item}" for item in tema.aprofundamentos))
         st.markdown(f"**Sobre a base:** {tema.descricao_base}")
         st.markdown(f"**Fonte:** [{tema.fonte}]({tema.fonte})  \n**Licença:** {tema.licenca}")
+        st.caption("📚 As bases são usadas apenas para fins educativos, com atribuição às fontes.")
 
     rodape(pode_avancar=tema is not None and not pendente, motivo="Escolha um desafio para avançar.")
