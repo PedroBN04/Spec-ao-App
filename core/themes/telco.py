@@ -400,4 +400,15 @@ THEME = Theme(
     regras_checklist=REGRAS,
     spec_defaults=SPEC_DEFAULTS,
     emoji="📱",
+    alvos_aceitos=(),
+    vazamento_derivado=("taxa_churn_pagamento",),
+    dicionario_extra={
+        "faixa_tenure": "Faixa de tempo de casa (0-12, 13-24, 25-48 ou 49-72 meses), criada a partir de `tenure`",
+        "taxa_churn_pagamento": "Taxa de churn da forma de pagamento do cliente — calculada a partir do alvo (vazamento)",
+    },
+    observacoes=(
+        ("Churn", "`Churn` = 1 (ou \"Yes\") significa que o cliente CANCELOU; 0 (ou \"No\") significa que continua."),
+        ("tenure", "`tenure` = 0 são clientes que acabaram de chegar: ainda não tiveram cobrança acumulada."),
+        ("customerID", "`customerID` identifica o cliente: use para listar clientes, nunca para calcular."),
+    ),
 )

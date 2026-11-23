@@ -15,7 +15,7 @@ RAIZ = Path(__file__).resolve().parent.parent
 ETAPAS = ["Boas-vindas", "Desafio", "Diagnóstico", "Tratamento", "Checklist", "Spec", "Exportar"]
 
 # Chaves de st.session_state que dependem do tema escolhido. Trocar de tema zera todas.
-CHAVES_DO_TEMA = ("passos", "df_atual", "diagnostico_lido", "justificativas", "spec")
+CHAVES_DO_TEMA = ("passos", "resultados", "df_atual", "avisos", "diagnostico_lido", "justificativas", "spec", "spec_passo")
 
 
 # ---------------------------------------------------------------------------
@@ -30,10 +30,13 @@ VALORES_INICIAIS = {
     "tema_id": None,
     "tema_pendente": None,
     "passos": list,
+    "resultados": dict,
     "df_atual": None,
+    "avisos": list,
     "diagnostico_lido": False,
     "justificativas": dict,
     "spec": dict,
+    "spec_passo": 0,
 }
 
 
@@ -61,7 +64,8 @@ def escolher_tema(tema_id: str) -> None:
     if st.session_state.get("tema_id") != tema_id:
         for chave in CHAVES_DO_TEMA:
             st.session_state[chave] = VALORES_INICIAIS[chave]() if callable(VALORES_INICIAIS[chave]) else VALORES_INICIAIS[chave]
-            st.session_state.pop(f"w_{chave}", None)
+        for chave in [k for k in st.session_state if str(k).startswith("w_") and k != "w_equipe"]:
+            del st.session_state[chave]
     st.session_state.tema_id = tema_id
     st.session_state.tema_pendente = None
 
@@ -78,6 +82,60 @@ def carregar_base(tema: Theme) -> pd.DataFrame:
     (cache_resource evita uma cópia por sessão; ver DECISOES.md.)
     """
     return _ler_csv(tema.arquivo)
+
+
+def df_atual(tema: Theme) -> pd.DataFrame:
+    """Base atual do pipeline (a original, sem cópia, enquanto nenhum bloco foi aplicado)."""
+    atual = st.session_state.get("df_atual")
+    return carregar_base(tema) if atual is None else atual
+
+
+def avisar(tipo: str, texto: str, detalhe: str | None = None) -> None:
+    """Guarda uma mensagem para mostrar no topo da etapa na próxima execução."""
+    st.session_state.avisos.append((tipo, texto, detalhe))
+
+
+def mostrar_avisos() -> None:
+    for tipo, texto, detalhe in st.session_state.get("avisos", []):
+        getattr(st, tipo)(texto)
+        if detalhe:
+            with st.expander("Detalhe técnico do erro"):
+                st.code(detalhe, language="text")
+    st.session_state.avisos = []
+
+
+def fmt_int(n: int) -> str:
+    return f"{n:,}".replace(",", ".")
+
+
+def fmt_pct(x: float, casas: int = 1) -> str:
+    return f"{x * 100:.{casas}f}%".replace(".", ",")
+
+
+SELO = {
+    "boa_pratica": ("Boa prática", "✅", "green"),
+    "armadilha": ("Armadilha", "⚠️", "red"),
+    "depende": ("Depende do objetivo", "🤔", "orange"),
+}
+
+
+def selo(categoria: str) -> None:
+    rotulo, icone, cor = SELO[categoria]
+    st.badge(rotulo, icon=icone, color=cor)
+
+
+MAX_COLUNAS_TABELA = 50
+
+
+def tabela_amostra(df: pd.DataFrame, linhas: int = 20) -> None:
+    """Mostra as primeiras linhas; limita as colunas exibidas para bases muito largas."""
+    if df.shape[1] > MAX_COLUNAS_TABELA:
+        st.caption(
+            f"A base tem {fmt_int(df.shape[1])} colunas; mostrando só as {MAX_COLUNAS_TABELA} primeiras "
+            "para a tela não travar. O arquivo exportado terá todas."
+        )
+        df = df.iloc[:, :MAX_COLUNAS_TABELA]
+    st.dataframe(df.head(linhas), width="stretch")
 
 
 def campo_persistente(chave: str) -> str:

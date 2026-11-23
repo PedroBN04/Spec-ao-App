@@ -38,6 +38,24 @@ def eh_numerica(serie: pd.Series) -> bool:
     return pd.api.types.is_numeric_dtype(serie) and not pd.api.types.is_bool_dtype(serie)
 
 
+def tipo_amigavel(dtype) -> str:
+    """Nome do tipo do pandas em português simples."""
+    nome = str(dtype)
+    if nome in ("object", "string", "str"):
+        return "texto"
+    if nome.startswith(("int", "Int", "uint")):
+        return "número inteiro"
+    if nome.startswith(("float", "Float")):
+        return "número decimal"
+    if nome.startswith("datetime"):
+        return "data/hora"
+    if nome == "bool":
+        return "verdadeiro/falso"
+    if nome == "category":
+        return "categoria"
+    return nome
+
+
 def parece_numero(serie: pd.Series) -> bool:
     """Coluna de texto cujos valores (não vazios) são ≥ 90% convertíveis em número após strip()."""
     if not eh_texto(serie):

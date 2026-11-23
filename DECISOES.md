@@ -54,3 +54,33 @@ Regra geral (CLAUDE.md): na dúvida, a opção mais simples.
     e nunca alterada": o executor sempre roda sobre `df.copy()` e nenhuma tela altera a original.
 20. **Licenças não puderam ser conferidas:** o kaggle.com está fora da rede permitida do ambiente de
     desenvolvimento. Os textos de licença ficam marcados "conferir" até a organização confirmar.
+
+## Marcos M3 e M4 — Tratamento e checklist
+
+21. **Desfazer em cascata:** além de colunas faltando, um passo cujo **bloco pré-requisito** foi desfeito
+    também sai (ex.: desfazer T01 remove T02, com aviso). Um passo que der erro ao ser reaplicado também
+    sai, com aviso.
+22. **Motivo de bloco desabilitado:** se falta um bloco: "Este bloco precisa que o bloco T01 seja aplicado
+    antes."; se falta uma coluna criada por outro bloco: "Este bloco precisa da coluna `x`. Aplique antes
+    o bloco N04 ou N05." (os blocos que criam a coluna são achados no próprio código); se a coluna existia
+    na base original: "...que não existe mais na base atual (um passo anterior removeu ou renomeou)".
+23. **N04 e N05 juntos:** ambos podem ser aplicados (cada um uma vez); vale o último.
+24. **"Ver código"** é um botão que mostra/esconde o código (o Streamlit não permite um expander dentro de
+    outro).
+25. **Bases muito largas (T11):** a tabela mostra só as 50 primeiras colunas, com aviso. O CSV exportado
+    tem todas. O código do bloco não muda.
+26. **Tipos amigáveis:** a etapa 3 mostra "texto → número decimal" em vez de `object → float64`.
+27. **Mensagem após aplicar:** além do cartão no pipeline (com `st.warning` + sugestão para armadilhas),
+    o topo mostra "Bloco X aplicado. Veja a avaliação em Meu pipeline", porque o pipeline pode estar
+    fora da tela em 1366×768.
+28. **Clique duplo em Aplicar:** o callback ignora um bloco que já está no pipeline.
+29. **Checklist — G01 "versão tratada"**: `Theme.alvos_aceitos` (noshow: `faltou`, `no_show_original`).
+    Depois do T11, `Churn` vira `Churn_No`/`Churn_Yes` e G01 acusa erro — comportamento intencional.
+30. **Checklist — G02 "nem derivada"**: `Theme.vazamento_derivado` (telco: `taxa_churn_pagamento`; hotel:
+    prefixo `status_`). A spec também tem regras do tema para o mesmo caso; as duas contam (ex.: T09 gera
+    G02 e TEL01), como a spec descreve.
+31. **Item informativo (G07)** aparece como "ℹ️ Informação" e não entra no placar nem na nota.
+32. **"Vou corrigir"** não libera o avanço: o item só sai da lista quando a regra passa. "Vou manter" exige
+    justificativa com ≥ 15 caracteres (sem contar espaços nas pontas). Justificativas ficam guardadas por
+    regra; se a regra passar depois, a justificativa é ignorada.
+33. **Regra com defeito** (exceção dentro da função) aparece como não verificada, sem derrubar a tela.

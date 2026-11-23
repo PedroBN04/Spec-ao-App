@@ -2,7 +2,7 @@
 
 Acréscimos em relação à spec (ver DECISOES.md):
 - Block.sugestao: id do bloco correto sugerido quando o participante aplica uma armadilha.
-- Theme.emoji: ícone do cartão na etapa 1.
+- Theme.emoji, alvos_aceitos, vazamento_derivado, dicionario_extra, observacoes.
 """
 
 from dataclasses import dataclass, field
@@ -57,6 +57,14 @@ class Theme:
     regras_checklist: tuple[Check, ...]
     spec_defaults: dict  # sugestões pré-preenchidas no assistente (seção 9)
     emoji: str = "📊"
+    # Nomes aceitos para o alvo depois de tratado (G01). O alvo original sempre conta.
+    alvos_aceitos: tuple[str, ...] = ()
+    # Colunas derivadas do alvo (nome exato ou prefixo terminado em "_"), além de colunas_vazamento (G02).
+    vazamento_derivado: tuple[str, ...] = ()
+    # Descrição padrão de colunas criadas ou renomeadas pelos blocos (assistente da SPEC, passo 3).
+    dicionario_extra: dict[str, str] = field(default_factory=dict)
+    # Observações automáticas da SPEC (seção 3.3): (coluna que precisa existir, texto).
+    observacoes: tuple[tuple[str, str], ...] = ()
 
     def bloco(self, block_id: str) -> Block:
         for b in self.blocos:
