@@ -139,3 +139,18 @@ Regra geral (CLAUDE.md): na dúvida, a opção mais simples.
 53. **Observação (não alterado):** o feedback do H05 diz "apagou mais de 90% da base"; se o H04 for
     aplicado antes, o H05 remove bem menos (~14%). O texto é o da spec; as métricas ao lado mostram o
     valor real.
+
+## Marco M7 — Polimento e deploy
+
+54. **`.streamlit/config.toml`:** `toolbarMode = "viewer"` (esconde o botão "Deploy" e o menu de
+    desenvolvedor, em inglês), `showErrorDetails = "none"` (nunca mostrar traceback), tema claro e sem
+    coleta de estatísticas de uso.
+55. **Dica "Press Enter to apply"** do Streamlit (em inglês) escondida com uma regra de CSS de uma linha;
+    os campos orientam em português ("digite e tecle Enter", "clique fora do campo ou tecle Ctrl+Enter").
+56. **Termos técnicos** ganharam dica na primeira aparição: CSV e agente de código (etapa 0), pipeline e
+    bloco/pandas (etapa 3), nulo, alvo, histograma, tipos (etapa 2).
+57. **Erro inesperado** mostra só "Tipo: mensagem" no expander técnico (sem traceback).
+58. **Limitação conhecida:** menus internos de componentes do Streamlit (ex.: ícones da tabela, indicador
+    "Running" no canto) continuam em inglês; não há configuração para traduzi-los.
+59. **Deploy:** Python 3.12 no Streamlit Community Cloud; `requirements.txt` com faixas de versão
+    testadas (instalação limpa conferida: streamlit 1.67.0, pandas 2.3.3, numpy 2.5.5, plotly 6.9.0).

@@ -100,7 +100,11 @@ def _cartao_bloco(tema: Theme, bloco: Block, motivo: str | None) -> None:
 
 
 def _catalogo(tema: Theme) -> None:
-    st.subheader("📚 Catálogo de blocos")
+    st.subheader(
+        "📚 Catálogo de blocos",
+        help="Cada bloco é um pequeno trecho de código pandas (biblioteca de Python para tabelas) "
+        "que transforma a base. Você não precisa escrever código: só escolher.",
+    )
     st.caption("Leia a explicação, veja o código se quiser e clique em **Aplicar**. A avaliação aparece depois.")
     original = carregar_base(tema)
     atual = df_atual(tema)
@@ -152,7 +156,11 @@ def _metricas_passo(r: StepResult) -> None:
 
 
 def _pipeline(tema: Theme) -> None:
-    st.subheader("🛠️ Meu pipeline")
+    st.subheader(
+        "🛠️ Meu pipeline",
+        help="Pipeline é a sequência de tratamentos que você aplicou, na ordem. "
+        "O app sempre refaz essa sequência a partir da base original.",
+    )
     passos = st.session_state.passos
     if not passos:
         st.info("Nenhum passo ainda. Aplique um bloco do catálogo para começar.")

@@ -18,8 +18,10 @@ def render() -> None:
     with col_arquivos:
         st.markdown(
             "**No final você baixa 2 arquivos:**\n"
-            "- `dados_tratados.csv` — a base depois dos seus tratamentos;\n"
-            "- `SPEC.md` — o documento que explica ao agente de código o que construir."
+            "- `dados_tratados.csv` — a base depois dos seus tratamentos "
+            "(CSV é uma planilha salva como texto: abre no Excel e em qualquer programa de dados);\n"
+            "- `SPEC.md` — o documento que explica ao **agente de código** o que construir "
+            "(agente de código é um assistente de IA que escreve programas, como o Claude Code)."
         )
     with col_tempo:
         st.metric("Tempo estimado", "≈ 60 min")
@@ -29,8 +31,8 @@ def render() -> None:
         key=campo_persistente("equipe"),
         on_change=salvar_campo,
         args=("equipe",),
-        placeholder="Ex.: Equipe Alfa",
-        help="Obrigatório. Aparece no nome dos arquivos e na SPEC.",
+        placeholder="Ex.: Equipe Alfa (digite e tecle Enter)",
+        help="Obrigatório. Aparece no nome dos arquivos e na SPEC. Digite e tecle Enter.",
         max_chars=40,
     )
     salvar_campo("equipe")

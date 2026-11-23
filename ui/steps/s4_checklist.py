@@ -51,7 +51,8 @@ def _decisao(r: ck.ResultadoCheck) -> None:
             on_change=_salvar_decisao,
             args=(cid,),
             height=80,
-            placeholder="Ex.: o painel precisa mostrar os clientes novos, por isso mantive as linhas.",
+            placeholder="Ex.: o painel precisa mostrar os clientes novos, por isso mantive as linhas. "
+            "(Clique fora do campo ou tecle Ctrl+Enter para registrar.)",
         )
         texto = st.session_state[f"w_just_{cid}"]
         if ck.justificativa_valida(texto):

@@ -17,6 +17,9 @@ ETAPAS = [s0_boas_vindas, s1_desafio, s2_diagnostico, s3_tratamento, s4_checklis
 
 st.set_page_config(page_title="Da Spec ao App", page_icon="🧪", layout="wide")
 
+# Esconde a dica "Press Enter to apply" (em inglês) dos campos de texto; o app orienta em português.
+st.html("<style>[data-testid='InputInstructions']{display:none}</style>")
+
 iniciar_estado()
 barra_progresso()
 
@@ -28,4 +31,4 @@ except Exception as erro:  # nenhuma exceção técnica deve aparecer crua para 
         "Se o problema continuar, chame a organização."
     )
     with st.expander("Detalhes técnicos (para a organização)"):
-        st.exception(erro)
+        st.code(f"{type(erro).__name__}: {erro}", language="text")

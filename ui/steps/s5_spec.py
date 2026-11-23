@@ -206,7 +206,8 @@ def render() -> None:
     st.header("5. Assistente da SPEC")
     st.caption(
         "Responda os 8 passos. As sugestões já vêm preenchidas a partir do desafio: leia, ajuste e complete. "
-        "À direita você vê a SPEC.md sendo montada."
+        "À direita você vê a SPEC.md sendo montada. Depois de digitar, clique fora do campo "
+        "(ou tecle Ctrl+Enter) para a prévia atualizar."
     )
 
     i = st.session_state.spec_passo
