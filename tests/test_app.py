@@ -263,3 +263,93 @@ def test_respostas_sobrevivem_a_ida_e_volta():
     assert at.session_state.spec["nome_solucao"] == "Radar de Churn"
     assert "# SPEC — Radar de Churn" in _preview(at)
     assert at.session_state.spec["aprofundamentos"] == [at.session_state.spec["aprofundamentos"][0]]
+
+
+# --- Jornadas completas dos três temas ------------------------------------------
+
+
+def _jornada_completa(tema_id, blocos):
+    import io
+
+    import pandas as pd
+
+    from core import exporter
+    from core.themes import REGISTRY
+    from ui.steps.s5_spec import estado_spec  # noqa: F401  (garante que o módulo importa)
+
+    at = _ate_diagnostico(tema_id, equipe="Equipe São João")
+    at.checkbox(key="w_diagnostico_lido").check().run()
+    _avancar(at)
+    for b in blocos:
+        _aplicar(at, b)
+    assert at.session_state.passos == blocos
+    _avancar(at)
+    for radio in [r for r in at.radio if r.key and r.key.startswith("w_dec_")]:
+        cid = radio.key.removeprefix("w_dec_")
+        radio.set_value("manter").run()
+        at.text_area(key=f"w_just_{cid}").input(f"Decisão consciente da equipe sobre {cid}").run()
+    assert not _botao(at, "Avançar →").disabled
+    _avancar(at)
+    assert not _botao(at, "Avançar →").disabled
+    _avancar(at)
+    assert at.session_state.etapa == 6
+    tema = REGISTRY[tema_id]
+    df = at.session_state.df_atual
+    texto = _preview_export(at)
+    lido = pd.read_csv(io.BytesIO(exporter.gerar_csv(df)), encoding="utf-8-sig")
+    assert lido.shape == df.shape
+    for c in df.columns:
+        assert f"| `{c}` |" in texto
+    for b in blocos:
+        assert tema.bloco(b).titulo in texto
+    return at, texto
+
+
+def _preview_export(at):
+    """Monta a SPEC com o mesmo estado da sessão (o AppTest não clica em download)."""
+    from core import checklist as ck
+    from core import spec_builder as sb
+    from core.themes import REGISTRY
+
+    ss = at.session_state
+    tema = REGISTRY[ss.tema_id]
+    import pandas as pd
+
+    original = pd.read_csv(Path(APP).parent / tema.arquivo)
+    e = sb.EstadoSpec(tema, ss.equipe, ss.df_atual, list(ss.passos), ss.resultados,
+                      ck.avaliar(tema, original, ss.df_atual, list(ss.passos)), ss.justificativas, ss.spec)
+    return sb.montar_spec(e)
+
+
+def test_jornada_completa_hotel():
+    _, texto = _jornada_completa("hotel", ["H01", "H02", "H03", "H04", "H06", "H08", "H11", "H12", "H14"])
+    assert "Alvo: `is_canceled`" in texto
+    assert "Depende do objetivo" in texto and "Armadilha" in texto
+    assert "`adr` = 0 é válido" in texto
+
+
+def test_jornada_completa_noshow():
+    _, texto = _jornada_completa("noshow", ["N01", "N03", "N05", "N06", "N08", "N13", "N14"])
+    assert "Alvo: `faltou`" in texto
+    assert "Erro mantido" in texto  # NOS03 (N05+N06 apagaram 1/3) justificado
+    assert "| `idade` |" in texto and "| `Age` |" not in texto
+
+
+def test_hotel_h07_desabilita_h08_na_tela():
+    at = _ate_tratamento("hotel")
+    _aplicar(at, "H07")
+    assert at.button(key="aplicar_H08").disabled
+    assert any("`reservation_status`, que não existe mais" in c.value for c in at.caption)
+
+
+def test_hotel_h05_mostra_erro_de_remocao():
+    at = _ate_tratamento("hotel")
+    _aplicar(at, "H05")
+    assert any("Este passo removeu" in e.value for e in at.error)
+
+
+def test_noshow_n14_desabilita_nomes_antigos_na_tela():
+    at = _ate_tratamento("noshow")
+    _aplicar(at, "N14")
+    for b in ["N01", "N03", "N07", "N09", "N13"]:
+        assert at.button(key=f"aplicar_{b}").disabled

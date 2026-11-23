@@ -10,6 +10,7 @@ from ui.components import (
     fmt_int,
     fmt_pct,
     mostrar_avisos,
+    SELO,
     rodape,
     selo,
     tabela_amostra,
@@ -114,16 +115,18 @@ def _catalogo(tema: Theme) -> None:
                 _cartao_bloco(tema, bloco, motivo)
 
 
+def _variacao(antes: int, depois: int) -> str:
+    if antes == depois:
+        return f"{fmt_int(depois)}"
+    sinal = "+" if depois > antes else "−"
+    return f"{fmt_int(antes)} → **{fmt_int(depois)}** ({sinal}{fmt_int(abs(depois - antes))})"
+
+
 def _metricas_passo(r: StepResult) -> None:
-    c = st.columns(3)
-    c[0].metric("Linhas", fmt_int(r.linhas_depois), delta=fmt_int(r.linhas_depois - r.linhas_antes) if r.linhas_depois != r.linhas_antes else None)
-    c[1].metric("Colunas", fmt_int(r.colunas_depois), delta=fmt_int(r.colunas_depois - r.colunas_antes) if r.colunas_depois != r.colunas_antes else None)
-    c[2].metric(
-        "Nulos",
-        fmt_int(r.nulos_depois),
-        delta=fmt_int(r.nulos_depois - r.nulos_antes) if r.nulos_depois != r.nulos_antes else None,
-        delta_color="inverse",
-        help="Nulo = célula vazia.",
+    st.markdown(
+        f"📏 Linhas: {_variacao(r.linhas_antes, r.linhas_depois)} · "
+        f"Colunas: {_variacao(r.colunas_antes, r.colunas_depois)} · "
+        f"Nulos (células vazias): {_variacao(r.nulos_antes, r.nulos_depois)}"
     )
     detalhes = []
     if r.colunas_criadas:
@@ -154,11 +157,12 @@ def _pipeline(tema: Theme) -> None:
     if not passos:
         st.info("Nenhum passo ainda. Aplique um bloco do catálogo para começar.")
         return
+    st.caption("O passo mais recente fica aberto; clique nos anteriores para rever.")
     for n, block_id in enumerate(passos, start=1):
         bloco = tema.bloco(block_id)
         r = st.session_state.resultados[block_id]
-        with st.container(border=True):
-            st.markdown(f"**Passo {n} · {bloco.id} · {bloco.titulo}**")
+        icone = SELO[bloco.categoria][1]
+        with st.expander(f"{icone} Passo {n} · {bloco.id} · {bloco.titulo}", expanded=n == len(passos)):
             selo(bloco.categoria)
             _metricas_passo(r)
             if bloco.categoria == "armadilha":

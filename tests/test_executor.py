@@ -100,3 +100,40 @@ def test_excecao_em_bloco_nao_altera_estado():
 def test_codigo_completo_na_ordem():
     texto = ex.codigo_completo(TELCO, ["T01", "T02"])
     assert texto.index(TELCO.bloco("T01").codigo) < texto.index(TELCO.bloco("T02").codigo)
+
+
+HOTEL = REGISTRY["hotel"]
+NOSHOW = REGISTRY["noshow"]
+
+
+def test_h07_desabilita_h08_com_motivo():
+    original = base("hotel")
+    pipe = ex.reexecutar(original, HOTEL, ["H07"])
+    motivo = ex.motivo_desabilitado(HOTEL, HOTEL.bloco("H08"), pipe.df, pipe.passos, list(original.columns))
+    assert motivo.startswith("Este bloco precisa da coluna `reservation_status`, que não existe mais")
+
+
+def test_n14_desabilita_blocos_com_nomes_antigos():
+    original = base("noshow")
+    pipe = ex.reexecutar(original, NOSHOW, ["N14"])
+    bloqueados = {
+        b.id for b in NOSHOW.blocos
+        if b.id != "N14" and ex.motivo_desabilitado(NOSHOW, b, pipe.df, pipe.passos, list(original.columns))
+    }
+    assert bloqueados == {"N01", "N02", "N03", "N04", "N05", "N06", "N07", "N08", "N09", "N10", "N11", "N12", "N13"}
+    motivo = ex.motivo_desabilitado(NOSHOW, NOSHOW.bloco("N07"), pipe.df, pipe.passos, list(original.columns))
+    assert "`Age`, que não existe mais" in motivo
+
+
+def test_n06_sem_dias_espera_indica_blocos():
+    original = base("noshow")
+    motivo = ex.motivo_desabilitado(NOSHOW, NOSHOW.bloco("N06"), original, [], list(original.columns))
+    assert motivo == "Este bloco precisa da coluna `dias_espera`. Aplique antes o bloco N04 ou N05."
+
+
+def test_desfazer_n03_remove_dependentes():
+    original = base("noshow")
+    pipe = ex.reexecutar(original, NOSHOW, ["N03", "N04", "N06", "N11", "N01"])
+    pipe = ex.desfazer(original, NOSHOW, pipe.passos, "N03")
+    assert pipe.passos == ["N01"]
+    assert {r[0] for r in pipe.removidos} == {"N04", "N06", "N11"}

@@ -56,8 +56,9 @@ def test_hotel_amostra_mantem_defeitos_raros():
     assert df["company"].isna().mean() > 0.8
 
 
-def test_telco_spec_defaults_completos():
-    d = REGISTRY["telco"].spec_defaults
+@pytest.mark.parametrize("tema_id", FORMATOS)
+def test_spec_defaults_completos(tema_id):
+    d = REGISTRY[tema_id].spec_defaults
     assert d["problema"] and d["usuario"] and d["metrica_sucesso"]
     assert len(d["funcionalidades"]) >= 4
     assert len(d["regras_negocio"]) >= 3

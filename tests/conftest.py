@@ -23,10 +23,17 @@ def executar(codigo: str, df: pd.DataFrame) -> pd.DataFrame:
 
 
 def aplicar_com_requisitos(tema: Theme, block_id: str, df: pd.DataFrame) -> pd.DataFrame:
-    """Aplica os blocos pré-requisito (recursivamente) e depois o bloco pedido."""
+    """Aplica os blocos pré-requisito (recursivamente), cria colunas que faltam usando o primeiro
+    bloco de boa prática que as cria, e depois aplica o bloco pedido."""
+    from core.executor import blocos_que_criam
+
     bloco = tema.bloco(block_id)
     for req in bloco.requer_blocos:
         df = aplicar_com_requisitos(tema, req, df)
+    for coluna in bloco.requer_colunas:
+        if coluna not in df.columns:
+            criadores = [b for b in blocos_que_criam(tema, coluna) if tema.bloco(b).categoria == "boa_pratica"]
+            df = aplicar_com_requisitos(tema, criadores[0], df)
     return executar(bloco.codigo, df)
 
 

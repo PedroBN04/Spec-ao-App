@@ -5,6 +5,7 @@ Junta as regras genéricas (G01–G07) com as regras do tema e calcula a nota.
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 
 import pandas as pd
@@ -26,6 +27,13 @@ class ResultadoCheck:
     def pendente(self) -> bool:
         """Erro ou alerta que não passou: precisa ser corrigido ou justificado."""
         return not self.passou and self.check.nivel in ("erro", "alerta")
+
+
+_IDENTIFICADOR = re.compile(r"(^id_|_id$|Id$|ID$|^id$)")
+
+
+def eh_identificador(coluna) -> bool:
+    return bool(_IDENTIFICADOR.search(str(coluna)))
 
 
 def colunas_vazamento_presentes(tema: Theme, df: pd.DataFrame) -> list[str]:
@@ -71,7 +79,8 @@ def regras_genericas(tema: Theme) -> tuple[Check, ...]:
         return False, f"Ainda há {int(nulos.sum())} célula(s) vazia(s): {lista}{extra}."
 
     def g05(orig, df, ids):
-        cols = [c for c in df.columns if dg.parece_numero(df[c])]
+        # Identificadores (PatientId, id_paciente...) DEVEM ser texto: não contam (DECISOES.md).
+        cols = [c for c in df.columns if dg.parece_numero(df[c]) and not eh_identificador(c)]
         if cols:
             return False, "Colunas de texto que parecem números: " + ", ".join(f"`{c}`" for c in cols) + "."
         return True, "Nenhuma coluna de número guardada como texto."

@@ -85,3 +85,56 @@ def test_pendencias_e_justificativa():
     assert not ck.pendencias(resultados, {"G04": {"decisao": "manter", "texto": "Mantive para análise de novos"}})
     assert not ck.justificativa_valida("   14 caractere ")  # 14 após strip
     assert ck.justificativa_valida("15 caracteres!!")
+
+
+def _avaliar_tema(tema_id, ids):
+    tema = REGISTRY[tema_id]
+    original = base(tema_id)
+    pipe = ex.reexecutar(original, tema, ids)
+    assert pipe.passos == ids
+    return {r.check.id: r for r in ck.avaliar(tema, original, pipe.df, ids)}
+
+
+def test_hotel_base_crua():
+    r = _avaliar_tema("hotel", [])
+    assert not r["G02"].passou and not r["HOT01"].passou
+    assert not r["G04"].passou and not r["HOT03"].passou and not r["HOT04"].passou and not r["HOT05"].passou
+
+
+def test_hotel_boas_praticas_resolvem():
+    r = _avaliar_tema("hotel", ["H01", "H02", "H03", "H04", "H06", "H08", "H09", "H10", "H13", "H14"])
+    pendentes = {k for k, v in r.items() if v.pendente}
+    assert pendentes == set()
+
+
+def test_hotel_h05_e_h07():
+    r = _avaliar_tema("hotel", ["H05"])
+    assert not r["HOT02"].passou and not r["G03"].passou
+    r = _avaliar_tema("hotel", ["H07"])
+    assert not r["G02"].passou and "status_Canceled" in r["G02"].mensagem and not r["HOT01"].passou
+
+
+def test_noshow_regras():
+    r = _avaliar_tema("noshow", [])
+    assert not r["NOS04"].passou and not r["NOS05"].passou and r["G01"].passou
+    r = _avaliar_tema("noshow", ["N02"])
+    assert not r["NOS01"].passou
+    r = _avaliar_tema("noshow", ["N03", "N05"])
+    assert not r["NOS02"].passou
+    r = _avaliar_tema("noshow", ["N03", "N05", "N06"])
+    assert not r["NOS03"].passou and r["NOS02"].passou
+    r = _avaliar_tema("noshow", ["N01", "N14"])
+    assert r["G01"].passou and r["NOS04"].passou
+    assert not r["NOS05"].passou and "`idade`" in r["NOS05"].mensagem
+    r = _avaliar_tema("noshow", ["N14"])
+    assert r["G01"].passou and "no_show_original" in r["G01"].mensagem
+
+
+def test_g05_ignora_identificadores():
+    assert ck.eh_identificador("PatientId") and ck.eh_identificador("id_paciente") and ck.eh_identificador("customerID")
+    assert not ck.eh_identificador("TotalCharges") and not ck.eh_identificador("Neighbourhood")
+
+
+def test_noshow_boas_praticas_resolvem():
+    r = _avaliar_tema("noshow", ["N01", "N03", "N04", "N06", "N07", "N10", "N11", "N12"])
+    assert {k for k, v in r.items() if v.pendente} == set()

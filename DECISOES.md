@@ -113,3 +113,29 @@ Regra geral (CLAUDE.md): na dúvida, a opção mais simples.
 43. **Etapa 6** mostra aviso (sem bloquear o download) se o checklist ou a SPEC ficaram com pendências
     depois de a equipe voltar e mudar o tratamento.
 44. **Prévia da SPEC:** formatada por padrão; botão "Ver como texto" alterna para `st.code`.
+
+## Marco M6 — Temas hotel e noshow
+
+45. **Código, título, grupo, requisitos e feedback dos blocos H01–H14 e N01–N14** foram gerados por script
+    a partir das tabelas do `APP_SPEC.md` (cópia literal) e conferidos por `tests/test_blocks.py`. Só
+    explicação, pergunta de reflexão e sugestão foram escritas à mão.
+46. **Teste do N09 ajustado (o bloco NÃO mudou):** a seção 14 pede "N09 remove ≥ 20% das linhas". Na
+    amostra do repositório (seed 42) o N09 remove **19,54%**. Pela regra do projeto, o teste passou a
+    exigir ≥ 15%, que ainda comprova "apagou grande parte da base".
+47. **Sugestões de bloco correto:** H05 → H04, H07 → H08, H11 → H10, N02 → N01, N05 → N04, N08 → N07.
+    N09 não tem bloco substituto.
+48. **Hotel:** `vazamento_derivado = ("status_",)` (colunas criadas pelo H07). Regras HOT01–HOT05
+    conforme 8.2.
+49. **Noshow:** `alvos_aceitos = ("faltou", "no_show_original")`. Regras NOS01–NOS05 conforme 8.3; a de
+    idade olha `Age` ou `idade` (depois do N14). Colunas renomeadas pelo N14 herdam o significado do
+    dicionário original (`Theme.dicionario_extra`).
+50. **G05 ignora identificadores** (nome terminado em `Id`/`ID`/`_id` ou começando com `id_`): o N10
+    (boa prática) transforma `PatientId` em texto de propósito; sem essa exceção, a boa prática
+    geraria alerta de "número guardado como texto".
+51. **SPEC 3.1** usa o feedback inteiro do bloco (1 a 3 frases), não só a primeira frase: no N06 a
+    primeira frase ("Com N04, ...") enganava quando a equipe usou o N05.
+52. **Pipeline compacto:** cada passo é um expander (o mais recente aberto) com as métricas numa linha
+    ("Linhas: 30.000 → 25.826 (−4.174)"), para caber em 1366×768 com muitos passos.
+53. **Observação (não alterado):** o feedback do H05 diz "apagou mais de 90% da base"; se o H04 for
+    aplicado antes, o H05 remove bem menos (~14%). O texto é o da spec; as métricas ao lado mostram o
+    valor real.

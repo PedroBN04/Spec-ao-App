@@ -253,9 +253,9 @@ def _celula(texto: str) -> str:
 
 
 def _resumo(feedback: str) -> str:
-    texto = feedback.replace("**", "").strip()
-    fim = texto.find(". ")
-    return texto if fim == -1 else texto[: fim + 1]
+    """Feedback do bloco sem marcação. Usamos o texto inteiro (são 1 a 3 frases): a primeira frase
+    sozinha pode enganar (ex.: N06 começa com "Com N04, ...")."""
+    return " ".join(feedback.replace("**", "").split())
 
 
 def _coluna_alvo(e: EstadoSpec) -> str:
