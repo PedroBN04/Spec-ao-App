@@ -406,6 +406,14 @@ THEME = Theme(
     regras_checklist=REGRAS,
     spec_defaults=SPEC_DEFAULTS,
     emoji="📱",
+    area_cliente="Diretoria de Retenção de Clientes",
+    solicitante="Gerência de Retenção",
+    missao=(
+        "Olá, time de dados! Estamos perdendo cerca de 1 em cada 4 clientes e as campanhas de retenção ainda "
+        "são decididas no \"achismo\". Precisamos de uma ferramenta simples para entender quais perfis "
+        "cancelam mais e onde agir primeiro. O TI exportou a base de clientes direto do sistema, do jeito que "
+        "estava — ninguém conferiu nem tratou nada."
+    ),
     alvos_aceitos=(),
     vazamento_derivado=("taxa_churn_pagamento",),
     dicionario_extra={

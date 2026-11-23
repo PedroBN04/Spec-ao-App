@@ -2,7 +2,9 @@
 
 Acréscimos em relação à spec (ver DECISOES.md):
 - Block.sugestao: id do bloco correto sugerido quando o participante aplica uma armadilha.
-- Theme.emoji, alvos_aceitos, vazamento_derivado, dicionario_extra, observacoes.
+- Theme.emoji, alvos_aceitos, vazamento_derivado, dicionario_extra, observacoes,
+  area_cliente, solicitante, missao (v2).
+- Categoria "livre" para blocos personalizados (v2).
 """
 
 from dataclasses import dataclass, field
@@ -10,7 +12,8 @@ from typing import Callable, Literal
 
 import pandas as pd
 
-Categoria = Literal["boa_pratica", "armadilha", "depende"]
+# "livre" = bloco personalizado montado pela pessoa (v2); não tem categoria de gabarito.
+Categoria = Literal["boa_pratica", "armadilha", "depende", "livre"]
 
 
 @dataclass(frozen=True)
@@ -63,8 +66,12 @@ class Theme:
     vazamento_derivado: tuple[str, ...] = ()
     # Descrição padrão de colunas criadas ou renomeadas pelos blocos (assistente da SPEC, passo 3).
     dicionario_extra: dict[str, str] = field(default_factory=dict)
-    # Observações automáticas da SPEC (seção 3.3): (coluna que precisa existir, texto).
+    # Observações sobre os dados (v2: usadas só no gabarito do facilitador): (coluna, texto).
     observacoes: tuple[tuple[str, str], ...] = ()
+    # Missão (v2): a solicitação da área cliente.
+    area_cliente: str = ""
+    solicitante: str = ""
+    missao: str = ""
 
     def bloco(self, block_id: str) -> Block:
         for b in self.blocos:

@@ -4,6 +4,23 @@
 > Leia inteiro antes de começar. Implemente na ordem dos **Marcos** (seção 13).
 > Quando esta spec não disser algo, escolha a opção mais simples e registre a decisão em `DECISOES.md`.
 
+> **Adendo v2 (23/11/2026, a pedido da organização).** Onde este adendo conflita com o restante da spec,
+> vale o adendo. Detalhes e motivos em `DECISOES.md` (seção "Versão 2").
+> - **Menos "mastigado":** durante a jornada o app **não revela** categoria, feedback, sugestão de bloco
+>   correto nem nota de qualidade. Isso tudo fica numa etapa final opcional, **"Revisão com o
+>   facilitador" (gabarito)**, liberada só depois da exportação.
+> - **Desafio = missão:** cada tema aparece como uma solicitação de uma área cliente; a pessoa pode ir além
+>   do pedido.
+> - **Diagnóstico** sem alertas que apontam colunas: roteiro de perguntas genéricas, Raio-X factual,
+>   explorador de colunas (estatísticas e relação com o alvo) e **anotações obrigatórias**.
+> - **Pipeline estilo n8n:** fluxo de nós (entrada → nós → saída) que podem ser reordenados e removidos,
+>   cada um com "por que este passo?". Além dos blocos da seção 8 (código intocado), há **blocos
+>   personalizados** configuráveis, cujo código pandas é gerado, exibido e executado.
+> - **Checklist → Revisão:** só fatos antes × depois; sem erro/alerta, nota ou justificativa obrigatória.
+> - **SPEC:** campos começam **vazios**, com perguntas-guia e um exemplo de outro domínio; `spec_defaults`
+>   viram a "SPEC de referência" do gabarito. Seção 3.1 sem categoria (com o motivo da equipe); 3.2 e 3.3
+>   escritas pela equipe.
+
 ---
 
 ## 1. Visão geral

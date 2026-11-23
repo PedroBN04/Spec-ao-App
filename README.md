@@ -2,11 +2,15 @@
 
 Laboratório guiado de dados e especificação, feito para o minicurso + hackathon de 24/11/2026.
 
-O participante escolhe um desafio com uma base de dados real, faz um diagnóstico visual, trata os dados
-clicando em blocos (boas práticas e **armadilhas** misturadas de propósito), passa por um checklist de
-qualidade e responde a um assistente que monta uma `SPEC.md`. No fim, baixa dois arquivos —
-`dados_tratados.csv` e `SPEC.md` — que entrega a um agente de código (Claude Code) para construir a
-solução do hackathon.
+> **Projeto educacional, sem fins comerciais.** As bases de dados em `data/` são usadas apenas para fins
+> educativos, com atribuição às fontes (ver [Créditos e licenças das bases](#créditos-e-licenças-das-bases)).
+
+O participante atua como analista de dados: aceita uma **missão** (uma solicitação de uma área cliente),
+investiga a base num **diagnóstico** guiado, monta uma **pipeline** de tratamento em blocos, no estilo de um
+fluxo do n8n (com blocos prontos e blocos configuráveis), **revisa** o resultado e escreve a **SPEC** por conta
+própria, com perguntas-guia. No fim, baixa `dados_tratados.csv` e `SPEC.md`, que entrega a um agente de
+código (Claude Code) para construir o painel do hackathon. Depois da exportação, uma etapa de **revisão
+com o facilitador** mostra o gabarito: quais blocos eram boas práticas, armadilhas ou "depende".
 
 > **Importante para quem for mexer no código:** os blocos de categoria "armadilha" e "depende" são errados
 > ou discutíveis **de propósito**. O código de cada bloco é cópia literal da seção 8 da `APP_SPEC.md` e um
@@ -54,7 +58,9 @@ As bases em `data/` são geradas a partir dos CSVs originais do Kaggle:
    `WA_Fn-UseC_-Telco-Customer-Churn.csv`, `hotel_bookings.csv` e `KaggleV2-May-2016.csv`.
 2. Rode `python scripts/preparar_dados.py`.
 
-O script copia a base telco inteira, tira amostras de 30.000 linhas (seed 42) das outras duas e confere
+O script copia a base telco inteira, tira amostras de 30.000 linhas (seed 42) das outras duas (no hotel,
+as 6 linhas com defeitos raros — `children` vazio, `adr` negativa ou acima de 1.000 — entram sempre; ver
+`DECISOES.md`, item 1) e confere
 que os "defeitos" usados nos blocos continuam presentes. Se algum sumir, ele falha com uma mensagem clara.
 
 ## Estrutura

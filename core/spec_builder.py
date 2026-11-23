@@ -1,6 +1,10 @@
-"""Assistente da SPEC (etapa 5) e montagem da SPEC.md (seções 9 e 9.1 da APP_SPEC).
+"""Assistente da SPEC (etapa 5) e montagem da SPEC.md — versão 2.
 
-Funções puras: recebem o estado como dicionário e não dependem do Streamlit.
+v2: a equipe escreve a SPEC por conta própria. Os campos começam vazios; cada passo traz perguntas-guia
+e um exemplo de OUTRO domínio (uma biblioteca municipal) para quem travar. Só o que é fato dos dados
+(nomes, tipos, valores reais, números de referência e os passos aplicados) é gerado automaticamente.
+
+Funções puras: recebem o estado como dicionário/dataclass e não dependem do Streamlit.
 """
 
 from __future__ import annotations
@@ -11,77 +15,133 @@ from datetime import date
 
 import pandas as pd
 
-from core import checklist as ck
 from core.diagnostics import tipo_amigavel
-from core.models import StepResult, Theme
+from core.models import Block, StepResult, Theme
 
 USUARIOS = {"gestor": "Gestor(a)", "atendente": "Atendente", "analista": "Analista", "outro": "Outro"}
 
-STACK_PADRAO = "Python + Streamlit + pandas + plotly"
-RESTRICOES_PADRAO = [
+STACK_EXEMPLO = "Python + Streamlit + pandas + plotly"
+RESTRICOES = [
     "Usar só o CSV fornecido (`dados_tratados.csv`)",
     "Não inventar dados",
     "Não usar APIs externas",
     "Não alterar o CSV",
     "Código em um único `app.py`, se possível",
 ]
-FORMATO_PADRAO = "Pitch de 3 minutos"
-ROTEIRO_PADRAO = "Problema → dados → decisão de tratamento → demo → impacto"
 
 
 @dataclass(frozen=True)
-class Passo:
+class PassoSpec:
     titulo: str
     pergunta: str
     porque: str
+    guia: tuple[str, ...]  # perguntas para orientar o raciocínio
+    exemplo: str  # exemplo de outro domínio (biblioteca), mostrado só se a pessoa pedir
 
 
 PASSOS = (
-    Passo(
+    PassoSpec(
         "1. Problema",
         "Que problema sua solução resolve, e para quem?",
         "Um agente de código sem problema claro constrói \"qualquer coisa que funcione\". "
         "O problema é a bússola de todas as decisões.",
+        (
+            "Quem sente esse problema no dia a dia?",
+            "O que essa pessoa não consegue saber ou decidir hoje?",
+            "O que se perde (dinheiro, tempo, pessoas atendidas) por causa disso?",
+        ),
+        "Problema: a coordenação da Biblioteca Municipal não sabe quais leitores costumam atrasar a "
+        "devolução, e os livros mais procurados ficam semanas indisponíveis.\n"
+        "Usuário principal: coordenação da biblioteca.",
     ),
-    Passo(
+    PassoSpec(
         "2. Objetivo e escopo",
-        "O que entra na primeira versão?",
+        "O que entra na primeira versão e o que fica de fora?",
         "Escopo explícito evita que o agente gaste tempo em funcionalidades que ninguém pediu. "
         "Dizer o que NÃO fazer é tão importante quanto o que fazer.",
+        (
+            "Dos pedidos da área cliente, quais você vai atender nesta versão?",
+            "Você vai além do pedido? Com o quê?",
+            "O que fica explicitamente de fora (para o agente não inventar)?",
+        ),
+        "Entra: painel com a taxa de atraso por tipo de livro e por bairro do leitor.\n"
+        "Fora do escopo: envio de mensagens aos leitores; cadastro de livros.",
     ),
-    Passo(
+    PassoSpec(
         "3. Dados",
-        "Confirme o dicionário das colunas do seu CSV.",
+        "Confira o dicionário das colunas e diga que cuidados o agente precisa ter.",
         "O agente só conhece seus dados pelo que você descreve. Colunas sem significado viram suposições — "
         "e suposições viram alucinações.",
+        (
+            "O significado de cada coluna ainda vale depois dos seus tratamentos?",
+            "Alguma coluna tem uma leitura que confunde (ex.: \"sim\" quer dizer o contrário do que parece)?",
+            "Alguma coluna não deve ser usada para prever o resultado? Por quê?",
+            "Que valores parecem estranhos mas são válidos?",
+        ),
+        "Cuidados: `dias_atraso` = 0 significa devolução no prazo; leitores com menos de 12 anos usam o "
+        "cadastro do responsável, então a coluna `idade` pode estar vazia para eles.",
     ),
-    Passo(
+    PassoSpec(
         "4. Funcionalidades",
         "O que o usuário consegue fazer na aplicação?",
         "Cada funcionalidade vira uma tarefa verificável para o agente.",
+        (
+            "O que o usuário precisa ver assim que abre o app?",
+            "Que filtros ou comparações ele vai querer fazer?",
+            "Ele precisa de uma lista (de clientes, reservas, consultas...) para agir?",
+        ),
+        "1. Ver a taxa de atraso geral.\n2. Ver a taxa de atraso por tipo de livro.\n"
+        "3. Filtrar por bairro do leitor.\n4. Ver a lista dos leitores com mais atrasos no ano.",
     ),
-    Passo(
+    PassoSpec(
         "5. Regras de negócio",
-        "Quais regras a solução deve respeitar?",
+        "Quais regras e fórmulas a solução deve respeitar?",
         "Regras escritas impedem que o agente invente fórmulas. É aqui que o resultado fica correto, "
         "não só bonito.",
+        (
+            "Como se calcula cada taxa ou número que aparece no app (usando quais colunas)?",
+            "Como você define o grupo \"de risco\" ou \"prioritário\"?",
+            "Como os números devem ser exibidos (porcentagem, casas decimais, ordem)?",
+        ),
+        "Taxa de atraso = empréstimos com `dias_atraso` > 0 ÷ total de empréstimos do filtro.\n"
+        "Leitor recorrente = 3 ou mais atrasos no ano.\nTaxas em % com 1 casa decimal.",
     ),
-    Passo(
+    PassoSpec(
         "6. Arquitetura e restrições",
-        "Como a solução deve ser construída?",
+        "Como a solução deve ser construída e o que o agente NÃO pode fazer?",
         "Restrições reduzem o espaço de erro do agente. Sem elas, ele pode buscar dados na internet ou criar "
         "uma estrutura complexa demais para 1 hora.",
+        (
+            "Com quais tecnologias a solução deve ser feita?",
+            "O agente pode buscar ou gerar dados novos?",
+            "A solução precisa ser simples a ponto de rodar com um único comando?",
+        ),
+        "Stack: Python + Streamlit + pandas.\nRestrições: usar só o CSV fornecido; não inventar dados.",
     ),
-    Passo(
+    PassoSpec(
         "7. Critérios de aceitação e métricas",
         "Como saberemos que ficou pronto e correto?",
         "Critério verificável é o que permite conferir o trabalho do agente. \"Ficar bonito\" não é "
-        "verificável; \"o painel mostra a taxa geral de 26,5% sem filtros\" é.",
+        "verificável; \"o painel mostra a taxa geral de 12,3% sem filtros\" é.",
+        (
+            "Que número o app deve mostrar sem nenhum filtro (veja os números de referência na prévia)?",
+            "O que deve acontecer quando o usuário usa cada filtro?",
+            "Como você confere a lista/ranking (quais colunas, qual ordem)?",
+        ),
+        "- Sem filtros, o painel mostra a taxa de atraso geral calculada do CSV.\n"
+        "- Ao filtrar por bairro, todos os gráficos se atualizam.\n"
+        "Métrica de sucesso: reduzir em 20% os atrasos dos leitores recorrentes em 3 meses.",
     ),
-    Passo(
+    PassoSpec(
         "8. Apresentação",
         "Como a equipe vai apresentar?",
         "A apresentação é parte da entrega. Planejar o roteiro agora orienta o que a aplicação precisa mostrar.",
+        (
+            "Quanto tempo vocês têm para apresentar?",
+            "Em que ordem vão contar a história (problema, dados, decisões, demonstração, impacto)?",
+        ),
+        "Formato: pitch de 3 minutos.\nRoteiro: problema → o que descobrimos nos dados → como tratamos → "
+        "demonstração → impacto esperado.",
     ),
 )
 
@@ -92,36 +152,34 @@ PASSOS = (
 
 
 def respostas_iniciais(tema: Theme) -> dict:
-    d = tema.spec_defaults
+    """v2: tudo começa vazio — a equipe escreve a SPEC."""
     return {
-        "nome_solucao": f"Painel — {tema.nome}",
-        "problema": d.get("problema", ""),
-        "usuario": d.get("usuario", "gestor"),
+        "nome_solucao": "",
+        "problema": "",
+        "usuario": None,
         "usuario_outro": "",
-        "proposta_itens": list(tema.proposta_inicial),
-        "aprofundamentos": [],
+        "escopo_pedido": [],
+        "escopo_proprio": "",
         "fora_escopo": "",
         "significados": {},
-        "funcionalidades": "\n".join(d.get("funcionalidades", [])),
-        "regras_negocio": "\n".join(d.get("regras_negocio", [])),
-        "stack": STACK_PADRAO,
-        "restricoes": list(RESTRICOES_PADRAO),
-        "criterios_aceitacao": "\n".join(d.get("criterios_aceitacao", [])),
-        "metrica_sucesso": d.get("metrica_sucesso", ""),
-        "formato": FORMATO_PADRAO,
-        "roteiro": ROTEIRO_PADRAO,
+        "cuidados": "",
+        "funcionalidades": "",
+        "regras_negocio": "",
+        "stack": "",
+        "restricoes": [],
+        "criterios_aceitacao": "",
+        "metrica_sucesso": "",
+        "formato": "",
+        "roteiro": "",
     }
 
 
 def linhas(texto: str | list | None) -> list[str]:
     """Lista a partir de texto com um item por linha (ignora linhas vazias e marcadores)."""
-    if isinstance(texto, list):
-        itens = texto
-    else:
-        itens = (texto or "").splitlines()
+    itens = texto if isinstance(texto, list) else (texto or "").splitlines()
     limpos = []
     for item in itens:
-        item = str(item).strip().lstrip("-*•").strip()
+        item = re.sub(r"^\s*(?:[-*•]|\d+[.)])\s*", "", str(item)).strip()
         if item:
             limpos.append(item)
     return limpos
@@ -130,7 +188,11 @@ def linhas(texto: str | list | None) -> list[str]:
 def usuario_texto(r: dict) -> str:
     if r.get("usuario") == "outro":
         return (r.get("usuario_outro") or "").strip()
-    return USUARIOS.get(r.get("usuario", ""), "")
+    return USUARIOS.get(r.get("usuario") or "", "")
+
+
+def itens_escopo(r: dict) -> list[str]:
+    return list(r.get("escopo_pedido") or []) + linhas(r.get("escopo_proprio"))
 
 
 def faltando_por_passo(r: dict) -> dict[int, list[str]]:
@@ -144,8 +206,8 @@ def faltando_por_passo(r: dict) -> dict[int, list[str]]:
         add(0, "Problema")
     if not usuario_texto(r):
         add(0, "Usuário principal")
-    if not r.get("proposta_itens"):
-        add(1, "Itens da proposta inicial (marque pelo menos 1)")
+    if not itens_escopo(r):
+        add(1, "O que entra nesta versão (pelo menos 1 item)")
     if not linhas(r.get("funcionalidades")):
         add(3, "Funcionalidades (pelo menos 1)")
     if not linhas(r.get("regras_negocio")):
@@ -160,44 +222,52 @@ def faltando_por_passo(r: dict) -> dict[int, list[str]]:
 # ---------------------------------------------------------------------------
 
 
-def origem_das_colunas(tema: Theme, passos: list[str], resultados: dict[str, StepResult]) -> dict[str, str]:
-    """Coluna -> id do bloco que a criou (o último que criou vale)."""
+def origem_das_colunas(passos_uid: list[str], resultados: dict[str, StepResult]) -> dict[str, str]:
+    """Coluna -> uid do passo que a criou (o último que criou vale)."""
     origem: dict[str, str] = {}
-    for bid in passos:
-        r = resultados.get(bid)
+    for chave in passos_uid:
+        r = resultados.get(chave)
         if r:
             for c in r.colunas_criadas:
-                origem[c] = bid
+                origem[c] = chave
     return origem
 
 
-def transformacoes(passos: list[str], resultados: dict[str, StepResult]) -> dict[str, list[str]]:
-    """Coluna -> blocos que mudaram o tipo dela (ex.: Churn texto -> 0/1 pelo T07)."""
+def transformacoes(passos_uid: list[str], resultados: dict[str, StepResult]) -> dict[str, list[str]]:
+    """Coluna -> uids dos passos que mudaram o tipo dela."""
     mudou: dict[str, list[str]] = {}
-    for bid in passos:
-        r = resultados.get(bid)
+    for chave in passos_uid:
+        r = resultados.get(chave)
         if r:
             for c in r.tipos_alterados:
-                mudou.setdefault(c, []).append(bid)
+                mudou.setdefault(c, []).append(chave)
     return mudou
 
 
+def _titulo_limpo(bloco: Block) -> str:
+    return bloco.titulo.replace("`", "")
+
+
 def significado_padrao(
-    tema: Theme, coluna: str, origem: dict[str, str], transformadas: dict[str, list[str]] | None = None
+    tema: Theme,
+    coluna: str,
+    origem: dict[str, str],
+    transformadas: dict[str, list[str]] | None = None,
+    blocos: dict[str, Block] | None = None,
 ) -> str:
+    """Significado vindo da documentação da base (dicionário do Kaggle) ou do passo que criou a coluna."""
+    blocos = blocos or {}
     if coluna in tema.dicionario:
         texto = tema.dicionario[coluna]
     elif coluna in tema.dicionario_extra:
         texto = tema.dicionario_extra[coluna]
-    elif coluna in origem:
-        bloco = tema.bloco(origem[coluna])
-        return f"Criada pelo bloco {bloco.id}: {bloco.titulo.replace('`', '')}"
+    elif coluna in origem and origem[coluna] in blocos:
+        return f"Criada pelo passo \"{_titulo_limpo(blocos[origem[coluna]])}\""
     else:
         return ""
-    blocos = (transformadas or {}).get(coluna, [])
-    if blocos:
-        nomes = "; ".join(f"{b} ({tema.bloco(b).titulo.replace('`', '')})" for b in blocos)
-        texto += f". ATENÇÃO: valores convertidos pelo bloco {nomes}"
+    chaves = [c for c in (transformadas or {}).get(coluna, []) if c in blocos]
+    if chaves:
+        texto += ". Tipo alterado no passo " + "; ".join(f"\"{_titulo_limpo(blocos[c])}\"" for c in chaves)
     return texto
 
 
@@ -239,11 +309,9 @@ def numeros_de_referencia(tema: Theme, df: pd.DataFrame) -> str:
             continue
         serie = df[alvo]
         if pd.api.types.is_numeric_dtype(serie) and set(serie.dropna().unique()) <= {0, 1}:
-            taxa = serie.mean()
-            partes.append(f"média de `{alvo}` (taxa geral) = {taxa:.1%}".replace(".", ","))
+            partes.append(f"média de `{alvo}` = {serie.mean():.1%}".replace(".", ","))
         elif set(serie.dropna().astype(str).unique()) <= {"Yes", "No"}:
-            taxa = (serie == "Yes").mean()
-            partes.append(f"proporção de `{alvo}` = \"Yes\": {taxa:.1%}".replace(".", ","))
+            partes.append(f"proporção de `{alvo}` = \"Yes\": {(serie == 'Yes').mean():.1%}".replace(".", ","))
         break
     return "Números de referência (calculados do `dados_tratados.csv`, sem filtros): " + "; ".join(partes) + "."
 
@@ -254,6 +322,7 @@ def tabela_dados(
     significados: dict[str, str],
     origem: dict[str, str],
     transformadas: dict[str, list[str]] | None = None,
+    blocos: dict[str, Block] | None = None,
 ) -> pd.DataFrame:
     return pd.DataFrame(
         {
@@ -261,7 +330,7 @@ def tabela_dados(
             "Tipo": [tipo_amigavel(df[c].dtype) for c in df.columns],
             "Valores reais": [valores_coluna(df[c]) for c in df.columns],
             "Significado": [
-                significados.get(str(c)) or significado_padrao(tema, str(c), origem, transformadas)
+                significados.get(str(c)) or significado_padrao(tema, str(c), origem, transformadas, blocos)
                 for c in df.columns
             ],
         }
@@ -279,7 +348,7 @@ def colunas_citadas_ausentes(texto: str, tema: Theme, df: pd.DataFrame) -> list[
 
 
 # ---------------------------------------------------------------------------
-# Montagem da SPEC.md (template 9.1). Seções vazias não aparecem.
+# Montagem da SPEC.md (template 9.1 da APP_SPEC, com os ajustes da v2). Seções vazias não aparecem.
 # ---------------------------------------------------------------------------
 
 
@@ -288,22 +357,24 @@ class EstadoSpec:
     tema: Theme
     equipe: str
     df: pd.DataFrame
-    passos: list[str]
+    passos: list  # passos do fluxo (texto ou dicionário), na ordem
+    blocos: dict[str, Block]  # uid -> bloco executado
     resultados: dict[str, StepResult]
-    checks: list[ck.ResultadoCheck]
-    justificativas: dict
     respostas: dict
+    notas_revisao: str = ""
     data: date = field(default_factory=date.today)
+
+
+def _uid(passo) -> str:
+    return passo if isinstance(passo, str) else passo["uid"]
+
+
+def _nota(passo) -> str:
+    return "" if isinstance(passo, str) else (passo.get("nota") or "").strip()
 
 
 def _celula(texto: str) -> str:
     return str(texto).replace("|", "\\|").replace("\n", " ")
-
-
-def _resumo(feedback: str) -> str:
-    """Feedback do bloco sem marcação. Usamos o texto inteiro (são 1 a 3 frases): a primeira frase
-    sozinha pode enganar (ex.: N06 começa com "Com N04, ...")."""
-    return " ".join(feedback.replace("**", "").split())
 
 
 def _coluna_alvo(e: EstadoSpec) -> str:
@@ -325,12 +396,11 @@ def montar_spec(e: EstadoSpec) -> str:
             out.extend(corpo)
             out.append("")
 
-    nome = (r.get("nome_solucao") or "").strip() or t.nome
+    nome = (r.get("nome_solucao") or "").strip() or f"Solução — {e.equipe.strip()}"
     out.append(f"# SPEC — {nome}")
     out.append(f"Equipe: {e.equipe.strip()} · Desafio: {t.nome} · Gerado em {e.data.strftime('%d/%m/%Y')}")
     out.append("")
 
-    # 1
     corpo1 = []
     if (r.get("problema") or "").strip():
         corpo1.append(r["problema"].strip())
@@ -338,8 +408,7 @@ def montar_spec(e: EstadoSpec) -> str:
         corpo1.append(f"Usuário principal: {usuario_texto(r)}")
     sec("## 1. Contexto e problema", ["  \n".join(corpo1)] if corpo1 else [])
 
-    # 2
-    entra = [f"- {i}" for i in r.get("proposta_itens", [])] + [f"- {i}" for i in r.get("aprofundamentos", [])]
+    entra = [f"- {i}" for i in itens_escopo(r)]
     fora = [f"- {i}" for i in linhas(r.get("fora_escopo"))]
     corpo2 = []
     if entra:
@@ -349,8 +418,9 @@ def montar_spec(e: EstadoSpec) -> str:
     sec("## 2. Objetivo e escopo", corpo2)
 
     # 3 — sempre do DataFrame real
-    origem = origem_das_colunas(t, e.passos, e.resultados)
-    tabela = tabela_dados(t, e.df, r.get("significados", {}), origem, transformacoes(e.passos, e.resultados))
+    uids = [_uid(p) for p in e.passos]
+    origem = origem_das_colunas(uids, e.resultados)
+    tabela = tabela_dados(t, e.df, r.get("significados", {}), origem, transformacoes(uids, e.resultados), e.blocos)
     out.append("## 3. Dados")
     out.append(
         f"Arquivo: `dados_tratados.csv` — {len(e.df)} linhas, {e.df.shape[1]} colunas. Alvo: `{_coluna_alvo(e)}`."
@@ -370,33 +440,19 @@ def montar_spec(e: EstadoSpec) -> str:
     )
     out.append("")
 
-    tratamentos = [
-        f"{i}. {t.bloco(b).titulo} — {ck.ROTULO_CATEGORIA[t.bloco(b).categoria]} — {_resumo(t.bloco(b).feedback)}"
-        for i, b in enumerate(e.passos, start=1)
-    ]
-    sec("### 3.1 Tratamentos já aplicados (não refazer)", tratamentos)
-
-    decisoes = []
-    for res in e.checks:
-        if not res.pendente:
+    tratamentos = []
+    for n, passo in enumerate(e.passos, start=1):
+        bloco = e.blocos.get(_uid(passo))
+        if bloco is None:
             continue
-        d = e.justificativas.get(res.check.id, {})
-        if d.get("decisao") == "manter" and ck.justificativa_valida(d.get("texto")):
-            nivel = "Erro" if res.check.nivel == "erro" else "Alerta"
-            decisoes.append(
-                f"- **{nivel} mantido — {res.check.titulo.replace('`', '')}:** {res.mensagem} "
-                f"Justificativa da equipe: {d['texto'].strip()}"
-            )
-    sec("### 3.2 Decisões conscientes e justificativas", decisoes)
+        linha = f"{n}. {bloco.titulo}"
+        if _nota(passo):
+            linha += f" — motivo da equipe: {_nota(passo)}"
+        tratamentos.append(linha)
+    sec("### 3.1 Tratamentos já aplicados (não refazer)", tratamentos)
+    sec("### 3.2 Decisões e observações da revisão", [f"- {x}" for x in linhas(e.notas_revisao)])
+    sec("### 3.3 Cuidados com os dados", [f"- {x}" for x in linhas(r.get("cuidados"))])
 
-    cuidados = []
-    vazamento = ck.colunas_vazamento_presentes(t, e.df)
-    if vazamento:
-        cuidados.append("- Não usar como entrada de previsão: " + ", ".join(f"`{c}`" for c in vazamento))
-    cuidados += [f"- {texto}" for coluna, texto in t.observacoes if coluna in e.df.columns]
-    sec("### 3.3 Cuidados com os dados", cuidados)
-
-    # 4 a 8
     sec("## 4. Funcionalidades", [f"{i}. {f}" for i, f in enumerate(linhas(r.get("funcionalidades")), start=1)])
     sec("## 5. Regras de negócio", [f"- {x}" for x in linhas(r.get("regras_negocio"))])
     arq = []
