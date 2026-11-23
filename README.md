@@ -86,15 +86,21 @@ acessando `http://<ip-do-computador>:8501`.
 
 ## Créditos e licenças das bases
 
-| Desafio | Base | Fonte | Licença |
+| Desafio | Base | Fonte | Licença (como aparece no Kaggle) |
 | --- | --- | --- | --- |
-| Telecom: quem vai cancelar? | Telco Customer Churn (base de exemplo da IBM) | https://www.kaggle.com/datasets/blastchar/telco-customer-churn | **Conferir na página do Kaggle** (a página não traz licença explícita, pelo que sabemos) |
-| Turismo: por que as reservas são canceladas? | Hotel Booking Demand — Antonio, Almeida e Nunes, *Hotel booking demand datasets*, Data in Brief 22 (2019) | https://www.kaggle.com/datasets/jessemostipak/hotel-booking-demand | **Conferir na página do Kaggle** (o artigo original é de acesso aberto, CC BY 4.0) |
-| Saúde pública: quem falta às consultas? | Medical Appointment No Shows (Vitória-ES, 2016) | https://www.kaggle.com/datasets/joniarroba/noshowappointments | **Conferir na página do Kaggle** (indicada como CC BY-NC-SA 4.0: uso não comercial, com atribuição) |
+| Telecom: quem vai cancelar? | Telco Customer Churn — publicada por BlastChar (base de exemplo da IBM) | https://www.kaggle.com/datasets/blastchar/telco-customer-churn | **"Data files © Original Authors"**: sem licença aberta; os direitos ficam com os autores originais |
+| Turismo: por que as reservas são canceladas? | Hotel Booking Demand — publicada por Jesse Mostipak; dados de Antonio, Almeida e Nunes, *Hotel booking demand datasets*, Data in Brief 22 (2019) | https://www.kaggle.com/datasets/jessemostipak/hotel-booking-demand | **CC BY 4.0** (Attribution 4.0 International): uso livre, inclusive comercial, com atribuição — https://creativecommons.org/licenses/by/4.0/ |
+| Saúde pública: quem falta às consultas? | Medical Appointment No Shows (Vitória-ES, 2016) — publicada por JoniHoppen | https://www.kaggle.com/datasets/joniarroba/noshowappointments | **CC BY-NC-SA 4.0**: uso não comercial, com atribuição e compartilhamento pela mesma licença — https://creativecommons.org/licenses/by-nc-sa/4.0/ |
 
-As licenças acima **não puderam ser conferidas** durante o desenvolvimento (o Kaggle estava fora da rede
-permitida do ambiente). Antes de publicar, confira cada página e atualize esta tabela e o campo `licenca`
-de cada tema em `core/themes/`.
+Licenças conferidas nas páginas do Kaggle em 23/11/2026.
+
+**Atenção — base telco:** a página não oferece licença aberta ("© Original Authors"). O uso aqui é
+educacional, com atribuição à fonte; antes de redistribuir a base fora do minicurso (ou em um projeto
+comercial), consulte os autores originais.
+
+**Atenção — base no-show:** a licença CC BY-NC-SA 4.0 exige uso **não comercial**, atribuição e que
+derivados (como `data/noshow_consultas.csv` e os CSVs exportados pelas equipes) sejam compartilhados sob a
+mesma licença.
 
 As bases do repositório são amostras (hotel e no-show) ou cópia integral (telco) dos arquivos originais,
 sem nenhuma limpeza, usadas para fins educacionais.

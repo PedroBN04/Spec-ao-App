@@ -25,8 +25,8 @@ Regra geral (CLAUDE.md): na dúvida, a opção mais simples.
 5. **`Theme.emoji`** (campo novo, opcional): ícone do cartão da etapa 1.
 6. **Hotel e noshow no M1** têm nome, problemática, proposta, fonte, licença e dicionário completos, para
    os cartões da etapa 1 e o diagnóstico funcionarem. Blocos, regras e `spec_defaults` entram no M6.
-7. **Licenças a confirmar no Kaggle:** telco sem licença explícita (base de exemplo da IBM);
-   hotel CC BY 4.0 (artigo em acesso aberto); noshow CC BY-NC-SA 4.0.
+7. **Licenças** (conferidas nas páginas do Kaggle em 23/11/2026, ver item 20): telco "Data files ©
+   Original Authors" (sem licença aberta); hotel CC BY 4.0; noshow CC BY-NC-SA 4.0.
 8. **Regras de checklist do telco** já estão no tema, com ids `TEL01`–`TEL05`. A execução e a etapa 4
    vêm no M4.
 9. **Estado entre etapas.** O Streamlit apaga o valor de widgets que saem da tela. Os valores ficam em
@@ -52,8 +52,11 @@ Regra geral (CLAUDE.md): na dúvida, a opção mais simples.
 19. **Base original em `st.cache_resource`** (uma cópia na memória, compartilhada por todas as sessões),
     em vez de `cache_data` (que entrega uma cópia nova a cada chamada). A spec pede "carregada uma vez
     e nunca alterada": o executor sempre roda sobre `df.copy()` e nenhuma tela altera a original.
-20. **Licenças não puderam ser conferidas:** o kaggle.com está fora da rede permitida do ambiente de
-    desenvolvimento. Os textos de licença ficam marcados "conferir" até a organização confirmar.
+20. **Licenças conferidas** em 23/11/2026, no campo "License" de cada página do Kaggle (depois de liberar
+    www.kaggle.com no ambiente de desenvolvimento): telco "Data files © Original Authors", hotel
+    "Attribution 4.0 International (CC BY 4.0)", noshow "CC BY-NC-SA 4.0". README e campo `licenca`
+    dos temas atualizados. A base telco não tem licença aberta: o README avisa para usar só no
+    contexto educacional e consultar os autores antes de redistribuir.
 
 ## Marcos M3 e M4 — Tratamento e checklist
 
