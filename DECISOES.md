@@ -168,3 +168,25 @@ Regra geral (CLAUDE.md): na dúvida, a opção mais simples.
 62. **"Barra de progresso fixa no topo"** foi interpretada como "presente no topo de toda tela" (não
     grudada na rolagem), para evitar CSS complexo (seção 11).
 63. **Selo "Depende do objetivo"** usa a cor laranja: o `st.badge` do Streamlit não tem amarelo.
+
+## Ensaio do hackathon (melhorias no spec builder)
+
+Ensaio: jornada telco com boas escolhas, exportação, e um app construído só a partir da `SPEC.md`
+(pasta `../ensaio_hackathon/`, fora do repositório). Na 1ª rodada os 4 critérios passaram, mas o agente
+precisou de 5 suposições. Melhorias:
+
+64. **Coluna "Valores reais" na seção 3** (e no passo 3 do assistente): calculada do DataFrame final —
+    lista de categorias (até 12), faixa mín–máx para números e datas, nº de vazios. Resolve descrições do
+    dicionário que ficam desatualizadas depois dos blocos (ex.: `SeniorCitizen` vira Yes/No pelo T05;
+    "No internet service" some pelo T06 sem mudar o tipo). A SPEC avisa que os valores reais valem mais
+    que o significado. É uma coluna a mais no template 9.1.
+65. **"Números de referência" na seção 7**, calculados do CSV exportado (nº de linhas e taxa do alvo),
+    para o agente conferir os critérios ("taxa geral = 26,5%"). Acréscimo ao template 9.1.
+66. **Defaults mais precisos:** telco define "cliente ativo = Churn 0", `TechSupport = No`, formato das
+    taxas (26,5%), moeda sem símbolo (a base não informa a moeda) e ordenação da lista de risco; hotel
+    define formato e ordenação do ranking; noshow define o que são "consultas futuras" numa base de 2016,
+    formato das taxas e as colunas/ordem da lista de risco.
+67. **No passo 3 do assistente** a coluna editável "Significado" vem logo depois do nome da coluna.
+
+Resultado da 2ª rodada: 4/4 critérios + 2 conferências extras (ordenação e só clientes ativos), sem
+suposições sobre dados ou regras.

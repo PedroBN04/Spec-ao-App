@@ -358,13 +358,16 @@ SPEC_DEFAULTS = {
     ],
     "regras_negocio": [
         "Taxa de churn = soma de Churn (0/1) ÷ nº de clientes do filtro",
-        "Cliente em risco = contrato mensal E tempo de casa ≤ 12 meses E sem suporte técnico",
-        "Valores em moeda exibidos com 2 casas decimais",
+        "Cliente ativo = cliente que ainda não cancelou (Churn = 0)",
+        "Cliente em risco = cliente ativo com contrato mensal (Month-to-month) E tempo de casa ≤ 12 meses "
+        "E sem suporte técnico (TechSupport = No)",
+        "Taxas exibidas em porcentagem com 1 casa decimal (ex.: 26,5%)",
+        "Valores em moeda exibidos com 2 casas decimais, sem símbolo de moeda (a base não informa a moeda)",
     ],
     "criterios_aceitacao": [
         "Sem filtros, o painel mostra a taxa de churn geral calculada do CSV",
         "Ao filtrar por contrato, todos os gráficos se atualizam",
-        "A lista de risco mostra customerID, contrato, tenure e MonthlyCharges",
+        "A lista de risco mostra customerID, contrato, tenure e MonthlyCharges, ordenada da maior para a menor MonthlyCharges",
         "O app abre sem erros com `streamlit run app.py`",
     ],
     "metrica_sucesso": "Identificar os 3 segmentos com maior taxa de churn para priorizar ações de retenção.",

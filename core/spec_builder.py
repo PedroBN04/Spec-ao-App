@@ -201,6 +201,53 @@ def significado_padrao(
     return texto
 
 
+def _fmt_num(v) -> str:
+    if pd.isna(v):
+        return ""
+    if float(v).is_integer():
+        return f"{int(v)}"
+    return f"{v:.2f}"
+
+
+def valores_coluna(serie: pd.Series, limite: int = 12) -> str:
+    """Resumo dos valores REAIS da coluna, calculado do DataFrame final."""
+    nao_vazios = serie.dropna()
+    vazios = len(serie) - len(nao_vazios)
+    sufixo = f"; {vazios} vazio(s)" if vazios else ""
+    if nao_vazios.empty:
+        return "todos vazios"
+    if pd.api.types.is_bool_dtype(serie):
+        return ", ".join(sorted(map(str, nao_vazios.unique()))) + sufixo
+    if pd.api.types.is_datetime64_any_dtype(serie):
+        return f"{nao_vazios.min():%Y-%m-%d} a {nao_vazios.max():%Y-%m-%d}{sufixo}"
+    distintos = nao_vazios.unique()
+    if pd.api.types.is_numeric_dtype(serie):
+        if len(distintos) <= 2:
+            return ", ".join(_fmt_num(v) for v in sorted(distintos)) + sufixo
+        return f"{_fmt_num(nao_vazios.min())} a {_fmt_num(nao_vazios.max())}{sufixo}"
+    if len(distintos) <= limite:
+        return ", ".join(sorted(map(str, distintos))) + sufixo
+    exemplos = ", ".join(map(str, nao_vazios.value_counts().index[:3]))
+    return f"{len(distintos)} valores distintos (ex.: {exemplos}){sufixo}"
+
+
+def numeros_de_referencia(tema: Theme, df: pd.DataFrame) -> str:
+    """Números calculados do CSV exportado, para o agente conferir os critérios."""
+    partes = [f"{len(df)} linhas no total"]
+    for alvo in (*tema.alvos_aceitos, tema.alvo):
+        if alvo not in df.columns:
+            continue
+        serie = df[alvo]
+        if pd.api.types.is_numeric_dtype(serie) and set(serie.dropna().unique()) <= {0, 1}:
+            taxa = serie.mean()
+            partes.append(f"média de `{alvo}` (taxa geral) = {taxa:.1%}".replace(".", ","))
+        elif set(serie.dropna().astype(str).unique()) <= {"Yes", "No"}:
+            taxa = (serie == "Yes").mean()
+            partes.append(f"proporção de `{alvo}` = \"Yes\": {taxa:.1%}".replace(".", ","))
+        break
+    return "Números de referência (calculados do `dados_tratados.csv`, sem filtros): " + "; ".join(partes) + "."
+
+
 def tabela_dados(
     tema: Theme,
     df: pd.DataFrame,
@@ -212,6 +259,7 @@ def tabela_dados(
         {
             "Coluna": [str(c) for c in df.columns],
             "Tipo": [tipo_amigavel(df[c].dtype) for c in df.columns],
+            "Valores reais": [valores_coluna(df[c]) for c in df.columns],
             "Significado": [
                 significados.get(str(c)) or significado_padrao(tema, str(c), origem, transformadas)
                 for c in df.columns
@@ -308,10 +356,18 @@ def montar_spec(e: EstadoSpec) -> str:
         f"Arquivo: `dados_tratados.csv` — {len(e.df)} linhas, {e.df.shape[1]} colunas. Alvo: `{_coluna_alvo(e)}`."
     )
     out.append("")
-    out.append("| Coluna | Tipo | Significado |")
-    out.append("| --- | --- | --- |")
+    out.append("| Coluna | Tipo | Valores reais | Significado |")
+    out.append("| --- | --- | --- | --- |")
     for _, linha in tabela.iterrows():
-        out.append(f"| `{_celula(linha['Coluna'])}` | {linha['Tipo']} | {_celula(linha['Significado'])} |")
+        out.append(
+            f"| `{_celula(linha['Coluna'])}` | {linha['Tipo']} | {_celula(linha['Valores reais'])} "
+            f"| {_celula(linha['Significado'])} |"
+        )
+    out.append("")
+    out.append(
+        "Os **valores reais** foram calculados do CSV exportado e valem mais que o significado "
+        "(que descreve a coluna original)."
+    )
     out.append("")
 
     tratamentos = [
@@ -349,6 +405,8 @@ def montar_spec(e: EstadoSpec) -> str:
     arq += [f"- {x}" for x in r.get("restricoes", [])]
     sec("## 6. Arquitetura e restrições", arq)
     crit = [f"- [ ] {x}" for x in linhas(r.get("criterios_aceitacao"))]
+    if crit:
+        crit.append(f"\n{numeros_de_referencia(t, e.df)}")
     if (r.get("metrica_sucesso") or "").strip():
         crit.append(f"\nMétrica de sucesso: {r['metrica_sucesso'].strip()}")
     sec("## 7. Critérios de aceitação", crit)

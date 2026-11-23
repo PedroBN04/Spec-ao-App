@@ -243,6 +243,8 @@ SPEC_DEFAULTS = {
         "Faixas de antecedência (`lead_time`): 0-7, 8-30, 31-90, 91-180 e mais de 180 dias",
         "Segmento = hotel + tipo de depósito + canal de venda; o ranking só considera segmentos com pelo menos 100 reservas",
         "Meses sempre em ordem do calendário (janeiro a dezembro), nunca em ordem alfabética",
+        "Taxas exibidas em porcentagem com 1 casa decimal (ex.: 37,1%)",
+        "Ranking ordenado da maior para a menor taxa de cancelamento",
     ],
     "criterios_aceitacao": [
         "Sem filtros, o painel mostra a taxa de cancelamento geral calculada do CSV",

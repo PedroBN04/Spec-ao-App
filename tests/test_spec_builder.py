@@ -47,8 +47,9 @@ def test_spec_tem_todas_as_colunas_do_df_final_na_secao_3():
         assert f"| `{coluna}` |" in secao3
     assert "customerID" not in secao3
     assert f"{len(e.df)} linhas, {e.df.shape[1]} colunas" in secao3
-    assert "| `faixa_tenure` | texto | Faixa de tempo de casa" in secao3
-    assert "| `TotalCharges` | número decimal |" in secao3
+    assert "| `faixa_tenure` | texto | 0-12 meses, 13-24 meses, 25-48 meses, 49-72 meses | Faixa de tempo de casa" in secao3
+    assert "| `TotalCharges` | número decimal | 0 a 8684.80 |" in secao3
+    assert "| `Churn` | número inteiro | 0, 1 |" in secao3
 
 
 def test_spec_lista_blocos_aplicados_com_categoria_na_3_1():
@@ -96,7 +97,7 @@ def test_template_cabecalho_e_secoes_em_ordem():
 
 def test_significado_editado_vai_para_a_spec():
     r = sb.respostas_iniciais(TELCO) | {"significados": {"tenure": "Meses de contrato do cliente"}}
-    assert "| `tenure` | número inteiro | Meses de contrato do cliente |" in sb.montar_spec(_estado([], respostas=r))
+    assert "| `tenure` | número inteiro | 0 a 72 | Meses de contrato do cliente |" in sb.montar_spec(_estado([], respostas=r))
 
 
 def test_obrigatorios():
@@ -143,7 +144,7 @@ def test_nomes_de_arquivo():
 
 def test_coluna_transformada_ganha_aviso_no_significado():
     texto = sb.montar_spec(_estado(["T07"]))
-    assert "| `Churn` | número inteiro | Alvo: o cliente cancelou? (Yes = cancelou, No = continua). ATENÇÃO: valores convertidos pelo bloco T07 (Converter Churn para 0/1) |" in texto
+    assert "| `Churn` | número inteiro | 0, 1 | Alvo: o cliente cancelou? (Yes = cancelou, No = continua). ATENÇÃO: valores convertidos pelo bloco T07 (Converter Churn para 0/1) |" in texto
 
 
 def test_colunas_citadas_que_nao_existem():
@@ -152,3 +153,26 @@ def test_colunas_citadas_que_nao_existem():
     assert sb.colunas_citadas_ausentes(criterios, TELCO, e.df) == ["customerID"]
     assert sb.colunas_citadas_ausentes(criterios, TELCO, base("telco")) == []
     assert sb.colunas_citadas_ausentes("taxa por Contract", TELCO, e.df) == []
+
+
+def test_valores_reais():
+    s = pd.Series
+    assert sb.valores_coluna(s(["No", "Yes", "No", None])) == "No, Yes; 1 vazio(s)"
+    assert sb.valores_coluna(s([1.5, 2.25, 10.0])) == "1.50 a 10"
+    assert sb.valores_coluna(s([0, 1, 1])) == "0, 1"
+    assert sb.valores_coluna(s([str(i) for i in range(20)])).startswith("20 valores distintos (ex.: ")
+    assert sb.valores_coluna(pd.to_datetime(s(["2016-04-29", "2016-06-08"]))) == "2016-04-29 a 2016-06-08"
+    assert sb.valores_coluna(s([None, None], dtype=float)) == "todos vazios"
+
+
+def test_numeros_de_referencia_na_secao_7():
+    texto = sb.montar_spec(_estado(["T07"]))
+    assert "Números de referência (calculados do `dados_tratados.csv`, sem filtros): 7043 linhas no total; média de `Churn` (taxa geral) = 26,5%." in texto
+    texto = sb.montar_spec(_estado([]))
+    assert 'proporção de `Churn` = "Yes": 26,5%' in texto
+
+
+def test_numeros_de_referencia_noshow_usa_faltou():
+    tema = REGISTRY["noshow"]
+    texto = sb.montar_spec(_estado(["N01"], tema=tema, tema_id="noshow"))
+    assert "média de `faltou` (taxa geral) = 19,9%" in texto

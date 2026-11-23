@@ -103,7 +103,7 @@ def _passo_escopo(estado: sb.EstadoSpec) -> None:
 def _passo_dados(estado: sb.EstadoSpec) -> None:
     st.caption(
         f"Gerado automaticamente da sua base tratada: {len(estado.df):,} linhas e {estado.df.shape[1]} colunas. ".replace(",", ".")
-        + "Você só pode editar o **significado**; nomes e tipos vêm dos dados reais."
+        + "Você só pode editar o **significado**; nome, tipo e valores reais vêm dos dados."
     )
     origem = sb.origem_das_colunas(estado.tema, estado.passos, estado.resultados)
     transformadas = sb.transformacoes(estado.passos, estado.resultados)
@@ -116,10 +116,12 @@ def _passo_dados(estado: sb.EstadoSpec) -> None:
         hide_index=True,
         width="stretch",
         height=min(38 * (len(tabela) + 1), 420),
-        disabled=["Coluna", "Tipo"],
+        disabled=["Coluna", "Tipo", "Valores reais"],
+        column_order=["Coluna", "Significado", "Tipo", "Valores reais"],
         column_config={
             "Coluna": st.column_config.TextColumn("Coluna", width="medium"),
             "Tipo": st.column_config.TextColumn("Tipo", width="small"),
+            "Valores reais": st.column_config.TextColumn("Valores reais", width="medium"),
             "Significado": st.column_config.TextColumn("Significado (editável)", width="large"),
         },
     )
