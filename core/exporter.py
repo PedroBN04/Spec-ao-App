@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import io
 import re
 import unicodedata
+import zipfile
 
 import pandas as pd
 
@@ -45,3 +47,45 @@ def slug_equipe(equipe: str) -> str:
 
 def nome_arquivo(equipe: str, sufixo: str) -> str:
     return f"{slug_equipe(equipe)}_{sufixo}"
+
+
+# ---------------------------------------------------------------------------
+# Excel e kit .zip (proposta P0.4)
+# ---------------------------------------------------------------------------
+
+LIMITE_CELULAS_XLSX = 3_000_000  # acima disso a planilha ficaria lenta demais (ex.: depois do T11)
+
+
+def xlsx_viavel(df: pd.DataFrame) -> bool:
+    return df.size <= LIMITE_CELULAS_XLSX and df.shape[1] <= 16_000
+
+
+def gerar_xlsx(df: pd.DataFrame) -> bytes:
+    """Planilha .xlsx real: abre em linhas e colunas no Excel em português, com números como números."""
+    dados = df.copy()
+    for c in dados.columns:
+        if pd.api.types.is_datetime64_any_dtype(dados[c]) and getattr(dados[c].dt, "tz", None) is not None:
+            dados[c] = dados[c].dt.tz_convert("UTC").dt.tz_localize(None)
+    buffer = io.BytesIO()
+    with pd.ExcelWriter(buffer, engine="xlsxwriter", datetime_format="yyyy-mm-dd hh:mm:ss",
+                        date_format="yyyy-mm-dd") as writer:
+        dados.to_excel(writer, index=False, sheet_name="dados_tratados")
+        planilha = writer.sheets["dados_tratados"]
+        planilha.freeze_panes(1, 0)
+        cabecalho = writer.book.add_format({"bold": True, "bg_color": "#EEF0FB", "border": 1})
+        for i, col in enumerate(dados.columns):
+            planilha.write(0, i, str(col), cabecalho)
+            amostra = dados[col].head(200).astype(str).str.len().max() if len(dados) else 0
+            planilha.set_column(i, i, min(max(len(str(col)), int(amostra or 0)) + 2, 45))
+    return buffer.getvalue()
+
+
+def gerar_zip(df: pd.DataFrame, spec: str) -> bytes:
+    """Kit da equipe: dados_tratados.csv (para o agente), dados_tratados_excel.xlsx e SPEC.md."""
+    buffer = io.BytesIO()
+    with zipfile.ZipFile(buffer, "w", compression=zipfile.ZIP_DEFLATED) as kit:
+        kit.writestr("dados_tratados.csv", gerar_csv(df))
+        if xlsx_viavel(df):
+            kit.writestr("dados_tratados_excel.xlsx", gerar_xlsx(df))
+        kit.writestr("SPEC.md", spec.encode("utf-8"))
+    return buffer.getvalue()

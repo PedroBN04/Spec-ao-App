@@ -8,6 +8,7 @@ Não corrija, melhore nem "otimize" esses trechos. tests/test_blocks.py confere 
 import pandas as pd
 
 from core.models import Block, Check, Theme
+from core.themes.traducoes import NOMES_HOTEL, SIGNIFICADO_APOS_HOTEL, VALORES_HOTEL
 
 BLOCOS = (
     Block(
@@ -312,13 +313,13 @@ THEME = Theme(
         "e não sabem quais reservas têm mais risco."
     ),
     proposta_inicial=[
-        "Painel com taxa de cancelamento por hotel, mês de chegada, antecedência da reserva "
-        "(faixas de `lead_time`), tipo de depósito e canal de venda",
+        "Painel com a taxa de cancelamento por hotel, mês de chegada, faixas de antecedência da reserva "
+        "(`lead_time`), tipo de depósito e canal de venda",
         "Filtros",
         "Ranking dos segmentos de maior risco",
     ],
     aprofundamentos=[
-        "Estimativa de receita perdida (`adr` × noites das reservas canceladas)",
+        "Estimativa de receita perdida: valor médio da diária (`adr`) × quantidade de noites das reservas canceladas",
         "Calendário de ocupação por mês",
     ],
     colunas_vazamento=("reservation_status", "reservation_status_date"),
@@ -331,9 +332,12 @@ THEME = Theme(
     missao=(
         "Olá, time de dados! Nossos dois hotéis em Portugal perdem muita receita com reservas canceladas — "
         "algo perto de 4 em cada 10. Queremos entender quais reservas têm mais risco de cancelamento para "
-        "rever a política de depósito e de overbooking. Segue uma extração do sistema de reservas, sem "
+        "rever a política de depósito e a venda de mais quartos do que existem (overbooking). Segue uma extração do sistema de reservas, sem "
         "nenhum tratamento."
     ),
+    nomes_pt=NOMES_HOTEL,
+    valores_pt=VALORES_HOTEL,
+    significado_apos=SIGNIFICADO_APOS_HOTEL,
     alvos_aceitos=(),
     vazamento_derivado=("status_",),
     dicionario_extra={

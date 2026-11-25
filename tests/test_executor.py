@@ -63,7 +63,7 @@ def test_desfazer_t01_remove_t02_e_avisa():
     pipe = ex.desfazer(original, TELCO, pipe.passos, "T01")
     assert pipe.passos == ["T07"]
     assert [r[0] for r in pipe.removidos] == ["T02"]
-    assert "T01" in pipe.removidos[0][1]
+    assert '"Converter `TotalCharges` para número"' in pipe.removidos[0][1]
     so_t07 = ex.executar_codigo(TELCO.bloco("T07").codigo, original)
     pd.testing.assert_frame_equal(pipe.df, so_t07)
 
@@ -71,7 +71,8 @@ def test_desfazer_t01_remove_t02_e_avisa():
 def test_bloco_sem_prerequisito_fica_desabilitado_com_motivo():
     df = base("telco")
     motivo = ex.motivo_desabilitado(TELCO, TELCO.bloco("T02"), df, [])
-    assert motivo == "Este bloco precisa que o bloco T01 seja aplicado antes."
+    assert motivo == 'Este bloco precisa que "Converter `TotalCharges` para número" seja aplicado antes.'
+    assert "T01" not in motivo
     assert ex.motivo_desabilitado(TELCO, TELCO.bloco("T02"), ex.executar_codigo(TELCO.bloco("T01").codigo, df), ["T01"]) is None
 
 
@@ -85,7 +86,7 @@ def test_motivo_indica_bloco_que_cria_a_coluna():
     falso = Block(id="X01", titulo="x", grupo="g", explicacao="", codigo="df = df", requer_colunas=("faixa_tenure",))
     tema = dataclasses.replace(TELCO, blocos=TELCO.blocos + (falso,))
     motivo = ex.motivo_desabilitado(tema, falso, base("telco"), [], list(base("telco").columns))
-    assert motivo == "Este bloco precisa da coluna `faixa_tenure`. Aplique antes o bloco T12."
+    assert motivo == 'Este bloco precisa da coluna `faixa_tenure`. Aplique antes "Criar faixa de tempo de casa (`faixa_tenure`)".'
 
 
 def test_excecao_em_bloco_nao_altera_estado():
@@ -128,7 +129,8 @@ def test_n14_desabilita_blocos_com_nomes_antigos():
 def test_n06_sem_dias_espera_indica_blocos():
     original = base("noshow")
     motivo = ex.motivo_desabilitado(NOSHOW, NOSHOW.bloco("N06"), original, [], list(original.columns))
-    assert motivo == "Este bloco precisa da coluna `dias_espera`. Aplique antes o bloco N04 ou N05."
+    assert motivo == ('Este bloco precisa da coluna `dias_espera`. Aplique antes "Calcular dias de espera (comparando só '
+                      'as datas)" ou "Calcular dias de espera (subtração direta)".')
 
 
 def test_desfazer_n03_remove_dependentes():

@@ -85,7 +85,10 @@ def parece_data(serie: pd.Series) -> bool:
 def metricas(df: pd.DataFrame) -> dict:
     total_celulas = df.size or 1
     n_numericas = sum(eh_numerica(df[c]) for c in df.columns)
+    texto = df.select_dtypes(include=["object", "string"])
+    espacos = int(texto.apply(lambda s: s.dropna().astype(str).str.strip().eq("").sum()).sum()) if texto.shape[1] else 0
     return {
+        "espacos": espacos,
         "linhas": len(df),
         "colunas": df.shape[1],
         "pct_nulos": float(df.isna().sum().sum() / total_celulas * 100),
@@ -199,15 +202,29 @@ ROTEIRO = (
 )
 
 
-def _fmt_valor(v) -> str:
+def fmt_br(v, casas: int = 2) -> str:
+    """Número no padrão brasileiro: vírgula decimal e ponto de milhar."""
     if v is None or (isinstance(v, float) and pd.isna(v)):
         return ""
-    if isinstance(v, float):
-        return f"{v:.2f}".rstrip("0").rstrip(".")
-    return str(v)
+    if isinstance(v, (int,)) or (isinstance(v, float) and float(v).is_integer()):
+        return f"{int(v):,}".replace(",", ".")
+    texto = f"{float(v):,.{casas}f}".rstrip("0").rstrip(".")
+    return texto.replace(",", "_").replace(".", ",").replace("_", ".")
 
 
-def raio_x_v2(df: pd.DataFrame, dicionario: dict[str, str]) -> pd.DataFrame:
+def pct_br(v: float, casas: int = 1) -> str:
+    return f"{v:.{casas}f}%".replace(".", ",")
+
+
+def _fmt_valor(v) -> str:
+    if hasattr(v, "item"):
+        v = v.item()
+    if isinstance(v, (int, float)):
+        return fmt_br(v)
+    return "" if v is None else str(v)
+
+
+def raio_x_v2(df: pd.DataFrame, dicionario: dict[str, str], nomes_pt: dict[str, str] | None = None) -> pd.DataFrame:
     """Raio-X só com fatos: tipo, vazios, distintos, exemplo e faixa (sem coluna de alerta)."""
     linhas = []
     for col in df.columns:
@@ -215,10 +232,11 @@ def raio_x_v2(df: pd.DataFrame, dicionario: dict[str, str]) -> pd.DataFrame:
         num = eh_numerica(s)
         linhas.append({
             "Coluna": col,
+            "Em português": (nomes_pt or {}).get(col, ""),
             "Significado": dicionario.get(col, ""),
             "Tipo": tipo_amigavel(s.dtype),
-            "% vazios": round(float(s.isna().mean() * 100), 1) if len(s) else 0.0,
-            "Distintos": int(s.nunique(dropna=True)),
+            "Vazios": pct_br(float(s.isna().mean() * 100)) if len(s) else "0,0%",
+            "Distintos": fmt_br(int(s.nunique(dropna=True))),
             "Exemplo": _exemplo(s),
             "Mínimo": _fmt_valor(s.min()) if num and s.notna().any() else "",
             "Máximo": _fmt_valor(s.max()) if num and s.notna().any() else "",
@@ -231,8 +249,8 @@ def estatisticas(serie: pd.Series) -> dict[str, str]:
     nao_vazios = s.dropna()
     info = {
         "Tipo": tipo_amigavel(s.dtype),
-        "Vazios": f"{int(s.isna().sum())} ({s.isna().mean():.1%})".replace(".", ","),
-        "Valores distintos": str(int(s.nunique(dropna=True))),
+        "Vazios": f"{fmt_br(int(s.isna().sum()))} ({pct_br(s.isna().mean() * 100)})",
+        "Valores distintos": fmt_br(int(s.nunique(dropna=True))),
     }
     if eh_numerica(s) and not nao_vazios.empty:
         info.update({
@@ -240,13 +258,13 @@ def estatisticas(serie: pd.Series) -> dict[str, str]:
             "Média": _fmt_valor(float(nao_vazios.mean())),
             "Mediana": _fmt_valor(float(nao_vazios.median())),
             "Máximo": _fmt_valor(nao_vazios.max()),
-            "Zeros": str(int((nao_vazios == 0).sum())),
-            "Negativos": str(int((nao_vazios < 0).sum())),
+            "Zeros": fmt_br(int((nao_vazios == 0).sum())),
+            "Negativos": fmt_br(int((nao_vazios < 0).sum())),
         })
     elif not nao_vazios.empty:
         textos = nao_vazios.astype(str)
         info["Valor mais comum"] = repr(textos.mode().iloc[0])
-        info["Valores só com espaços"] = str(int(textos.str.strip().eq("").sum()))
+        info["Valores só com espaços"] = fmt_br(int(textos.str.strip().eq("").sum()))
     return info
 
 
@@ -283,3 +301,14 @@ def relacao_com_alvo(df: pd.DataFrame, coluna: str, alvo: str, top: int = 15) ->
         .head(top)
     )
     return tabela, rotulo
+
+
+def tabela_frequentes(serie: pd.Series, valores_pt: dict[str, str] | None = None, top: int = 20) -> pd.DataFrame:
+    """Valores mais frequentes, com % no padrão brasileiro e a tradução quando existir."""
+    dist = distribuicao(serie, top=top)
+    out = pd.DataFrame({"Valor": dist["valor"]})
+    if valores_pt and any(v in valores_pt for v in out["Valor"]):
+        out["Em português"] = [valores_pt.get(v, "") for v in out["Valor"]]
+    out["Linhas"] = [fmt_br(int(q)) for q in dist["quantidade"]]
+    out["% da base"] = [pct_br(p) for p in dist["%"]]
+    return out

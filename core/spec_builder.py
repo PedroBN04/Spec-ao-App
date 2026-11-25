@@ -39,6 +39,30 @@ class PassoSpec:
     exemplo: str  # exemplo de outro domínio (biblioteca), mostrado só se a pessoa pedir
 
 
+# Esqueletos genéricos com lacunas [entre colchetes], sem conteúdo de nenhum tema (meio-termo da P2.4).
+# Só são inseridos em campos vazios e só se a pessoa clicar.
+ESQUELETOS: dict[int, dict[str, str]] = {
+    0: {"problema": "Hoje a [área cliente] não consegue [o que não consegue saber ou decidir]. Por isso, "
+                    "[o que se perde: dinheiro, tempo, pessoas atendidas]. Queremos ajudar [quem] a [objetivo]."},
+    1: {"escopo_proprio": "[algo além do pedido que você quer entregar]",
+        "fora_escopo": "[algo que o agente NÃO deve fazer]"},
+    2: {"cuidados": "[coluna]: [o que significa um valor que confunde]\n"
+                    "[coluna]: não usar para prever [resultado], porque [motivo]"},
+    3: {"funcionalidades": "Ver [indicador principal] assim que o app abre\n"
+                          "Filtrar por [coluna ou grupo]\nVer [uma lista ou ranking] de [quem ou o quê]"},
+    4: {"regras_negocio": "[Indicador] = [como calcular, usando quais colunas]\n"
+                          "[Grupo prioritário] = [condição 1] E [condição 2]\n"
+                          "Números exibidos em [formato, ex.: % com 1 casa decimal]"},
+    5: {"stack": "[linguagem e bibliotecas]"},
+    6: {"criterios_aceitacao": "Sem filtros, o app mostra [indicador] = [valor dos números de referência]\n"
+                               "Ao filtrar por [coluna], [o que deve mudar]\n"
+                               "[A lista] mostra [colunas], ordenada por [critério]",
+        "metrica_sucesso": "[indicador de negócio] [aumentar/reduzir] [quanto] em [prazo]"},
+    7: {"formato": "[duração e tipo de apresentação]",
+        "roteiro": "[problema] → [o que descobrimos nos dados] → [decisões] → [demonstração] → [impacto]"},
+}
+
+
 PASSOS = (
     PassoSpec(
         "1. Problema",
@@ -110,7 +134,7 @@ PASSOS = (
         "6. Arquitetura e restrições",
         "Como a solução deve ser construída e o que o agente NÃO pode fazer?",
         "Restrições reduzem o espaço de erro do agente. Sem elas, ele pode buscar dados na internet ou criar "
-        "uma estrutura complexa demais para 1 hora.",
+        "uma estrutura complexa demais para o tempo disponível na primeira versão.",
         (
             "Com quais tecnologias a solução deve ser feita?",
             "O agente pode buscar ou gerar dados novos?",
@@ -195,12 +219,27 @@ def itens_escopo(r: dict) -> list[str]:
     return list(r.get("escopo_pedido") or []) + linhas(r.get("escopo_proprio"))
 
 
+LACUNAS = {m for texto in (t for d in ESQUELETOS.values() for t in d.values()) for m in re.findall(r"\[[^\]]+\]", texto)}
+
+
+def tem_lacuna(texto) -> bool:
+    """True se o texto ainda tem alguma lacuna do esqueleto, ex.: "[área cliente]"."""
+    texto = "\n".join(texto) if isinstance(texto, list) else (texto or "")
+    return any(lacuna in texto for lacuna in LACUNAS)
+
+
 def faltando_por_passo(r: dict) -> dict[int, list[str]]:
-    """Campos obrigatórios vazios, por índice de passo (0 a 7)."""
+    """Campos obrigatórios vazios (ou com lacunas do esqueleto), por índice de passo (0 a 7)."""
     falta: dict[int, list[str]] = {}
 
     def add(i: int, campo: str) -> None:
         falta.setdefault(i, []).append(campo)
+
+    for i, campos in ESQUELETOS.items():
+        for campo in campos:
+            if tem_lacuna(r.get(campo)):
+                add(i, "complete as lacunas [entre colchetes]")
+                break
 
     if not (r.get("problema") or "").strip():
         add(0, "Problema")
@@ -254,9 +293,17 @@ def significado_padrao(
     origem: dict[str, str],
     transformadas: dict[str, list[str]] | None = None,
     blocos: dict[str, Block] | None = None,
+    catalogo_aplicado: list[str] | None = None,
 ) -> str:
-    """Significado vindo da documentação da base (dicionário do Kaggle) ou do passo que criou a coluna."""
+    """Significado vindo da documentação da base (dicionário do Kaggle) ou do passo que criou a coluna.
+
+    Se um bloco do catálogo com conversão conhecida foi aplicado, vale o significado depois dela
+    (ex.: depois do T07, `Churn` passa a ser "1 = cancelou, 0 = continua").
+    """
     blocos = blocos or {}
+    for bid in reversed(catalogo_aplicado or []):
+        if coluna in tema.significado_apos.get(bid, {}):
+            return tema.significado_apos[bid][coluna]
     if coluna in tema.dicionario:
         texto = tema.dicionario[coluna]
     elif coluna in tema.dicionario_extra:
@@ -267,7 +314,8 @@ def significado_padrao(
         return ""
     chaves = [c for c in (transformadas or {}).get(coluna, []) if c in blocos]
     if chaves:
-        texto += ". Tipo alterado no passo " + "; ".join(f"\"{_titulo_limpo(blocos[c])}\"" for c in chaves)
+        texto += ". Valores alterados no passo " + "; ".join(f"\"{_titulo_limpo(blocos[c])}\"" for c in chaves)
+        texto += " (confira os valores reais)"
     return texto
 
 
@@ -323,6 +371,7 @@ def tabela_dados(
     origem: dict[str, str],
     transformadas: dict[str, list[str]] | None = None,
     blocos: dict[str, Block] | None = None,
+    catalogo_aplicado: list[str] | None = None,
 ) -> pd.DataFrame:
     return pd.DataFrame(
         {
@@ -330,7 +379,8 @@ def tabela_dados(
             "Tipo": [tipo_amigavel(df[c].dtype) for c in df.columns],
             "Valores reais": [valores_coluna(df[c]) for c in df.columns],
             "Significado": [
-                significados.get(str(c)) or significado_padrao(tema, str(c), origem, transformadas, blocos)
+                significados.get(str(c))
+                or significado_padrao(tema, str(c), origem, transformadas, blocos, catalogo_aplicado)
                 for c in df.columns
             ],
         }
@@ -363,6 +413,17 @@ class EstadoSpec:
     respostas: dict
     notas_revisao: str = ""
     data: date = field(default_factory=date.today)
+
+
+def catalogo_aplicado(passos: list) -> list[str]:
+    """Ids dos blocos do catálogo no fluxo, na ordem."""
+    ids = []
+    for p in passos:
+        if isinstance(p, str):
+            ids.append(p)
+        elif p.get("tipo") == "catalogo":
+            ids.append(p["id"])
+    return ids
 
 
 def _uid(passo) -> str:
@@ -420,7 +481,8 @@ def montar_spec(e: EstadoSpec) -> str:
     # 3 — sempre do DataFrame real
     uids = [_uid(p) for p in e.passos]
     origem = origem_das_colunas(uids, e.resultados)
-    tabela = tabela_dados(t, e.df, r.get("significados", {}), origem, transformacoes(uids, e.resultados), e.blocos)
+    tabela = tabela_dados(t, e.df, r.get("significados", {}), origem, transformacoes(uids, e.resultados), e.blocos,
+                          catalogo_aplicado(e.passos))
     out.append("## 3. Dados")
     out.append(
         f"Arquivo: `dados_tratados.csv` — {len(e.df)} linhas, {e.df.shape[1]} colunas. Alvo: `{_coluna_alvo(e)}`."

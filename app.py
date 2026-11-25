@@ -12,7 +12,6 @@ st.set_page_config(page_title="Da Spec ao App", page_icon=":material/schema:", l
 
 aplicar_estilo()
 iniciar_estado()
-barra_lateral()
 
 try:
     ETAPAS[st.session_state.etapa].render()
@@ -24,3 +23,6 @@ except Exception as erro:  # nenhuma exceção técnica deve aparecer crua para 
     )
     with st.expander("Detalhes técnicos (para a organização)"):
         st.code(f"{type(erro).__name__}: {erro}", language="text")
+
+# A barra lateral vem DEPOIS da etapa: assim o rascunho (.json) já inclui o que acabou de ser digitado.
+barra_lateral()

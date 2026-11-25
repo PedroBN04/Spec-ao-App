@@ -27,10 +27,15 @@ def _avancar(at, rotulo="Avançar"):
     _sem_erros(at)
 
 
+def _comecar(at, equipe):
+    at.text_input(key="form_equipe").input(equipe)
+    _botao(at, "Começar").click().run()
+    _sem_erros(at)
+
+
 def _ate_missao(tema_id, equipe="Equipe Teste"):
     at = _app()
-    at.text_input(key="w_equipe").input(equipe).run()
-    _avancar(at, "Começar")
+    _comecar(at, equipe)
     at.button(key=f"escolher_{tema_id}").click().run()
     return at
 
@@ -62,11 +67,13 @@ def _textos(at) -> str:
 def test_inicio_exige_equipe_e_explica_jornada():
     at = _app()
     _sem_erros(at)
-    assert _botao(at, "Começar").disabled
     texto = _textos(at)
     assert "painel" in texto and "agente" in texto.lower()
-    at.text_input(key="w_equipe").input("Equipe Teste").run()
-    assert not _botao(at, "Começar").disabled
+    _botao(at, "Começar").click().run()  # sem nome: não avança e avisa
+    assert at.session_state.etapa == 0
+    assert any("Digite um nome" in w.value for w in at.warning)
+    _comecar(at, "  Equipe Teste  ")  # digitar e clicar direto, sem Enter
+    assert at.session_state.etapa == 1 and at.session_state.equipe == "Equipe Teste"
 
 
 def test_missao_como_solicitacao_e_liberdade_para_ir_alem():
@@ -186,7 +193,7 @@ def _preview(at) -> str:
 
 def _ir_passo_spec(at, n):
     while at.session_state.spec_passo < n:
-        next(b for b in at.button if b.label.startswith("Próximo")).click().run()
+        _botao(at, "Próximo passo").click().run()
         _sem_erros(at)
 
 
@@ -220,10 +227,60 @@ def test_jornada_completa_ate_gabarito(tema_id, blocos):
     assert not _botao(at, "Avançar").disabled
     _avancar(at)
     assert at.session_state.etapa == 6
-    assert any("Leia SPEC.md e construa" in c.value for c in at.code)
+    assert any("Leia o arquivo SPEC.md e construa" in c.value for c in at.code)
     assert not any(b.key == "nav_7" for b in at.button)  # gabarito só depois da exportação
     _botao(at, "Abrir revisão com o facilitador").click().run()
     _sem_erros(at)
     assert at.session_state.etapa == 7
     gab = _textos(at)
     assert "Armadilha" in gab or "Depende do objetivo" in gab or "Boa prática" in gab
+
+
+def test_missao_troca_pendente_mostra_mensagem_certa():
+    at = _ate_missao("telco")
+    _avancar(at)
+    at.text_area(key="w_notas_diag").input(NOTA_DIAG).run()
+    at.button(key="nav_1").click().run()
+    at.button(key="escolher_hotel").click().run()
+    assert any("Confirme ou cancele a troca" in c.value for c in at.caption)
+    _botao(at, "Cancelar").click().run()
+    assert not _botao(at, "Avançar").disabled and at.session_state.tema_id == "telco"
+
+
+def test_diagnostico_mostra_celulas_so_com_espacos():
+    at = _ate_missao("telco")
+    _avancar(at)
+    metricas = {m.label: m.value for m in at.metric}
+    assert metricas["Células só com espaços"] == "11"
+    assert metricas["Células vazias (nulos)"] == "0,0%"
+
+
+def test_pipeline_mover_invalido_nao_remove_passo():
+    at = _ate_pipeline("telco")
+    for b in ["T01", "T02"]:
+        _adicionar(at, b)
+    uid_t02 = at.session_state.passos[1]["uid"]
+    at.text_input(key=f"nota_{uid_t02}").input("Clientes novos ainda não foram cobrados").run()
+    at.button(key=f"subir_{uid_t02}").click().run()
+    _sem_erros(at)
+    assert [p["id"] for p in at.session_state.passos] == ["T01", "T02"]
+    assert at.session_state.passos[1]["nota"] == "Clientes novos ainda não foram cobrados"
+    texto = _textos(at)
+    assert "A ordem não foi alterada" in texto and '"Converter `TotalCharges` para número"' in texto
+    assert "T01" not in "\n".join(w.value for w in at.warning)
+
+
+def test_pipeline_mostra_linhas_repetidas_no_efeito():
+    at = _ate_pipeline("telco")
+    _adicionar(at, "T08")
+    assert "linhas repetidas: 0 → 22" in _textos(at)
+
+
+def test_spec_esqueleto_preenche_vazios_e_exige_completar_lacunas():
+    at = _ate_spec("telco", ["T01"])
+    at.button(key="esqueleto_0").click().run()
+    _sem_erros(at)
+    assert at.session_state.spec["problema"].startswith("Hoje a [área cliente]")
+    assert any("complete as lacunas" in c.value for c in at.caption)
+    at.text_area(key="w_spec_problema").input("Hoje a diretoria não sabe quem cancela.").run()
+    assert not any("passo 1: complete as lacunas" in c.value for c in at.caption)

@@ -8,6 +8,7 @@ Não corrija, melhore nem "otimize" esses trechos. tests/test_blocks.py confere 
 import pandas as pd
 
 from core.models import Block, Check, Theme
+from core.themes.traducoes import NOMES_TELCO, SIGNIFICADO_APOS_TELCO, VALORES_TELCO
 
 # ---------------------------------------------------------------------------
 # Blocos
@@ -168,8 +169,9 @@ BLOCOS = (
         titulo="Remover \"outliers\" de `MonthlyCharges` (z-score > 1,5)",
         grupo="Outliers",
         explicacao=(
-            "Calcula o quanto cada mensalidade se afasta da média (o \"z-score\") e apaga os clientes "
-            "cujo valor está a mais de 1,5 desvios-padrão da média, para cima ou para baixo."
+            "Procura mensalidades muito fora da curva (outliers) e apaga esses clientes. Para isso mede o quanto "
+            "cada mensalidade se afasta da média (método estatístico z-score) e remove quem está a mais de 1,5 "
+            "desvios-padrão, para cima ou para baixo."
         ),
         codigo=(
             'z = (df["MonthlyCharges"] - df["MonthlyCharges"].mean()) / df["MonthlyCharges"].std()\n'
@@ -188,8 +190,8 @@ BLOCOS = (
         titulo="Transformar todas as colunas de texto em colunas 0/1 (one-hot)",
         grupo="Variáveis",
         explicacao=(
-            "Para cada coluna de texto, cria uma coluna 0/1 para cada valor diferente "
-            "(técnica chamada one-hot) e remove a coluna de texto original."
+            "Transforma cada coluna de texto em várias colunas de 0 e 1 (Sim/Não), uma para cada resposta "
+            "diferente (codificação one-hot), e remove a coluna de texto original."
         ),
         codigo='df = pd.get_dummies(df, columns=df.select_dtypes("object").columns.tolist())',
         categoria="armadilha",
@@ -393,13 +395,14 @@ THEME = Theme(
         "A operadora perde ~1 em cada 4 clientes e não sabe quais perfis cancelam mais nem onde agir primeiro."
     ),
     proposta_inicial=[
-        "Painel com taxa de churn geral e por tipo de contrato, forma de pagamento e faixa de tempo de casa",
+        "Painel com a taxa geral de cancelamento de clientes (churn) e a taxa por tipo de contrato, forma de "
+        "pagamento e faixa de tempo de casa",
         "Filtros na barra lateral",
-        "Lista de clientes ativos com perfil de maior risco (regra simples baseada nos segmentos de maior churn)",
+        "Lista de clientes ativos com perfil de maior risco (regra simples baseada nos grupos que mais cancelam)",
     ],
     aprofundamentos=[
         "Simulador \"e se\" de retenção (ex.: migrar X% dos contratos mensais para anuais)",
-        "Estimativa de receita mensal em risco",
+        "Estimativa de quanto a empresa fatura por mês com os clientes em risco (receita em risco)",
     ],
     colunas_vazamento=(),
     blocos=BLOCOS,
@@ -414,6 +417,9 @@ THEME = Theme(
         "cancelam mais e onde agir primeiro. O TI exportou a base de clientes direto do sistema, do jeito que "
         "estava — ninguém conferiu nem tratou nada."
     ),
+    nomes_pt=NOMES_TELCO,
+    valores_pt=VALORES_TELCO,
+    significado_apos=SIGNIFICADO_APOS_TELCO,
     alvos_aceitos=(),
     vazamento_derivado=("taxa_churn_pagamento",),
     dicionario_extra={

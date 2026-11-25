@@ -76,6 +76,13 @@ def render() -> None:
         with st.expander("Sobre a base de dados", icon=":material/dataset:"):
             st.write(tema.descricao_base)
             st.markdown(f"**Fonte:** [{tema.fonte}]({tema.fonte})  \n**Licença:** {tema.licenca}")
-            st.caption("As bases são usadas apenas para fins educativos, com atribuição às fontes.")
+            st.caption("As bases são usadas apenas para fins educativos, com atribuição às fontes. Kaggle é um site "
+                       "gratuito com bases de dados reais publicadas para estudo.")
+            st.caption("Os nomes das colunas e alguns valores estão em inglês, como vieram do sistema de origem. "
+                       "O Diagnóstico mostra o equivalente em português de cada um.")
 
-    rodape(pode_avancar=tema is not None and not pendente, motivo="Aceite uma missão para avançar.")
+    if pendente:
+        motivo = "Confirme ou cancele a troca de missão acima para continuar."
+    else:
+        motivo = "Aceite uma missão para avançar."
+    rodape(pode_avancar=tema is not None and not pendente, motivo=motivo)

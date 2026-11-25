@@ -93,7 +93,8 @@ def _p_dados(estado):
     origem = sb.origem_das_colunas(uids, estado.resultados)
     transf = sb.transformacoes(uids, estado.resultados)
     salvos = st.session_state.spec.get("significados", {})
-    tabela = sb.tabela_dados(estado.tema, estado.df, salvos, origem, transf, estado.blocos)
+    aplicados = sb.catalogo_aplicado(estado.passos)
+    tabela = sb.tabela_dados(estado.tema, estado.df, salvos, origem, transf, estado.blocos, aplicados)
     editada = st.data_editor(
         tabela,
         key=f"{PREFIXO}dados_{abs(hash(tuple(tabela['Coluna']))) % 10**8}",
@@ -102,7 +103,8 @@ def _p_dados(estado):
         column_order=["Coluna", "Significado", "Tipo", "Valores reais"],
         column_config={"Significado": st.column_config.TextColumn("Significado (editável)", width="large")},
     )
-    padrao = sb.tabela_dados(estado.tema, estado.df, {}, origem, transf, estado.blocos).set_index("Coluna")["Significado"]
+    padrao = sb.tabela_dados(estado.tema, estado.df, {}, origem, transf, estado.blocos,
+                             aplicados).set_index("Coluna")["Significado"]
     mudados = {c: s for c, s in zip(editada["Coluna"], editada["Significado"].fillna("")) if s != padrao.get(c, "")}
     _guardar("significados", {**salvos, **mudados})
     if (st.session_state.notas_diag or "").strip():
@@ -161,6 +163,16 @@ def _sincronizar() -> None:
         st.session_state.spec = {**st.session_state.spec, **novos}
 
 
+def _usar_esqueleto(i: int) -> None:
+    """Preenche só os campos vazios do passo com o esqueleto genérico (lacunas entre colchetes)."""
+    novos = {}
+    for campo, texto in sb.ESQUELETOS[i].items():
+        if not (st.session_state.spec.get(campo) or "").strip():
+            novos[campo] = texto
+            st.session_state[PREFIXO + campo] = texto
+    st.session_state.spec = {**st.session_state.spec, **novos}
+
+
 def _navegar(chave: str) -> None:
     escolhido = st.session_state.get(chave)
     if escolhido is not None:
@@ -204,21 +216,34 @@ def render() -> None:
             DESENHO[i](estado)
             with st.expander("Travou? Veja um exemplo de outro contexto (biblioteca municipal)", icon=":material/lightbulb:"):
                 st.text(passo.exemplo)
+            if i in sb.ESQUELETOS:
+                vazios = [c for c in sb.ESQUELETOS[i] if not (st.session_state.spec.get(c) or "").strip()]
+                st.button(
+                    "Usar esqueleto com lacunas",
+                    icon=":material/edit_note:",
+                    help="Coloca frases com lacunas [entre colchetes] nos campos vazios deste passo. "
+                    "Troque cada lacuna pelo que vale para a sua missão.",
+                    disabled=not vazios,
+                    on_click=_usar_esqueleto,
+                    args=(i,),
+                    key=f"esqueleto_{i}",
+                )
         dica(passo.porque)
         a, b = st.columns(2)
-        a.button(f"Anterior: {nomes[i - 1]}" if i else "Anterior", icon=":material/chevron_left:",
+        a.button("Passo anterior", icon=":material/chevron_left:", help=f"Voltar para: {nomes[i - 1]}" if i else None,
                  on_click=_ir_passo, args=(i - 1,), disabled=i == 0, width="stretch")
-        b.button(f"Próximo: {nomes[i + 1]}" if i < len(nomes) - 1 else "Próximo", icon=":material/chevron_right:",
-                 icon_position="right", on_click=_ir_passo, args=(i + 1,), disabled=i == len(sb.PASSOS) - 1,
-                 type="primary", width="stretch")
+        b.button("Próximo passo", icon=":material/chevron_right:", icon_position="right",
+                 help=f"Ir para: {nomes[i + 1]}" if i < len(nomes) - 1 else None,
+                 on_click=_ir_passo, args=(i + 1,), disabled=i == len(sb.PASSOS) - 1, type="primary", width="stretch")
 
     texto = sb.montar_spec(estado_spec())
     with direita:
         topo, botao = st.columns([3, 2], vertical_alignment="center")
         topo.markdown("**Prévia da SPEC.md**")
         como_texto = st.session_state.get("spec_como_texto", False)
-        botao.button("Ver formatado" if como_texto else "Ver como texto", on_click=_alternar_texto, width="stretch",
-                     icon=":material/article:" if como_texto else ":material/code:")
+        botao.button("Formatado" if como_texto else "Texto", on_click=_alternar_texto, width="stretch",
+                     icon=":material/article:" if como_texto else ":material/code:",
+                     help="Alternar entre a prévia formatada e o texto puro do arquivo SPEC.md")
         with st.container(height=680, border=True, key="previa"):
             if como_texto:
                 st.code(texto, language="markdown")

@@ -26,7 +26,8 @@ def render() -> None:
 
     aba1, aba2, aba3 = st.tabs(["Seus passos", "Pontos de qualidade", "SPEC de referência"])
     with aba1:
-        for item in gb.passos_comentados(tema, st.session_state.passos, st.session_state.blocos):
+        for item in gb.passos_comentados(tema, st.session_state.passos, st.session_state.blocos,
+                                         st.session_state.resultados):
             rotulo, icone, cor = SELO[item.categoria]
             with st.container(border=True):
                 st.markdown(f"**{item.n}. {item.titulo}**")
@@ -36,6 +37,8 @@ def render() -> None:
                     st.caption(f"Para discutir: {item.pergunta}")
                 if item.sugestao:
                     st.caption(item.sugestao)
+                if item.observacao:
+                    st.info(item.observacao, icon=":material/info:")
         faltaram = gb.boas_praticas_nao_usadas(tema, st.session_state.passos)
         if faltaram:
             with st.expander(f"Boas práticas do catálogo que você não usou ({len(faltaram)})"):
