@@ -8,7 +8,8 @@ JORNADA = [
     ("Pipeline", "Você monta, bloco a bloco, a sequência de tratamentos que deixa a base pronta para uso."),
     ("Revisão", "Você compara a base original com a tratada e decide se precisa ajustar algo."),
     ("SPEC", "Você escreve a especificação: o que construir, para quem, com quais regras e como conferir."),
-    ("Exportar", "Você baixa a base tratada e a SPEC, que um agente de IA usa para construir o painel."),
+    ("Exportar", "Você baixa o kit (base tratada + SPEC) e envia para a organização pelo WhatsApp; um agente de IA "
+                  "constrói o painel a partir dele."),
 ]
 
 

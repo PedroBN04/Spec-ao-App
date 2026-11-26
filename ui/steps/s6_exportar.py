@@ -29,7 +29,7 @@ def render() -> None:
     estado = estado_spec()
     original = carregar_base(tema)
 
-    cabecalho("Exporte sua entrega", "Baixe o kit da equipe e leve para o assistente de IA que vai construir o painel.")
+    cabecalho("Exporte sua entrega", "Baixe o kit da equipe e envie para a organização pelo WhatsApp.")
     c = st.columns(4)
     c[0].metric("Missão", tema.dominio, help=tema.area_cliente)
     c[1].metric("Passos na pipeline", len(estado.passos))
@@ -48,9 +48,9 @@ def render() -> None:
     with st.container(border=True):
         st.markdown("**Kit da equipe (recomendado)**")
         st.caption(
-            "Um arquivo .zip com tudo pronto e com os nomes certos: `dados_tratados.csv` (para o assistente de IA), "
+            "Um arquivo .zip com tudo pronto e com os nomes certos: `dados_tratados.csv` (para o agente de IA), "
             + ("`dados_tratados_excel.xlsx` (abre direto no Excel, em linhas e colunas) " if tem_xlsx else "")
-            + "e `SPEC.md`. É só extrair numa pasta — não precisa renomear nada."
+            + "e `SPEC.md`. Envie o .zip como está: não precisa extrair nem renomear nada."
         )
         st.download_button(
             f"Baixar kit_{slug}.zip",
@@ -84,25 +84,20 @@ def render() -> None:
                           on_click=_marcar_exportou, key="baixar_spec")
         st.caption(f"Base tratada: {fmt_int(len(df))} linhas e {fmt_int(df.shape[1])} colunas.")
 
-    st.subheader("Próximo passo: construir a solução com um assistente de IA", anchor=False)
-    st.write("Use o assistente de código que a turma estiver usando. O pedido (prompt) é o mesmo para todos:")
-    st.code(PROMPT, language="text", wrap_lines=True)
-    aba1, aba2 = st.tabs(["Assistente no computador (terminal ou editor)", "Chat na web"])
-    with aba1:
+    st.subheader("Próximo passo: entregar o kit para a organização", anchor=False)
+    with st.container(border=True):
         st.markdown(
-            "Ex.: Claude Code, Cursor, Windsurf, GitHub Copilot, Antigravity.\n\n"
-            "1. Extraia o kit `.zip` numa pasta nova.\n"
-            "2. Abra o assistente **nessa pasta** (no terminal ou abrindo a pasta no editor).\n"
-            "3. Cole o prompt acima e acompanhe o que ele faz."
+            f"1. Baixe o kit acima (`kit_{slug}.zip`). **Não precisa extrair nem renomear nada.**\n"
+            "2. Envie o arquivo `.zip` no **WhatsApp** para o organizador do hackathon "
+            "(como documento, não como foto).\n"
+            f"3. Na mensagem, escreva o nome da equipe: **{st.session_state.equipe or 'sua equipe'}**.\n"
+            "4. Pronto. A organização entrega o kit a um agente de IA, que constrói o painel seguindo a sua SPEC."
         )
-    with aba2:
-        st.markdown(
-            "Ex.: ChatGPT, Gemini, Claude no navegador.\n\n"
-            "1. Extraia o kit `.zip`.\n"
-            "2. Envie os arquivos `dados_tratados.csv` e `SPEC.md` na conversa.\n"
-            "3. Cole o prompt acima. Se a base for grande demais para o chat, peça o código do app e rode-o no "
-            "seu computador com o CSV."
-        )
+        st.caption("Se o WhatsApp recusar o arquivo, envie os três arquivos separados (expansor acima).")
+    with st.expander("O que a organização vai pedir ao agente de IA", icon=":material/smart_toy:"):
+        st.write("O pedido (prompt) é o mesmo para todas as equipes. Por isso, tudo o que importa precisa estar "
+                 "escrito na SPEC:")
+        st.code(PROMPT, language="text", wrap_lines=True)
 
     st.subheader("Revisão com o facilitador", anchor=False)
     st.write("Depois de baixar os arquivos, abra o gabarito do desafio para discutir suas decisões em grupo.")
