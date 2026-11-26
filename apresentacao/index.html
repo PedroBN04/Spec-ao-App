@@ -47,7 +47,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .tb-right{display:flex;justify-content:flex-end;gap:16px;padding-right:18px;color:var(--mut);font-size:18px}
 
 /* Corpo */
-.main{display:grid;grid-template-columns:64px var(--side) 1fr;min-height:0;transition:grid-template-columns .35s ease}
+.main{display:grid;grid-template-columns:64px var(--side) 1fr;min-height:0;overflow:hidden;transition:grid-template-columns .35s ease}
 .activity{background:var(--bg2);border-right:1px solid var(--line);display:flex;flex-direction:column;align-items:center;gap:6px;padding-top:10px}
 .activity .codicon{font-size:30px;color:#868686;padding:12px 0;width:100%;text-align:center;border-left:2px solid transparent}
 .activity .on{color:var(--fg);border-left-color:var(--blue)}.activity .bottom{margin-top:auto}
@@ -59,12 +59,13 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .tree .file{display:flex;align-items:center;gap:8px;padding:4px 14px 4px 38px;color:#bdbdbd;font-family:var(--mono);font-size:15.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;border:1px solid transparent}
 .tree .file:hover{background:#2a2d2e}
 .tree .file.on{background:#04395e;color:#fff;border-color:var(--blue)}
+.tree .sub-pasta.hide{display:none}
 .tree .file.sub{padding-left:58px}
 .ficon{font-size:11px;font-weight:700;width:22px;flex:0 0 22px;text-align:center;border-radius:3px;font-family:var(--mono);line-height:16px}
 .ficon.md{color:#519aba}.ficon.py{color:#f2cc60}.ficon.sh{color:#89e051}.ficon.diff{color:#e37933}.ficon.json{color:#cbcb41}.ficon.tree{color:#a074c4}
 
 /* Editor */
-.editor{display:grid;grid-template-rows:50px 36px 1fr;min-width:0;min-height:0;background:var(--bg)}
+.editor{display:grid;grid-template-rows:50px 36px minmax(0,1fr);min-width:0;min-height:0;background:var(--bg)}
 .tabs{display:flex;background:var(--bg2);border-bottom:1px solid var(--line);overflow:hidden}
 .tab{display:flex;align-items:center;gap:10px;padding:0 22px;font-family:var(--mono);font-size:17px;color:var(--mut);border-right:1px solid var(--line);white-space:nowrap}
 .tab.on{background:var(--bg);color:var(--fg);border-top:2px solid var(--blue);animation:tabIn .3s ease}
@@ -76,8 +77,8 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .gutter{font-family:var(--mono);font-size:16px;color:#5a5a5a;text-align:right;padding:28px 16px 0 0;line-height:31.6px;overflow:hidden;user-select:none}
 .gutter .cur{color:#cccccc}
 .canvas{position:relative;overflow:hidden}
-.minimap{border-left:1px solid var(--line);padding:14px 10px;display:flex;flex-direction:column;gap:5px;position:relative;background:#1b1b1b}
-.minimap i{display:block;height:20px;border-radius:2px;background:linear-gradient(90deg,#3a3d41 0 60%,transparent 60%);opacity:.7;cursor:pointer}
+.minimap{border-left:1px solid var(--line);padding:14px 10px;display:flex;flex-direction:column;gap:5px;overflow:hidden;min-height:0;position:relative;background:#1b1b1b}
+.minimap i{display:block;height:15px;flex:0 0 15px;border-radius:2px;background:linear-gradient(90deg,#3a3d41 0 60%,transparent 60%);opacity:.7;cursor:pointer}
 .minimap i:nth-child(3n){background:linear-gradient(90deg,#3a3d41 0 80%,transparent 80%)}
 .minimap i:nth-child(4n+1){background:linear-gradient(90deg,#264f78 0 45%,transparent 45%)}
 .minimap i.on{outline:2px solid var(--blue);background:#3b4a5a;opacity:1}
@@ -213,6 +214,66 @@ code{font-size:.9em;color:var(--type);background:#ffffff0d;padding:1px 8px;borde
 .impact .q{font-size:104px;font-weight:700;line-height:1.1;letter-spacing:-.02em}
 .impact .sub{font-size:40px;color:var(--fg2);margin-top:40px;font-family:var(--mono)}
 
+/* Corpo do slide: ocupa a altura livre e centraliza o conteúdo */
+.body{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center}
+.card.tall{display:flex;flex-direction:column;justify-content:center;min-height:300px}
+/* Mapa da apresentação */
+.mapa .card{position:relative;padding:24px 24px 22px}
+.mapa .ltr{font:700 44px var(--mono);color:var(--mut);display:block;margin-bottom:10px;line-height:1}
+.mapa h3{font-size:27px}.mapa p{font-size:22px}
+/* Foto */
+.foto{margin:0}.foto img{display:block;width:100%;border-radius:12px;border:1px solid var(--line2);box-shadow:0 12px 40px #0008}
+.foto figcaption{font:17px var(--mono);color:var(--mut);margin-top:10px;text-align:center}
+/* Equação (1991 × 2026) */
+.eq{display:flex;align-items:center;gap:16px;font-size:28px;flex-wrap:wrap}
+.eq .yr{font:700 36px var(--mono);color:var(--blue2);width:116px}
+.eq .tk{background:var(--bg3);border:1px solid var(--line2);border-radius:10px;padding:14px 22px;white-space:nowrap}
+.eq .op{color:var(--mut);font:700 34px var(--mono)}
+.eq .res{border-color:var(--blue2);color:var(--blue2);font-weight:600;background:#0e8ef01a}
+/* Linha do tempo */
+.timeline{position:relative;display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:16px}
+.timeline::before{content:"";position:absolute;left:0;right:0;top:84px;height:4px;border-radius:2px;background:linear-gradient(90deg,var(--line2),var(--blue2))}
+.timeline .ev{position:relative;text-align:center}
+.timeline .yr{font:700 40px var(--mono);color:var(--blue2);height:62px;line-height:62px;white-space:nowrap}
+.timeline .dot{width:26px;height:26px;border-radius:50%;background:var(--bg);border:4px solid var(--blue2);margin:9px auto 24px;position:relative;z-index:1}
+.timeline .ev b{display:block;font-size:28px;line-height:1.2;margin-bottom:8px;color:var(--fg)}
+.timeline .ev span{display:block;font-size:22px;color:var(--fg2);line-height:1.35}
+.timeline .ev.rd .yr{color:var(--red)}.timeline .ev.rd .dot{border-color:var(--red)}
+.timeline .ev.gr .yr{color:var(--green)}.timeline .ev.gr .dot{border-color:var(--green);background:var(--green)}
+/* Escada da cascata */
+.stairs>div{width:440px;background:var(--bg3);border:2px solid var(--line2);border-radius:10px;padding:16px 22px;font-size:27px;margin-left:calc(var(--i,0) * 62px);margin-bottom:12px;display:flex;gap:14px;align-items:center}
+.stairs>div .codicon{color:var(--blue2)}
+.stairs>div.rd{border-color:var(--red);background:#f851491a;width:auto;font-size:24px}.stairs>div.rd .codicon{color:var(--red)}
+/* Valores do manifesto */
+.valores>div{background:var(--bg3);border:1px solid var(--line2);border-left:5px solid var(--blue2);border-radius:10px;padding:18px 24px;margin-bottom:16px;font-size:29px}
+.valores>div:last-child{margin-bottom:0}
+.valores b{color:var(--fg)}.valores span{color:var(--mut)}
+/* Estados do TDD */
+.estado{border:2px solid var(--cor);border-radius:12px;padding:16px 22px;background:color-mix(in srgb,var(--cor) 12%,transparent)}
+.estado b{display:block;font-size:30px;color:var(--cor)}.estado span{font-size:23px;color:var(--fg2)}
+/* Tabela de comparação */
+.cmp{display:grid;border:1px solid var(--line2);border-radius:12px;overflow:hidden;font-size:26px;line-height:1.3}
+.cmp>div{padding:16px 24px;border-top:1px solid var(--line2);background:var(--bg3)}
+.cmp>.hd{font:600 19px var(--mono);letter-spacing:.06em;color:var(--mut);background:var(--bg2);border-top:0}
+.cmp>.hd.rd{color:var(--red)}.cmp>.hd.gr{color:var(--green)}
+.cmp>.k{color:var(--fg2);font:500 22px var(--mono);display:flex;align-items:center}
+/* Diagrama de Venn */
+.venn{position:relative;width:760px;height:500px;margin:0 auto}
+.venn .c{position:absolute;top:0;width:500px;height:500px;border-radius:50%;display:flex;flex-direction:column;justify-content:center;gap:6px;font-size:26px;line-height:1.2}
+.venn .c b{font-size:36px}.venn .c small{font-size:20px;color:var(--fg2);font-family:var(--mono)}.venn .c span{font-size:21px;color:var(--fg2)}
+.venn .c1{left:0;background:#0e8ef026;border:3px solid var(--blue2);padding:0 280px 0 50px}
+.venn .c2{right:0;background:#3fb95026;border:3px solid var(--green);padding:0 50px 0 280px;text-align:right}
+.venn .mid{position:absolute;left:50%;top:250px;transform:translate(-50%,-50%);font:700 110px var(--sans);color:var(--yellow);line-height:1;text-shadow:0 0 30px #f2cc6066}
+/* Referências */
+.refs{font-size:18.5px;line-height:1.45;color:var(--fg2)}
+.refs>div>div{margin-bottom:5px}
+.refs .acc.mono{margin-bottom:6px;font-size:18px}
+/* Explorador: pastas recolhidas fora da seção atual */
+.tree .folder{cursor:pointer}
+.tree .file.hide{display:none}
+.tree .folder.cur{color:var(--fg)}
+.ficon.feature{color:#89e051}
+
 .qr{background:#fff;padding:14px;border-radius:12px;display:inline-block;line-height:0}
 .qr svg{width:100%;height:100%}
 
@@ -234,7 +295,7 @@ code{font-size:.9em;color:var(--type);background:#ffffff0d;padding:1px 8px;borde
   #app,#toasts,#palette,#commit{display:none!important}
   #print{display:block}
   .page{width:1920px;height:1080px;position:relative;display:grid;grid-template-rows:44px 50px 1fr 38px;background:var(--bg);break-after:page;page-break-after:always;overflow:hidden}
-  .page .slide{display:flex!important;position:relative;inset:auto;animation:none}
+  .page .slide{display:flex!important;position:relative;inset:auto;animation:none;padding-left:70px}
   .page .titlebar,.page .tabs,.page .status{display:flex}
   .page .titlebar{display:grid}
   *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
@@ -284,195 +345,492 @@ code{font-size:.9em;color:var(--type);background:#ffffff0d;padding:1px 8px;borde
       <div class="pill" style="margin-top:14px"><i class="codicon codicon-milestone"></i> prêmios + certificado de participação</div>
     </div>
   </div>
-  <aside class="notes">Boa noite! Este é o “Da Spec ao App”, um minicurso seguido de hackathon da ACE de Inteligência de Negócios. Apresente o professor José Eduardo e a equipe organizadora. Peça para todos já abrirem o site pelo QR Code: vamos usá-lo daqui a pouco.</aside>
+  <aside class="notes">Boa noite! Este é o “Da Spec ao App”, um minicurso seguido de hackathon da ACE de Inteligência de Negócios. Apresente o professor José Eduardo e a equipe organizadora. Peça para todos já abrirem o site pelo QR Code: vamos usá-lo mais tarde.</aside>
 </section>
 
 <section class="slide" data-file="02_agenda.tree" data-folder="A_abertura" data-section="A. Abertura" data-time="1 min">
   <div class="s-file">// 02_agenda.tree</div>
   <h1>Agenda da noite</h1>
-  <div class="code stg" style="--step:260ms;font-size:30px;line-height:1.65"><span class="ln"><span class="t">noite_26-11/</span></span><span class="ln">├── <span class="n">19h00</span>  abertura.md</span><span class="ln">├── <span class="n">19h10</span>  apresentacao_sdd.md          <span class="c"># o que vamos ver agora</span></span><span class="ln">├── <span class="n">20h30</span>  <span class="t">hackathon/</span>                   <span class="c"># missão → dados → SPEC → kit</span></span><span class="ln">├── <span class="n">21h40</span>  <span class="t">pitches/</span>                     <span class="c"># até 3 min por equipe</span></span><span class="ln">└── <span class="n">22h30</span>  encerramento</span>
+  <div class="body">
+    <div class="g2" style="grid-template-columns:1.3fr .7fr;align-items:center">
+      <div class="code stg" style="--step:260ms;font-size:26px;line-height:1.85"><span class="ln"><span class="t">noite_26-11/</span></span><span class="ln">├── <span class="n">19h00</span>  abertura.md</span><span class="ln">├── <span class="n">19h10</span>  apresentacao/  <span class="c"># SDD, dados e caso real</span></span><span class="ln">├── <span class="n">20h30</span>  <span class="t">hackathon/</span>     <span class="c"># missão → SPEC → kit</span></span><span class="ln">├── <span class="n">21h40</span>  <span class="t">pitches/</span>       <span class="c"># até 3 min por equipe</span></span><span class="ln">└── <span class="n">22h30</span>  encerramento</span></div>
+      <div class="card stg" style="--d:1700ms">
+        <h3><i class="codicon codicon-target"></i> Você sai daqui sabendo</h3>
+        <ul class="l" style="font-size:25px;margin-top:14px">
+          <li><i class="codicon codicon-check" style="font-size:26px"></i><span>por que a IA amplia quem tem base técnica</span></li>
+          <li><i class="codicon codicon-check" style="font-size:26px"></i><span>o que é <b>Spec-Driven Development</b></span></li>
+          <li><i class="codicon codicon-check" style="font-size:26px"></i><span>como tratar dados e escrever uma spec</span></li>
+          <li style="margin-bottom:0"><i class="codicon codicon-check" style="font-size:26px"></i><span>como um agente transforma isso em painel</span></li>
+        </ul>
+      </div>
+    </div>
   </div>
-  <aside class="notes">Mostre como a noite está organizada: abertura às 19h, apresentação a partir das 19h10, hackathon das 20h30 às 21h40, depois os pitches e o encerramento às 22h30. Reforce que os pitches têm até 3 minutos.</aside>
+  <aside class="notes">A noite tem duas partes: até as 20h30, a apresentação; depois, o hackathon até 21h40, os pitches e o encerramento às 22h30. Ao final, cada um deve saber por que a IA amplia quem tem base técnica, o que é SDD, como tratar dados e escrever uma spec e como um agente transforma isso em painel.</aside>
 </section>
 
-<!-- ===================================================== B. O CENÁRIO -->
-<section class="slide" data-file="03_mercado_pede_agilidade.md" data-folder="B_cenario" data-section="B. O cenário" data-time="1,5 min"
+<section class="slide" data-file="03_mapa_da_apresentacao.md" data-folder="A_abertura" data-section="A. Abertura" data-time="1,5 min">
+  <div class="s-file">// 03_mapa_da_apresentacao.md</div>
+  <h1>O mapa da apresentação</h1>
+  <div class="body">
+    <div class="g4 stg mapa" style="--step:180ms">
+      <div class="card"><span class="ltr">B</span><h3>Da garagem à IA</h3><p>Linux, 1991: o que uma pessoa com conhecimento técnico consegue construir.</p></div>
+      <div class="card"><span class="ltr">C</span><h3>Como se fazia software</h3><p>Cascata, Ágil, TDD e BDD: o que cada um resolveu.</p></div>
+      <div class="card"><span class="ltr">D</span><h3>A IA chegou</h3><p>Uso, confiança e o risco do “vibe coding”.</p></div>
+      <div class="card"><span class="ltr">E</span><h3>Spec-Driven Development</h3><p>A especificação como fonte da verdade.</p></div>
+      <div class="card"><span class="ltr">F</span><h3>Dados: antes e hoje</h3><p>Da planilha ao agente de dados, e por que qualidade importa.</p></div>
+      <div class="card"><span class="ltr">G</span><h3>Caso real: Analy</h3><p>Agentes de dados na Algar e o que aprendemos.</p></div>
+      <div class="card"><span class="ltr">H</span><h3>O hackathon</h3><p>A jornada no site, a entrega do kit e a avaliação.</p></div>
+      <div class="card" style="border-color:var(--blue)"><span class="ltr acc">→</span><h3>Mão na massa</h3><p>Das 20h30 às 21h40, com a organização circulando.</p></div>
+    </div>
+  </div>
+  <aside class="notes">Este é o mapa: vamos começar pela história, com o Linux, passar pelos métodos de desenvolvimento que vieram antes da IA, ver o que muda com a IA e o SDD, como a exploração de dados evoluiu, um caso real da Algar e, por fim, as regras do hackathon. O explorador à esquerda mostra em que pasta estamos. A apresentação leva uns 60 minutos, com espaço para perguntas.</aside>
+</section>
+
+<!-- ===================================================== B. DA GARAGEM À IA -->
+<section class="slide" data-file="04_linux_1991.md" data-folder="B_da_garagem_a_ia" data-section="B. Da garagem à IA" data-time="2 min">
+  <div class="s-file">// 04_linux_1991.md</div>
+  <h1>1991: um estudante e um <span class="acc">PC comum</span></h1>
+  <div class="body">
+    <div class="g2" style="grid-template-columns:.62fr 1.38fr;align-items:center;gap:44px">
+      <figure class="foto stg"><img src="assets/img/linus_torvalds_2003.webp" alt="Linus Torvalds sorrindo, em 2003"><figcaption>Linus Torvalds em 2003 · foto: Alex Dawson, CC BY-SA 2.0</figcaption></figure>
+      <div>
+        <div class="term"><div class="th"><b>comp.os.minix</b><span>25/08/1991 · Usenet</span></div>
+          <div class="tl" style="white-space:pre-wrap;padding-top:14px;font-size:23px"><span class="type" data-delay="500">Hello everybody out there using minix — I'm doing a (free) operating system (just a hobby, won't be big and professional like gnu) for 386(486) AT clones.</span></div></div>
+        <p class="mu" style="font-size:22px;margin:12px 0 22px">“Estou fazendo um sistema operacional (gratuito) — só um hobby, não vai ser grande e profissional como o GNU — para clones AT 386(486).”</p>
+        <ul class="l stg" style="--d:1200ms;--step:300ms;font-size:27px">
+          <li><i class="codicon codicon-mortar-board"></i><span><b>21 anos</b>, estudante de Computação na Universidade de Helsinque.</span></li>
+          <li><i class="codicon codicon-device-desktop"></i><span>Um <b>PC pessoal com processador Intel 386</b>, comprado no início de 1991.</span></li>
+          <li style="margin-bottom:0"><i class="codicon codicon-rocket"></i><span>Setembro de 1991: publica a <b>versão 0.01</b> do Linux.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="foot">Mensagem original de L. Torvalds em comp.os.minix (25/08/1991) · Torvalds &amp; Diamond, “Just for Fun” (2001). Foto: Alex Dawson (Flickr), Perth, jan/2003, CC BY-SA 2.0, via Wikimedia Commons (recortada).</div>
+  <aside class="notes">Em agosto de 1991, um estudante de 21 anos da Universidade de Helsinque, Linus Torvalds, escreveu num fórum que estava fazendo um sistema operacional “só como hobby, nada grande e profissional”. Ele tinha um PC comum, com processador 386, comprado no começo daquele ano. Em setembro saiu a versão 0.01 do Linux. Repare: não havia grande empresa nem supercomputador, só uma pessoa com muito conhecimento técnico.</aside>
+</section>
+
+<section class="slide" data-file="05_so_um_hobby.md" data-folder="B_da_garagem_a_ia" data-section="B. Da garagem à IA" data-time="1,5 min">
+  <div class="s-file">// 05_so_um_hobby.md</div>
+  <h1>“Só um hobby”… que virou <span class="acc">infraestrutura do mundo</span></h1>
+  <div class="body">
+    <div class="g3 stg" style="--step:350ms">
+      <div class="card tall"><div class="big">500/500</div><h3 style="margin-top:18px"><i class="codicon codicon-server"></i> Supercomputadores</h3><p>Todos os 500 supercomputadores da lista TOP500 rodam Linux desde novembro de 2017.</p></div>
+      <div class="card tall"><div class="big gr"><i class="codicon codicon-device-mobile" style="font-size:84px;color:var(--green)"></i></div><h3 style="margin-top:18px"><i class="codicon codicon-layers"></i> Android</h3><p>O sistema dos celulares Android é construído sobre o kernel Linux.</p></div>
+      <div class="card tall"><div class="big yl"><i class="codicon codicon-source-control" style="font-size:84px;color:var(--yellow)"></i></div><h3 style="margin-top:18px"><i class="codicon codicon-git-commit"></i> Git (2005)</h3><p>Linus também criou o Git, o controle de versão usado no mundo todo — e imitado por este “editor”.</p></div>
+    </div>
+    <p class="stg" style="--d:1500ms;margin-top:40px;font-size:34px;text-align:center"><span>Ferramenta modesta + <span class="acc">conhecimento técnico profundo</span> = impacto enorme.</span></p>
+  </div>
+  <div class="foot">Fontes: TOP500.org (estatísticas de sistema operacional, listas desde nov/2017) · source.android.com (“Kernel”) · git-scm.com (“A Short History of Git”).</div>
+  <aside class="notes">O hobby virou a base de quase tudo: todos os 500 supercomputadores mais rápidos do mundo rodam Linux desde 2017, o Android é construído sobre o kernel Linux e, de quebra, o Linus criou o Git em 2005, que é o controle de versão que todo mundo usa — inclusive este “editor” que estou usando para apresentar. A ferramenta era modesta; o diferencial era o conhecimento.</aside>
+</section>
+
+<section class="slide" data-file="06_ia_amplia_conhecimento.md" data-folder="B_da_garagem_a_ia" data-section="B. Da garagem à IA" data-time="2 min">
+  <div class="s-file">// 06_ia_amplia_conhecimento.md</div>
+  <h1>Hoje a IA é a nova <span class="acc">alavanca</span></h1>
+  <div class="body">
+    <div class="stg" style="--step:500ms;display:flex;flex-direction:column;gap:22px">
+      <div class="eq"><span class="yr">1991</span><span class="tk">1 pessoa</span><span class="op">+</span><span class="tk">um PC 386</span><span class="op">+</span><span class="tk">conhecimento profundo</span><span class="op">=</span><span class="tk res">Linux</span></div>
+      <div class="eq"><span class="yr">2026</span><span class="tk">1 pessoa</span><span class="op">+</span><span class="tk">IA</span><span class="op">+</span><span class="tk">conhecimento técnico</span><span class="op">=</span><span class="tk res">apps, agentes, painéis</span></div>
+    </div>
+    <div class="g3 stg" style="--d:1400ms;--step:300ms;margin-top:46px">
+      <div class="card"><h3><i class="codicon codicon-zap"></i> A IA acelera</h3><p>Escrever código, montar telas, sugerir consultas e documentar.</p></div>
+      <div class="card"><h3><i class="codicon codicon-person"></i> Continua com você</h3><p>Entender o problema, escolher os dados, definir as regras e conferir.</p></div>
+      <div class="card" style="border-color:var(--red)"><h3><i class="codicon codicon-warning" style="color:var(--red)"></i> Sem base técnica</h3><p>A IA acelera também os erros — e eles saem com cara de certo.</p></div>
+    </div>
+  </div>
+  <aside class="notes">Hoje temos ferramentas de IA que facilitam construir muita coisa: apps, agentes, painéis. Mas a equação continua tendo um termo essencial: o conhecimento técnico adequado. A IA acelera o código, as telas, as consultas; entender o problema, escolher os dados, definir regras e conferir continua sendo nosso trabalho. Sem base técnica, a IA acelera também os erros.</aside>
+</section>
+
+<!-- ===================================================== C. COMO SE FAZIA SOFTWARE -->
+<section class="slide" data-file="07_linha_do_tempo_metodos.md" data-folder="C_como_se_fazia_software" data-section="C. Como se fazia software" data-time="1,5 min">
+  <div class="s-file">// 07_linha_do_tempo_metodos.md</div>
+  <h1>Meio século de <span class="acc">métodos</span> de desenvolvimento</h1>
+  <div class="body">
+    <div class="timeline stg" style="--step:260ms">
+      <div class="ev"><div class="yr">1970</div><div class="dot"></div><b>Cascata</b><span>etapas em sequência (Royce)</span></div>
+      <div class="ev"><div class="yr">2001</div><div class="dot"></div><b>Manifesto Ágil</b><span>17 pessoas, ciclos curtos</span></div>
+      <div class="ev"><div class="yr">2002</div><div class="dot"></div><b>TDD</b><span>o teste antes do código (Kent Beck)</span></div>
+      <div class="ev"><div class="yr">2006</div><div class="dot"></div><b>BDD</b><span>Dado / Quando / Então (Dan North)</span></div>
+      <div class="ev"><div class="yr">2009</div><div class="dot"></div><b>DevOps</b><span>desenvolvimento + operação</span></div>
+      <div class="ev"><div class="yr">2021</div><div class="dot"></div><b>Copilot</b><span>IA sugere código no editor</span></div>
+      <div class="ev rd"><div class="yr">2025</div><div class="dot"></div><b>Vibe coding</b><span>aceitar sem olhar</span></div>
+      <div class="ev gr"><div class="yr">2025</div><div class="dot"></div><b>SDD</b><span>a spec como fonte da verdade</span></div>
+    </div>
+    <p class="stg" style="--d:2400ms;margin-top:54px;font-size:32px;text-align:center"><span>Cada método resolveu um problema do anterior. <span class="acc">O SDD reaproveita o melhor deles.</span></span></p>
+  </div>
+  <div class="foot">Royce (1970) · agilemanifesto.org (2001) · Beck, “TDD: By Example” (2002) · North, “Introducing BDD” (2006) · DevOpsDays Ghent (2009) · GitHub Blog (29/06/2021) · Spec Kit e Kiro (2025).</div>
+  <aside class="notes">Antes da IA, já havia meio século de métodos. Em 1970, a cascata; em 2001, o Manifesto Ágil; logo depois, TDD e BDD; em 2009, DevOps. Em 2021, a IA começa a sugerir código no editor com o Copilot. Em 2025 surgem o vibe coding, o lado arriscado, e o SDD, o lado com método. Cada um resolveu um problema do anterior.</aside>
+</section>
+
+<section class="slide" data-file="08_cascata.md" data-folder="C_como_se_fazia_software" data-section="C. Como se fazia software" data-time="1,5 min">
+  <div class="s-file">// 08_cascata.md</div>
+  <h1>Cascata (1970): cada etapa <span class="acc">espera a anterior</span></h1>
+  <div class="body">
+    <div class="g2" style="grid-template-columns:1.05fr .95fr;align-items:center;gap:44px">
+      <div class="stairs stg" style="--step:300ms">
+        <div><i class="codicon codicon-list-unordered"></i> Requisitos</div>
+        <div><i class="codicon codicon-symbol-structure"></i> Projeto</div>
+        <div><i class="codicon codicon-code"></i> Implementação</div>
+        <div><i class="codicon codicon-beaker"></i> Testes</div>
+        <div class="rd"><i class="codicon codicon-bug"></i> Erro de requisito descoberto aqui</div>
+      </div>
+      <div class="stg" style="--d:1700ms;--step:400ms">
+        <div class="card"><h3><i class="codicon codicon-quote"></i> O próprio Royce avisou</h3><p style="font-size:27px">“Acredito no conceito, mas a implementação descrita acima é arriscada e convida ao fracasso.”</p><p class="mu" style="font-size:20px;margin-top:10px">W. W. Royce, 1970 (tradução livre)</p></div>
+        <p style="margin-top:28px">Quanto mais tarde o erro aparece, <span class="rd">mais caro</span> é corrigir.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot">Royce, W. W. “Managing the Development of Large Software Systems”. IEEE WESCON, 1970. O nome “cascata” se popularizou depois. Etapas simplificadas.</div>
+  <aside class="notes">Na cascata, cada etapa espera a anterior terminar: requisitos, projeto, implementação, testes. O problema é que um erro de entendimento do pedido só aparece lá no fim. Curiosidade: o artigo de Royce, de 1970, já avisava que fazer tudo em sequência “é arriscado e convida ao fracasso”. O nome “cascata” veio depois.</aside>
+</section>
+
+<section class="slide" data-file="09_manifesto_agil.md" data-folder="C_como_se_fazia_software" data-section="C. Como se fazia software" data-time="1,5 min">
+  <div class="s-file">// 09_manifesto_agil.md</div>
+  <h1>Manifesto Ágil (2001): <span class="acc">ciclos curtos</span></h1>
+  <div class="body">
+    <div class="g2" style="grid-template-columns:1.25fr .75fr;align-items:center;gap:40px">
+      <div class="valores stg" style="--step:350ms">
+        <div><b>Indivíduos e interações</b> <span>mais que processos e ferramentas</span></div>
+        <div><b>Software em funcionamento</b> <span>mais que documentação abrangente</span></div>
+        <div><b>Colaboração com o cliente</b> <span>mais que negociação de contratos</span></div>
+        <div><b>Responder a mudanças</b> <span>mais que seguir um plano</span></div>
+      </div>
+      <div class="stg" style="--d:1700ms">
+        <div class="card"><h3><i class="codicon codicon-info"></i> Atenção</h3><p>O manifesto não diz “sem documentação”: “mesmo havendo valor nos itens à direita, valorizamos mais os itens à esquerda.”</p></div>
+      </div>
+    </div>
+  </div>
+  <div class="foot">Manifesto para Desenvolvimento Ágil de Software (Snowbird, fev/2001) — tradução oficial em agilemanifesto.org/iso/ptbr.</div>
+  <aside class="notes">Em 2001, 17 desenvolvedores se reuniram em Snowbird, nos Estados Unidos, e escreveram o Manifesto Ágil: entregar em ciclos curtos, conversar com o cliente e aceitar mudanças. Um mal-entendido comum é achar que ágil significa “sem documentação”. O texto diz que os itens da direita têm valor; só valorizamos mais os da esquerda. O SDD aproveita isso: a spec é curta e muda junto com o pedido.</aside>
+</section>
+
+<section class="slide" data-file="10_tdd.py" data-folder="C_como_se_fazia_software" data-section="C. Como se fazia software" data-time="2 min">
+  <div class="s-file">// 10_tdd.py</div>
+  <h1>TDD (2002): o <span class="acc">teste nasce antes</span> do código</h1>
+  <div class="body">
+    <div class="g2" style="grid-template-columns:1.3fr .7fr;align-items:center;gap:34px">
+      <div class="code stg" style="--step:420ms;font-size:23px"><span class="ln c"># 1. VERMELHO: escreva o teste primeiro</span><span class="ln"><span class="k">def</span> <span class="f">test_taxa_churn</span>():</span><span class="ln">    <span class="v">df</span> = <span class="v">pd</span>.<span class="f">DataFrame</span>({<span class="s">"Churn"</span>: [<span class="n">1</span>, <span class="n">0</span>, <span class="n">0</span>, <span class="n">1</span>]})</span><span class="ln">    <span class="k">assert</span> <span class="f">taxa_churn</span>(<span class="v">df</span>) == <span class="n">0.5</span>   <span class="rd"># ✗ ainda não existe</span></span><span class="ln"> </span><span class="ln c"># 2. VERDE: o mínimo para passar</span><span class="ln"><span class="k">def</span> <span class="f">taxa_churn</span>(<span class="v">df</span>):</span><span class="ln">    <span class="k">return</span> <span class="v">df</span>[<span class="s">"Churn"</span>].<span class="f">mean</span>()   <span class="gr"># ✓ passou</span></span><span class="ln"> </span><span class="ln c"># 3. REFATORAR: melhore sem quebrar o teste</span></div>
+      <div class="stg" style="--d:1800ms;--step:300ms;display:flex;flex-direction:column;gap:16px">
+        <div class="estado" style="--cor:var(--red)"><b>Vermelho</b><span>um teste que falha</span></div>
+        <div class="estado" style="--cor:var(--green)"><b>Verde</b><span>código que passa</span></div>
+        <div class="estado" style="--cor:var(--blue2)"><b>Refatorar</b><span>melhorar com segurança</span></div>
+      </div>
+    </div>
+    <p class="stg" style="--d:2900ms;margin-top:34px"><span><i class="codicon codicon-beaker acc"></i> O site do hackathon tem <b>272 testes automatizados</b> — inclusive um que garante que nenhum bloco foi “corrigido”.</span></p>
+  </div>
+  <div class="foot">Beck, K. “Test-Driven Development: By Example”. Addison-Wesley, 2002 · Fowler, M. “TestDrivenDevelopment”, martinfowler.com/bliki.</div>
+  <aside class="notes">No TDD, popularizado por Kent Beck, o teste vem antes do código. Primeiro escrevemos um teste que falha, o vermelho; depois o mínimo de código para ele passar, o verde; e então melhoramos o código sem quebrar o teste. A ideia que o SDD herda é: o critério de “pronto” existe antes da implementação. O site que vocês vão usar tem 272 testes automatizados.</aside>
+</section>
+
+<section class="slide" data-file="11_bdd.feature" data-folder="C_como_se_fazia_software" data-section="C. Como se fazia software" data-time="1,5 min">
+  <div class="s-file">// 11_bdd.feature</div>
+  <h1>BDD (2006): comportamento em <span class="acc">linguagem de negócio</span></h1>
+  <div class="body">
+    <div class="g2" style="grid-template-columns:1.2fr .8fr;align-items:center;gap:34px">
+      <div class="code stg" style="--step:330ms;font-size:25px"><span class="ln c"># language: pt</span><span class="ln"><span class="h">Funcionalidade:</span> Painel de cancelamentos</span><span class="ln">  <span class="h">Cenário:</span> taxa geral sem filtros</span><span class="ln">    <span class="p">Dado</span> a base <span class="s">dados_tratados.csv</span></span><span class="ln">    <span class="p">E</span> nenhum filtro selecionado</span><span class="ln">    <span class="p">Quando</span> o painel abre</span><span class="ln">    <span class="p">Então</span> a taxa geral exibida é <span class="n">26,5%</span></span></div>
+      <div class="stg" style="--d:2600ms;--step:350ms">
+        <div class="mono mu" style="font-size:20px;margin-bottom:10px">NA SUA SPEC · CRITÉRIO DE ACEITAÇÃO</div>
+        <div class="card" style="border-color:var(--green)"><p style="font-size:26px;color:var(--fg)">“Sem filtros, o painel mostra a taxa geral calculada do CSV.”</p></div>
+        <p style="margin-top:22px;font-size:26px;color:var(--fg2)">Quem lê: a área de negócio, o desenvolvedor e, agora, <span class="acc">o agente de IA</span>.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot">North, D. “Introducing BDD”. Better Software, mar/2006 · Fowler, M. “GivenWhenThen”, martinfowler.com/bliki. 26,5% = taxa real da base Telco do hackathon.</div>
+  <aside class="notes">O BDD, proposto por Dan North em 2006, escreve o comportamento esperado em frases de negócio: Dado, Quando, Então. Qualquer pessoa da área cliente consegue ler e dizer se está certo. É exatamente o espírito dos critérios de aceitação da SPEC de vocês. A diferença é que, agora, quem também lê é o agente de IA.</aside>
+</section>
+
+<section class="slide" data-file="12_o_que_o_sdd_herda.md" data-folder="C_como_se_fazia_software" data-section="C. Como se fazia software" data-time="1,5 min">
+  <div class="s-file">// 12_o_que_o_sdd_herda.md</div>
+  <h1>O que o SDD <span class="acc">herda</span> de cada método</h1>
+  <div class="body">
+    <div class="cmp stg" style="--step:120ms;grid-template-columns:.55fr 1fr 1.25fr">
+      <div class="hd">MÉTODO</div><div class="hd">IDEIA</div><div class="hd">NA SPEC DO HACKATHON</div>
+      <div class="k">Cascata</div><div>pensar antes de construir</div><div>contexto, escopo e dados antes do código</div>
+      <div class="k">Ágil</div><div>mudança é normal</div><div>mudou o pedido? edite a spec e gere de novo</div>
+      <div class="k">TDD</div><div>“pronto” definido antes</div><div>critérios de aceitação verificáveis</div>
+      <div class="k">BDD</div><div>linguagem de negócio</div><div>regras e critérios em português claro</div>
+      <div class="k acc">Novo</div><div class="acc">quem lê é um agente</div><div class="acc">nada pode ficar implícito</div>
+    </div>
+  </div>
+  <aside class="notes">O SDD não surgiu do nada. Da cascata, herda o pensar antes de construir; do ágil, a ideia de que mudar é normal; do TDD, definir o “pronto” antes; do BDD, escrever em linguagem de negócio. O que é novo: quem lê a especificação é um agente de IA, que não tem o contexto da empresa. Por isso nada pode ficar implícito.</aside>
+</section>
+
+<!-- ===================================================== D. A IA CHEGOU -->
+<section class="slide" data-file="13_mercado_pede_agilidade.md" data-folder="D_a_ia_chegou" data-section="D. A IA chegou" data-time="1,5 min"
   data-notify="A área comercial abriu mais 3 pedidos de painel." data-notify-delay="2600">
-  <div class="s-file">// 03_mercado_pede_agilidade.md</div>
+  <div class="s-file">// 13_mercado_pede_agilidade.md</div>
   <h1>O mercado pede <span class="acc">agilidade</span></h1>
-  <div class="g2" style="grid-template-columns:1fr 1.05fr">
-    <ul class="l stg" style="--step:420ms">
-      <li><i class="codicon codicon-zap"></i><span>A área de negócio quer o painel “para ontem”.</span></li>
-      <li><i class="codicon codicon-history"></i><span>Os pedidos de dados chegam mais rápido do que o time consegue entregar.</span></li>
-      <li><i class="codicon codicon-question"></i><span>Cada pedido passa por entender, tratar dados, construir e conferir.</span></li>
-    </ul>
-    <div class="card stg" style="--step:330ms;--d:500ms;padding:20px 24px">
-      <div class="mono mu" style="font-size:19px;margin-bottom:6px">BACKLOG · área de dados</div>
-      <div class="mono" style="font-size:22px;padding:9px 0;border-bottom:1px solid var(--line2)"><span class="rd">●</span> Painel de cancelamentos por região</div>
-      <div class="mono" style="font-size:22px;padding:9px 0;border-bottom:1px solid var(--line2)"><span class="rd">●</span> Indicadores de vendas para a diretoria</div>
-      <div class="mono" style="font-size:22px;padding:9px 0;border-bottom:1px solid var(--line2)"><span class="yl">●</span> Relatório de estoque semanal</div>
-      <div class="mono" style="font-size:22px;padding:9px 0;border-bottom:1px solid var(--line2)"><span class="yl">●</span> Taxa de faltas por unidade</div>
-      <div class="mono" style="font-size:22px;padding:9px 0"><span class="mu">●</span> … e mais pedidos chegando</div>
+  <div class="body">
+    <div class="g2" style="grid-template-columns:1fr 1.05fr;align-items:center">
+      <ul class="l stg" style="--step:420ms">
+        <li><i class="codicon codicon-zap"></i><span>A área de negócio quer o painel “para ontem”.</span></li>
+        <li><i class="codicon codicon-history"></i><span>Os pedidos de dados chegam mais rápido do que o time consegue entregar.</span></li>
+        <li style="margin-bottom:0"><i class="codicon codicon-question"></i><span>Cada pedido passa por entender, tratar dados, construir e conferir.</span></li>
+      </ul>
+      <div class="card stg" style="--step:330ms;--d:500ms;padding:20px 24px">
+        <div class="mono mu" style="font-size:19px;margin-bottom:6px">BACKLOG · área de dados</div>
+        <div class="mono" style="font-size:22px;padding:11px 0;border-bottom:1px solid var(--line2)"><span class="rd">●</span> Painel de cancelamentos por região</div>
+        <div class="mono" style="font-size:22px;padding:11px 0;border-bottom:1px solid var(--line2)"><span class="rd">●</span> Indicadores de vendas para a diretoria</div>
+        <div class="mono" style="font-size:22px;padding:11px 0;border-bottom:1px solid var(--line2)"><span class="yl">●</span> Relatório de estoque semanal</div>
+        <div class="mono" style="font-size:22px;padding:11px 0;border-bottom:1px solid var(--line2)"><span class="yl">●</span> Taxa de faltas por unidade</div>
+        <div class="mono" style="font-size:22px;padding:11px 0"><span class="mu">●</span> … e mais pedidos chegando</div>
+      </div>
     </div>
   </div>
   <aside class="notes">Quem trabalha com dados conhece o cenário: a área de negócio quer o painel para ontem e a fila de pedidos só cresce. Cada pedido exige entender o problema, tratar os dados, construir e conferir. A pergunta da noite é: como entregar mais rápido sem entregar errado?</aside>
 </section>
 
-<section class="slide" data-file="04_ia_no_desenvolvimento.md" data-folder="B_cenario" data-section="B. O cenário" data-time="1,5 min">
-  <div class="s-file">// 04_ia_no_desenvolvimento.md</div>
+<section class="slide" data-file="14_ia_no_desenvolvimento.md" data-folder="D_a_ia_chegou" data-section="D. A IA chegou" data-time="1,5 min">
+  <div class="s-file">// 14_ia_no_desenvolvimento.md</div>
   <h1>A IA chegou ao desenvolvimento</h1>
-  <div class="g4 stg" style="--step:300ms">
-    <div class="card"><div class="big" data-count="66">66%</div><p style="margin-top:14px">usam assistentes ou agentes de código</p></div>
-    <div class="card"><div class="big" data-count="26">26%</div><p style="margin-top:14px">já usam fluxos automatizados com agentes</p></div>
-    <div class="card"><div class="big gr" data-count="48">48%</div><p style="margin-top:14px">confiam na resposta da IA quando conseguem verificá-la</p></div>
-    <div class="card"><div class="big yl" data-count="6.6" data-dec="1">6,6%</div><p style="margin-top:14px">confiam nela para decisões importantes</p></div>
+  <div class="body">
+    <div class="g4 stg" style="--step:300ms">
+      <div class="card tall"><div class="big" data-count="66">66%</div><p style="margin-top:18px">usam assistentes ou agentes de código</p></div>
+      <div class="card tall"><div class="big" data-count="26">26%</div><p style="margin-top:18px">já usam fluxos automatizados com agentes</p></div>
+      <div class="card tall"><div class="big gr" data-count="48">48%</div><p style="margin-top:18px">confiam na resposta da IA quando conseguem verificá-la</p></div>
+      <div class="card tall"><div class="big yl" data-count="6.6" data-dec="1">6,6%</div><p style="margin-top:18px">confiam nela para decisões importantes</p></div>
+    </div>
+    <p style="margin-top:46px;font-size:36px;text-align:center">Usar IA virou rotina. <span class="acc">Confiar exige poder conferir.</span></p>
   </div>
-  <p style="margin-top:40px;font-size:34px">Usar IA virou rotina. <span class="acc">Confiar exige poder conferir.</span></p>
   <div class="foot">Fonte: Stack Overflow Developer Survey 2026 — seção “AI” (survey.stackoverflow.co/2026/ai), resultados publicados em 06/10/2026.</div>
   <aside class="notes">Segundo a pesquisa da Stack Overflow de 2026, dois em cada três desenvolvedores já usam assistentes ou agentes de código. Mas repare na confiança: quase metade confia quando consegue verificar, e só 6,6% confiam para decisões importantes. Guardem essa ideia: verificar é o que torna a IA útil.</aside>
 </section>
 
-<section class="slide" data-file="05_vibe_coding.diff" data-folder="B_cenario" data-section="B. O cenário" data-time="2 min"
+<section class="slide" data-file="15_vibe_coding.diff" data-folder="D_a_ia_chegou" data-section="D. A IA chegou" data-time="2 min"
   data-notify="O app parece pronto… mas quem conferiu os números?" data-notify-delay="4200">
-  <div class="s-file">// 05_vibe_coding.diff</div>
+  <div class="s-file">// 15_vibe_coding.diff</div>
   <h1>O problema: <span class="rd">“vibe coding”</span></h1>
-  <div class="g2" style="grid-template-columns:.85fr 1.15fr">
-    <div>
-      <div class="mono mu" style="font-size:20px;margin-bottom:10px">PEDIDO VAGO</div>
-      <div class="term"><div class="th"><b>CHAT</b></div><div class="tl" style="white-space:pre-wrap;padding-top:14px"><span class="pr">&gt;</span> <span class="type" data-delay="300">faz um dashboard bonito de churn com esse csv</span></div></div>
-      <p style="margin-top:26px;font-size:28px">Termo popularizado em 2025: aceitar o código gerado sem olhar o que ele faz.</p>
-    </div>
-    <div>
-      <div class="mono mu" style="font-size:20px;margin-bottom:10px">RESULTADO QUE “PARECE CERTO”</div>
-      <div class="code stg" style="--d:1700ms;--step:380ms;font-size:23px"><span class="ln"><span class="v">taxa_churn</span> = <span class="sq">73,5%</span>        <span class="c"># contou quem NÃO cancelou</span></span><span class="ln"><span class="f">grafico</span>(<span class="s sq">"receita_anual"</span>)  <span class="c"># coluna que não existe</span></span><span class="ln"><span class="f">filtro</span>(<span class="s sq">"regiao"</span>)          <span class="c"># inventou um filtro</span></span><span class="ln"><span class="v">vazios</span> → <span class="sq">média</span>           <span class="c"># regra que ninguém pediu</span></span></div>
-      <div class="card stg" style="--d:3400ms;margin-top:18px;padding:16px 22px;font-size:22px;font-family:var(--mono)"><div><span class="rd">✕ 4 problemas</span> <span class="mu">— nenhum aparece na tela bonita</span></div></div>
+  <div class="body">
+    <div class="g2" style="grid-template-columns:.85fr 1.15fr;align-items:center">
+      <div>
+        <div class="mono mu" style="font-size:20px;margin-bottom:10px">PEDIDO VAGO</div>
+        <div class="term"><div class="th"><b>CHAT</b></div><div class="tl" style="white-space:pre-wrap;padding-top:14px"><span class="pr">&gt;</span> <span class="type" data-delay="300">faz um dashboard bonito de churn com esse csv</span></div></div>
+        <p style="margin-top:26px;font-size:28px">Termo popularizado em 2025: aceitar o código gerado sem olhar o que ele faz.</p>
+      </div>
+      <div>
+        <div class="mono mu" style="font-size:20px;margin-bottom:10px">RESULTADO QUE “PARECE CERTO”</div>
+        <div class="code stg" style="--d:1700ms;--step:380ms;font-size:23px"><span class="ln"><span class="v">taxa_churn</span> = <span class="sq">73,5%</span>        <span class="c"># contou quem NÃO cancelou</span></span><span class="ln"><span class="f">grafico</span>(<span class="s sq">"receita_anual"</span>)  <span class="c"># coluna que não existe</span></span><span class="ln"><span class="f">filtro</span>(<span class="s sq">"regiao"</span>)          <span class="c"># inventou um filtro</span></span><span class="ln"><span class="v">vazios</span> → <span class="sq">média</span>           <span class="c"># regra que ninguém pediu</span></span></div>
+        <div class="card stg" style="--d:3400ms;margin-top:18px;padding:16px 22px;font-size:22px;font-family:var(--mono)"><div><span class="rd">✕ 4 problemas</span> <span class="mu">— nenhum aparece na tela bonita</span></div></div>
+      </div>
     </div>
   </div>
   <div class="foot">“Vibe coding”: termo cunhado por Andrej Karpathy em fev/2025 (MIT Technology Review, 16/04/2025; IBM, “What is vibe coding?”). Exemplo da direita ilustrativo.</div>
-  <aside class="notes">Vibe coding é pedir algo vago e aceitar o que vier, sem olhar o código. O resultado parece certo, mas a taxa pode estar invertida, o gráfico usa uma coluna que não existe e o agente inventa regras. O app bonito esconde os erros. O exemplo à direita é ilustrativo.</aside>
+  <aside class="notes">Vibe coding é pedir algo vago e aceitar o que vier, sem olhar o código. O resultado parece certo, mas a taxa pode estar invertida, o gráfico usa uma coluna que não existe e o agente inventa regras. O app bonito esconde os erros. É a IA sem o conhecimento técnico do slide do Linux. O exemplo à direita é ilustrativo.</aside>
 </section>
 
-<!-- ===================================================== C. SDD E SPECS -->
-<section class="slide" data-file="06_o_que_e_sdd.md" data-folder="C_sdd" data-section="C. SDD e specs" data-time="1,5 min">
-  <div class="s-file">// 06_o_que_e_sdd.md</div>
+<!-- ===================================================== E. SDD -->
+<section class="slide" data-file="16_o_que_e_sdd.md" data-folder="E_spec_driven_development" data-section="E. Spec-Driven Development" data-time="1,5 min">
+  <div class="s-file">// 16_o_que_e_sdd.md</div>
   <h1>Spec-Driven Development <span class="mu" style="font-weight:500">(SDD)</span></h1>
-  <div class="g2" style="grid-template-columns:1fr 1fr;align-items:center">
-    <div>
-      <p style="font-size:36px;line-height:1.35">A <span class="acc">especificação</span> é a fonte da verdade.<br>O código é <span class="yl">consequência</span>.</p>
-      <p style="margin-top:28px;color:var(--fg2)">Em vez de “pedir para a IA”: especificar, gerar e verificar — e voltar para a spec quando algo muda.</p>
-    </div>
-    <div class="cycle">
-      <div class="ring"></div><div class="spin"></div>
-      <div class="node" style="--i:0;left:165px;top:0">Especificar<small>SPEC.md</small></div>
-      <div class="node" style="--i:1;right:0;top:245px">Planejar<small>tarefas</small></div>
-      <div class="node" style="--i:2;left:165px;bottom:0">Gerar<small>agente de código</small></div>
-      <div class="node" style="--i:3;left:0;top:245px">Verificar<small>critérios</small></div>
+  <div class="body">
+    <div class="g2" style="grid-template-columns:1fr 1fr;align-items:center">
+      <div>
+        <p style="font-size:38px;line-height:1.35">A <span class="acc">especificação</span> é a fonte da verdade.<br>O código é <span class="yl">consequência</span>.</p>
+        <p style="margin-top:28px;color:var(--fg2)">Em vez de “pedir para a IA”: especificar, gerar e verificar — e voltar para a spec quando algo muda.</p>
+      </div>
+      <div class="cycle">
+        <div class="ring"></div><div class="spin"></div>
+        <div class="node" style="--i:0;left:165px;top:0">Especificar<small>SPEC.md</small></div>
+        <div class="node" style="--i:1;right:0;top:245px">Planejar<small>tarefas</small></div>
+        <div class="node" style="--i:2;left:165px;bottom:0">Gerar<small>agente de código</small></div>
+        <div class="node" style="--i:3;left:0;top:245px">Verificar<small>critérios</small></div>
+      </div>
     </div>
   </div>
   <aside class="notes">No Spec-Driven Development, a especificação vem primeiro e é a fonte da verdade. O agente planeja e gera o código a partir dela, e nós verificamos com critérios claros. Se algo muda, mudamos a spec e geramos de novo: o ciclo gira.</aside>
 </section>
 
-<section class="slide" data-file="07_anatomia_da_spec.md" data-folder="C_sdd" data-section="C. SDD e specs" data-time="1,5 min">
-  <div class="s-file">// 07_anatomia_da_spec.md</div>
+<section class="slide" data-file="17_anatomia_da_spec.md" data-folder="E_spec_driven_development" data-section="E. Spec-Driven Development" data-time="1,5 min">
+  <div class="s-file">// 17_anatomia_da_spec.md</div>
   <h1>Anatomia de uma boa spec</h1>
-  <div class="g2" style="grid-template-columns:1.25fr .75fr">
-    <div class="code stg" style="--step:330ms;font-size:25px"><span class="ln"><span class="h"># SPEC — Painel de Cancelamentos</span></span><span class="ln"><span class="h">## 1. Contexto e problema</span>  <span class="c">por que existe</span></span><span class="ln"><span class="h">## 2. Usuário</span>              <span class="c">quem vai usar</span></span><span class="ln"><span class="h">## 3. Escopo</span>               <span class="c">entra × fica de fora</span></span><span class="ln"><span class="h">## 4. Dados</span>                <span class="c">dicionário de colunas</span></span><span class="ln"><span class="h">## 5. Regras de negócio</span>    <span class="c">fórmulas e definições</span></span><span class="ln"><span class="h">## 6. Restrições</span>           <span class="c">o que não pode fazer</span></span><span class="ln"><span class="h">## 7. Critérios de aceitação</span> <span class="c">como conferir</span></span></div>
-    <div class="stg" style="--d:2800ms">
-      <div class="card"><h3><i class="codicon codicon-lightbulb"></i> Dica</h3><p>Escreva para alguém que não conhece o seu negócio: o agente só sabe o que estiver no arquivo.</p></div>
+  <div class="body">
+    <div class="g2" style="grid-template-columns:1.25fr .75fr;align-items:center">
+      <div class="code stg" style="--step:330ms;font-size:25px;line-height:1.75"><span class="ln"><span class="h"># SPEC — Painel de Cancelamentos</span></span><span class="ln"><span class="h">## 1. Contexto e problema</span>  <span class="c">por que existe</span></span><span class="ln"><span class="h">## 2. Usuário</span>              <span class="c">quem vai usar</span></span><span class="ln"><span class="h">## 3. Escopo</span>               <span class="c">entra × fica de fora</span></span><span class="ln"><span class="h">## 4. Dados</span>                <span class="c">dicionário de colunas</span></span><span class="ln"><span class="h">## 5. Regras de negócio</span>    <span class="c">fórmulas e definições</span></span><span class="ln"><span class="h">## 6. Restrições</span>           <span class="c">o que não pode fazer</span></span><span class="ln"><span class="h">## 7. Critérios de aceitação</span> <span class="c">como conferir</span></span></div>
+      <div class="stg" style="--d:2800ms;--step:350ms;display:flex;flex-direction:column;gap:20px">
+        <div class="card"><h3><i class="codicon codicon-lightbulb"></i> Escreva para um estranho</h3><p>O agente só sabe o que estiver no arquivo.</p></div>
+        <div class="card"><h3><i class="codicon codicon-dash"></i> Diga o que fica de fora</h3><p>Escopo fechado evita funcionalidade inventada.</p></div>
+      </div>
     </div>
   </div>
-  <aside class="notes">Uma boa spec tem sete partes: contexto e problema, usuário, escopo com o que fica de fora, dicionário de dados, regras de negócio, restrições e critérios de aceitação. É exatamente a estrutura que vocês vão montar no site hoje. Escrevam pensando em alguém que não conhece o negócio.</aside>
+  <aside class="notes">Uma boa spec tem sete partes: contexto e problema, usuário, escopo com o que fica de fora, dicionário de dados, regras de negócio, restrições e critérios de aceitação. É a estrutura que vocês vão montar no site hoje. Escrevam pensando em alguém que não conhece o negócio, e digam também o que não entra.</aside>
 </section>
 
-<section class="slide" data-file="08_spec_reduz_alucinacao.md" data-folder="C_sdd" data-section="C. SDD e specs" data-time="1,5 min">
-  <div class="s-file">// 08_spec_reduz_alucinacao.md</div>
+<section class="slide" data-file="18_spec_reduz_alucinacao.md" data-folder="E_spec_driven_development" data-section="E. Spec-Driven Development" data-time="1,5 min">
+  <div class="s-file">// 18_spec_reduz_alucinacao.md</div>
   <h1>Cada seção fecha uma porta para a <span class="rd">invenção</span></h1>
-  <div class="g2" style="grid-template-columns:1fr 1fr">
-    <ul class="l stg" style="--step:360ms;font-size:28px">
-      <li><i class="codicon codicon-lock"></i><span><b>Escopo</b> → não cria funcionalidade extra</span></li>
-      <li><i class="codicon codicon-lock"></i><span><b>Dados</b> → não inventa coluna</span></li>
-      <li><i class="codicon codicon-lock"></i><span><b>Regras</b> → não inventa fórmula</span></li>
-      <li><i class="codicon codicon-lock"></i><span><b>Critérios</b> → dá para conferir o resultado</span></li>
-    </ul>
-    <div class="stg" style="--d:1600ms">
-      <div class="mono mu" style="font-size:20px;margin-bottom:10px">REGRA ESCRITA NA SPEC</div>
-      <div class="code" style="font-size:26px"><span class="v">taxa de churn</span> =
+  <div class="body">
+    <div class="g2" style="grid-template-columns:1fr 1fr;align-items:center">
+      <ul class="l stg" style="--step:360ms">
+        <li><i class="codicon codicon-lock"></i><span><b>Escopo</b> → não cria funcionalidade extra</span></li>
+        <li><i class="codicon codicon-lock"></i><span><b>Dados</b> → não inventa coluna</span></li>
+        <li><i class="codicon codicon-lock"></i><span><b>Regras</b> → não inventa fórmula</span></li>
+        <li style="margin-bottom:0"><i class="codicon codicon-lock"></i><span><b>Critérios</b> → dá para conferir o resultado</span></li>
+      </ul>
+      <div class="stg" style="--d:1600ms">
+        <div class="mono mu" style="font-size:20px;margin-bottom:10px">REGRA ESCRITA NA SPEC</div>
+        <div class="code" style="font-size:26px"><span class="v">taxa de churn</span> =
     clientes com <span class="v">Churn</span> = <span class="n">1</span>
     ÷ total de clientes do filtro</div>
-      <p style="margin-top:20px;font-size:27px;color:var(--fg2)">Sem essa linha, o agente escolhe sozinho como calcular.</p>
+        <p style="margin-top:20px;font-size:27px;color:var(--fg2)">Sem essa linha, o agente escolhe sozinho como calcular.</p>
+      </div>
     </div>
   </div>
   <aside class="notes">Alucinação é quando a IA preenche lacunas inventando. Cada seção da spec fecha uma dessas lacunas: escopo, dados, regras, critérios. Por exemplo, escrever a fórmula da taxa de churn impede que o agente escolha sozinho como calcular.</aside>
 </section>
 
-<section class="slide" data-file="09_criterio_de_aceitacao.diff" data-folder="C_sdd" data-section="C. SDD e specs" data-time="1 min">
-  <div class="s-file">// 09_criterio_de_aceitacao.diff</div>
+<section class="slide" data-file="19_criterio_de_aceitacao.diff" data-folder="E_spec_driven_development" data-section="E. Spec-Driven Development" data-time="1 min">
+  <div class="s-file">// 19_criterio_de_aceitacao.diff</div>
   <h1>Critério de aceitação: dá para conferir?</h1>
-  <div class="code diff stg" style="--step:500ms;font-size:28px;white-space:pre-wrap"><span class="ln del">O painel deve ficar bonito e intuitivo</span><span class="ln add">Sem filtros, o painel mostra a taxa geral calculada do CSV</span><span class="ln del">Os gráficos devem carregar rápido</span><span class="ln add">Ao filtrar por contrato, todos os gráficos se atualizam</span><span class="ln del">Mostrar os clientes importantes</span><span class="ln add">A lista mostra customerID, contrato e mensalidade, do maior para o menor</span></div>
-  <p style="margin-top:28px;font-size:32px">Verificável = alguém consegue responder <span class="gr">sim</span> ou <span class="rd">não</span>.</p>
-  <aside class="notes">Um critério de aceitação bom é aquele que dá para conferir com sim ou não. “Ficar bonito” não é verificável; “sem filtros, o painel mostra a taxa geral calculada do CSV” é. Na hora de avaliar o trabalho do agente, são esses critérios que vocês vão checar.</aside>
+  <div class="body">
+    <div class="code diff stg" style="--step:500ms;font-size:28px;white-space:pre-wrap;line-height:1.75"><span class="ln del">O painel deve ficar bonito e intuitivo</span><span class="ln add">Sem filtros, o painel mostra a taxa geral calculada do CSV</span><span class="ln del">Os gráficos devem carregar rápido</span><span class="ln add">Ao filtrar por contrato, todos os gráficos se atualizam</span><span class="ln del">Mostrar os clientes importantes</span><span class="ln add">A lista mostra customerID, contrato e mensalidade, do maior para o menor</span></div>
+    <p style="margin-top:34px;font-size:34px;text-align:center">Verificável = alguém consegue responder <span class="gr">sim</span> ou <span class="rd">não</span>.</p>
+  </div>
+  <aside class="notes">Um critério de aceitação bom é aquele que dá para conferir com sim ou não. “Ficar bonito” não é verificável; “sem filtros, o painel mostra a taxa geral calculada do CSV” é. É o “Então” do BDD. Na hora de avaliar o trabalho do agente, são esses critérios que vocês vão checar.</aside>
 </section>
 
-<section class="slide" data-file="10_sdd_no_mercado.md" data-folder="C_sdd" data-section="C. SDD e specs" data-time="1,5 min">
-  <div class="s-file">// 10_sdd_no_mercado.md</div>
+<section class="slide" data-file="20_sdd_no_mercado.md" data-folder="E_spec_driven_development" data-section="E. Spec-Driven Development" data-time="1,5 min">
+  <div class="s-file">// 20_sdd_no_mercado.md</div>
   <h1>SDD no mercado</h1>
-  <div class="g2 stg" style="--step:300ms;gap:24px">
-    <div class="card"><h3><img src="assets/icons/github.svg" alt="" style="height:34px;filter:invert(1)"> GitHub Spec Kit</h3><p>Kit open source para SDD: especificação → plano → tarefas. Funciona com Copilot, Claude Code, Gemini CLI e outros.</p></div>
-    <div class="card"><h3><img src="assets/icons/amazonwebservices.svg" alt="" style="height:30px;filter:invert(1)"> Kiro (AWS)</h3><p>Ambiente de desenvolvimento com specs: requisitos, design e tarefas antes do código.</p></div>
-    <div class="card"><h3><i class="codicon codicon-file-code"></i> AGENTS.md · CLAUDE.md</h3><p>Arquivos de instruções do projeto que os agentes leem no início de cada sessão.</p></div>
-    <div class="card"><h3><i class="codicon codicon-checklist"></i> Regras do Cursor</h3><p>Regras de projeto versionadas em <code>.cursor/rules</code>, aplicadas ao agente.</p></div>
+  <div class="body">
+    <div class="g2 stg" style="--step:300ms;gap:28px">
+      <div class="card"><h3><img src="assets/icons/github.svg" alt="" style="height:34px;filter:invert(1)"> GitHub Spec Kit</h3><p>Kit open source para SDD: especificação → plano → tarefas. Funciona com Copilot, Claude Code, Gemini CLI e outros.</p></div>
+      <div class="card"><h3><img src="assets/icons/amazonwebservices.svg" alt="" style="height:30px;filter:invert(1)"> Kiro (AWS)</h3><p>Ambiente de desenvolvimento com specs: requisitos, design e tarefas antes do código.</p></div>
+      <div class="card"><h3><i class="codicon codicon-file-code"></i> AGENTS.md · CLAUDE.md</h3><p>Arquivos de instruções do projeto que os agentes leem no início de cada sessão.</p></div>
+      <div class="card"><h3><i class="codicon codicon-checklist"></i> Regras do Cursor</h3><p>Regras de projeto versionadas em <code>.cursor/rules</code>, aplicadas ao agente.</p></div>
+    </div>
   </div>
   <div class="foot">Fontes: github.github.com/spec-kit · github.blog (Spec-driven development with AI) · kiro.dev · agents.md · code.claude.com/docs/en/memory · cursor.com/docs/rules</div>
-  <aside class="notes">Isso não é teoria: o mercado já está adotando. O GitHub lançou o Spec Kit, open source; a AWS tem o Kiro, que trabalha com requisitos, design e tarefas; e agentes como Claude Code, Codex e Cursor leem arquivos de instruções como AGENTS.md, CLAUDE.md e regras de projeto. A spec virou parte do repositório.</aside>
+  <aside class="notes">Isso não é teoria: o mercado já está adotando. O GitHub lançou o Spec Kit, open source; a AWS tem o Kiro, que trabalha com requisitos, design e tarefas; e agentes como Claude Code, Codex e Cursor leem arquivos de instruções como AGENTS.md, CLAUDE.md e regras de projeto. A spec virou parte do repositório. Este site, aliás, foi construído assim: a partir de uma APP_SPEC.md.</aside>
 </section>
 
-<!-- ===================================================== D. DADOS + SDD -->
-<section class="slide" data-file="11_dados_e_sdd.py" data-folder="D_dados" data-section="D. Dados + SDD" data-time="1,5 min">
-  <div class="s-file">// 11_dados_e_sdd.py</div>
+<!-- ===================================================== F. DADOS: ANTES E HOJE -->
+<section class="slide" data-file="21_dados_linha_do_tempo.md" data-folder="F_dados_antes_e_hoje" data-section="F. Dados: antes e hoje" data-time="2 min">
+  <div class="s-file">// 21_dados_linha_do_tempo.md</div>
+  <h1>Como exploramos dados: <span class="acc">da planilha ao agente</span></h1>
+  <div class="body">
+    <div class="timeline stg" style="--step:300ms">
+      <div class="ev"><div class="yr">1979</div><div class="dot"></div><b>VisiCalc</b><span>primeira planilha de sucesso para computador pessoal</span></div>
+      <div class="ev"><div class="yr">1985</div><div class="dot"></div><b>Excel</b><span>planilha com interface gráfica</span></div>
+      <div class="ev"><div class="yr">anos 90</div><div class="dot"></div><b>Data warehouse e BI</b><span>relatórios feitos pela TI</span></div>
+      <div class="ev"><div class="yr">2015</div><div class="dot"></div><b>Power BI</b><span>BI self-service: a área monta o painel</span></div>
+      <div class="ev"><div class="yr">2019</div><div class="dot"></div><b>Streamlit</b><span>data apps em Python puro</span></div>
+      <div class="ev gr"><div class="yr">2026</div><div class="dot"></div><b>Agentes de dados</b><span>perguntas em linguagem natural</span></div>
+    </div>
+    <p class="stg" style="--d:2200ms;margin-top:54px;font-size:32px;text-align:center"><span>A distância entre <b>quem pergunta</b> e <b>o dado</b> diminuiu a cada geração.</span></p>
+  </div>
+  <div class="foot">bricklin.com/visicalc.htm · Microsoft (Excel 1.0 para Macintosh, 1985) · Power BI Blog (disponibilidade geral, 24/07/2015) · TechCrunch (Streamlit, 01/10/2019) · caso Analy (seção G).</div>
+  <aside class="notes">Também na exploração de dados houve gerações. Em 1979, o VisiCalc, a primeira planilha de sucesso para computador pessoal; em 1985, o Excel. Nos anos 90, data warehouses e BI corporativo, com relatórios feitos pela TI. Em 2015, o Power BI popularizou o BI self-service; em 2019, o Streamlit, que é o que roda o site de vocês, tornou data apps simples em Python. Hoje, agentes respondem perguntas em linguagem natural. A cada geração, a distância entre quem pergunta e o dado diminuiu.</aside>
+</section>
+
+<section class="slide" data-file="22_antes_x_hoje.diff" data-folder="F_dados_antes_e_hoje" data-section="F. Dados: antes e hoje" data-time="2 min">
+  <div class="s-file">// 22_antes_x_hoje.diff</div>
+  <h1>Explorar dados: <span class="mu" style="font-weight:500">antes</span> × <span class="acc">hoje</span></h1>
+  <div class="body">
+    <div class="cmp stg" style="--step:110ms;grid-template-columns:.6fr 1fr 1fr">
+      <div class="hd"></div><div class="hd rd">− ANTES</div><div class="hd gr">+ HOJE</div>
+      <div class="k">Quem acessa</div><div>a TI, por chamado</div><div>a própria área, direto</div>
+      <div class="k">Como pergunta</div><div>pedido de relatório</div><div>filtros, data apps e linguagem natural</div>
+      <div class="k">Formato</div><div>relatório estático (PDF, planilha)</div><div>painel interativo, app, conversa</div>
+      <div class="k">Mudou a pergunta?</div><div>volta para a fila</div><div>ajuste rápido, muitas vezes pela área</div>
+      <div class="k">Quem constrói</div><div>só especialistas</div><div>especialistas + IA, guiados por spec</div>
+    </div>
+    <div class="card stg" style="--d:1700ms;margin-top:30px;border-color:var(--yellow);padding:20px 26px"><p style="font-size:27px;color:var(--fg)"><i class="codicon codicon-pin yl"></i> <b>O que não mudou:</b> dado ruim gera painel errado, e a regra de negócio precisa estar clara.</p></div>
+  </div>
+  <aside class="notes">Antes, quem precisava de um número abria um chamado para a TI e recebia um relatório estático. Se a pergunta mudasse, voltava para a fila. Hoje, a própria área explora com filtros, data apps e até perguntas em linguagem natural, e especialistas constroem com ajuda da IA. Mas duas coisas não mudaram: dado ruim gera painel errado, e a regra de negócio precisa estar clara.</aside>
+</section>
+
+<section class="slide" data-file="23_dados_e_sdd.py" data-folder="F_dados_antes_e_hoje" data-section="F. Dados: antes e hoje" data-time="1,5 min">
+  <div class="s-file">// 23_dados_e_sdd.py</div>
   <h1>Na área de dados: <span class="acc">dados tratados + spec clara</span></h1>
-  <div class="flow stg" style="--step:420ms">
-    <div class="st"><i class="codicon codicon-database"></i>Base bruta</div><div class="ar">→</div>
-    <div class="st"><img src="assets/icons/pandas.svg" alt="">Tratamento</div><div class="ar">→</div>
-    <div class="st"><i class="codicon codicon-file-code"></i>CSV + SPEC</div><div class="ar">→</div>
-    <div class="st"><i class="codicon codicon-hubot"></i>Agente de código</div><div class="ar">→</div>
-    <div class="st"><img src="assets/icons/streamlit.svg" alt="">Painel</div>
+  <div class="body">
+    <div class="flow stg" style="--step:420ms">
+      <div class="st"><i class="codicon codicon-database"></i>Base bruta</div><div class="ar">→</div>
+      <div class="st"><img src="assets/icons/pandas.svg" alt="">Tratamento</div><div class="ar">→</div>
+      <div class="st"><i class="codicon codicon-file-code"></i>CSV + SPEC</div><div class="ar">→</div>
+      <div class="st"><i class="codicon codicon-hubot"></i>Agente de código</div><div class="ar">→</div>
+      <div class="st"><img src="assets/icons/streamlit.svg" alt="">Painel</div>
+    </div>
+    <div class="term"><div class="th"><b>TERMINAL</b><span>build</span></div>
+      <div class="tl stg" style="--d:2200ms;--step:500ms;padding-top:12px"><div><span class="pr">$</span> construir painel --spec SPEC.md --dados dados_tratados.csv</div><div class="dim">gerando app a partir da especificação…</div></div>
+      <div class="bar" style="--d:3.2s"><i></i></div>
+    </div>
+    <p style="margin-top:30px;font-size:34px;text-align:center">= dashboards e data apps <span class="acc">mais rápidos</span> e <span class="gr">confiáveis</span>.</p>
   </div>
-  <div class="term"><div class="th"><b>TERMINAL</b><span>build</span></div>
-    <div class="tl stg" style="--d:2200ms;--step:500ms;padding-top:12px"><div><span class="pr">$</span> construir painel --spec SPEC.md --dados dados_tratados.csv</div><div class="dim">gerando app a partir da especificação…</div></div>
-    <div class="bar" style="--d:3.2s"><i></i></div>
-  </div>
-  <p style="margin-top:22px">= dashboards e data apps <span class="acc">mais rápidos</span> e <span class="gr">confiáveis</span>.</p>
   <aside class="notes">Na área de dados, o SDD encaixa naturalmente: a base bruta passa por um tratamento, vira um CSV confiável acompanhado da spec, e o agente constrói o painel. Dados bem tratados mais uma spec clara resultam num app em que dá para confiar. É exatamente o caminho do hackathon.</aside>
 </section>
 
-<section class="slide" data-file="12_qualidade_de_dados.py" data-folder="D_dados" data-section="D. Dados + SDD" data-time="1,5 min"
+<section class="slide" data-file="24_qualidade_de_dados.py" data-folder="F_dados_antes_e_hoje" data-section="F. Dados: antes e hoje" data-time="1,5 min"
   data-notify="O agente não questiona os seus dados: ele confia no CSV." data-notify-delay="3400">
-  <div class="s-file">// 12_qualidade_de_dados.py</div>
+  <div class="s-file">// 24_qualidade_de_dados.py</div>
   <h1>Com IA, qualidade de dados importa <span class="yl">ainda mais</span></h1>
-  <div class="code stg" style="--step:600ms;font-size:25px"><span class="ln"><span class="c"># armadilha 1 — preencher vazios com a média</span></span><span class="ln"><span class="v">df</span>[<span class="s">"total"</span>] = <span class="v">df</span>[<span class="s">"total"</span>].<span class="f">fillna</span>(<span class="v">df</span>[<span class="s">"total"</span>].<span class="f">mean</span>())   <span class="rd"># cliente novo “pagou” 2 mil</span></span><span class="ln"><span class="c"># armadilha 2 — vazamento de dados</span></span><span class="ln"><span class="v">df</span>[<span class="s">"taxa_pgto"</span>] = churn médio por forma de pagamento   <span class="rd"># usa a própria resposta</span></span><span class="ln"><span class="c"># armadilha 3 — apagar “outliers”</span></span><span class="ln"><span class="v">df</span> = <span class="v">df</span>[<span class="v">z</span>.<span class="f">abs</span>() &lt;= <span class="n">1.5</span>]   <span class="rd"># apaga clientes reais</span></span></div>
-  <p style="margin-top:22px">Erro nos dados vira erro no painel — com cara de certo.</p>
+  <div class="body">
+    <div class="code stg" style="--step:600ms;font-size:24px;line-height:1.75"><span class="ln"><span class="c"># armadilha 1 — preencher vazios com a média</span></span><span class="ln"><span class="v">df</span>[<span class="s">"total"</span>] = <span class="v">df</span>[<span class="s">"total"</span>].<span class="f">fillna</span>(<span class="v">df</span>[<span class="s">"total"</span>].<span class="f">mean</span>())   <span class="rd"># cliente novo “pagou” 2 mil</span></span><span class="ln"><span class="c"># armadilha 2 — vazamento de dados</span></span><span class="ln"><span class="v">df</span>[<span class="s">"taxa_pgto"</span>] = churn médio por forma de pagamento   <span class="rd"># usa a própria resposta</span></span><span class="ln"><span class="c"># armadilha 3 — apagar “outliers”</span></span><span class="ln"><span class="v">df</span> = <span class="v">df</span>[<span class="v">z</span>.<span class="f">abs</span>() &lt;= <span class="n">1.5</span>]   <span class="rd"># apaga clientes reais</span></span></div>
+    <p style="margin-top:34px;font-size:34px;text-align:center">Erro nos dados vira erro no painel — <span class="rd">com cara de certo</span>.</p>
+  </div>
   <aside class="notes">O agente confia no CSV que recebe. Se preenchemos vazios com a média, um cliente que acabou de chegar parece ter pagado dois mil. Se criamos uma coluna calculada a partir da resposta, temos vazamento de dados. Se apagamos “outliers”, podemos apagar clientes reais. Vocês vão encontrar armadilhas como essas no hackathon.</aside>
 </section>
 
-<!-- ===================================================== E. CASO REAL -->
-<section class="slide" data-file="13_caso_algar_snowflake.md" data-folder="E_caso_real" data-section="E. Caso real" data-time="3 min">
-  <div class="s-file">// 13_caso_algar_snowflake.md</div>
-  <h1>Caso real: data apps na Algar</h1>
-  <div class="g2" style="grid-template-columns:1fr 1fr;gap:30px">
-    <div class="card stg"><h3><img src="assets/icons/snowflake.svg" alt="" style="height:38px;filter:invert(58%) sepia(80%) saturate(2000%) hue-rotate(170deg)"> Snowflake Cortex Code</h3>
-      <p>Agente de IA de programação da Snowflake que trabalha dentro da plataforma e entende o contexto dos dados da empresa.</p></div>
-    <div class="stg" style="--d:600ms;--step:350ms;display:flex;flex-direction:column;gap:16px">
-      <div><span class="todo">[PEDRO: exemplo de projeto]</span></div>
-      <div><span class="todo">[PEDRO: tempo antes × depois]</span></div>
-      <div><span class="todo">[PEDRO: aprendizado]</span></div>
+<!-- ===================================================== G. CASO REAL: ANALY -->
+<section class="slide" data-file="25_caso_analy.md" data-folder="G_caso_real_analy" data-section="G. Caso real: Analy" data-time="2,5 min">
+  <div class="s-file">// 25_caso_analy.md</div>
+  <h1>Caso real: <span class="acc">Analy</span>, a agente de dados da Algar</h1>
+  <div class="body">
+    <div class="g2" style="grid-template-columns:.95fr 1.05fr;align-items:center;gap:40px">
+      <ul class="l stg" style="--step:350ms;font-size:28px">
+        <li><i class="codicon codicon-hubot"></i><span>Agente conversacional de dados criado pela <b>Algar Telecom</b> com o <b>Snowflake Intelligence</b>.</span></li>
+        <li><i class="codicon codicon-organization"></i><span>Ecossistema de <b>vários agentes</b> treinados com os dados da própria empresa.</span></li>
+        <li><i class="codicon codicon-comment-discussion"></i><span>Integrada ao <b>Microsoft Teams</b>: a pergunta é feita na conversa.</span></li>
+        <li style="margin-bottom:0"><i class="codicon codicon-graph"></i><span>Apoia vendas, marketing e sucesso do cliente: <b>churn</b>, desempenho comercial e visão 360° do cliente.</span></li>
+      </ul>
+      <div class="stg" style="--d:1600ms;--step:420ms;display:flex;flex-direction:column;gap:14px">
+        <div class="term"><div class="th"><b>TEAMS</b><span>conversa com a agente (ilustrativo)</span></div><div class="tl" style="white-space:pre-wrap;padding-top:14px;font-size:22px"><span class="pr">você&gt;</span> Quais clientes do segmento empresarial têm mais risco de cancelar este mês?</div></div>
+        <div class="flow" style="margin:0"><div class="st" style="font-size:20px"><i class="codicon codicon-comment"></i>Pergunta</div><div class="ar">→</div><div class="st" style="font-size:20px"><img src="assets/icons/snowflake.svg" alt="">Agentes</div><div class="ar">→</div><div class="st" style="font-size:20px"><i class="codicon codicon-database"></i>Dados da empresa</div><div class="ar">→</div><div class="st" style="font-size:20px"><i class="codicon codicon-check"></i>Resposta</div></div>
+      </div>
     </div>
   </div>
-  <p style="margin-top:30px">Ferramentas como essa tornam o desenvolvimento <span class="acc">mais ágil</span> — e são apoiadas dentro da empresa.</p>
-  <div class="foot">Fonte: Snowflake, comunicado “Snowflake Unveils Cortex Code, An AI Coding Agent…” (03/02/2026), snowflake.com/en/news/press-releases.</div>
-  <aside class="notes">(Pedro fala.) O Cortex Code é o agente de programação da Snowflake, anunciado em fevereiro de 2026, que trabalha dentro da plataforma e entende o contexto dos dados. Conte o exemplo de projeto, o tempo antes e depois e o principal aprendizado. Feche com a ideia de que essas ferramentas são apoiadas dentro da empresa.</aside>
+  <div class="foot">Fontes: TI Inside (13/04/2026) · Teletime (14/04/2026) · Inforchannel (10/04/2026) · Baguete. A pergunta no Teams é um exemplo ilustrativo.</div>
+  <aside class="notes">(Pedro fala.) Agora um caso real, aqui da região: a Analy, agente de dados da Algar Telecom, construída com o Snowflake Intelligence. Ela é um ecossistema de vários agentes treinados com os dados da empresa e fica dentro do Microsoft Teams: a pessoa pergunta na conversa e recebe a resposta. Apoia vendas, marketing e sucesso do cliente em temas como churn, desempenho comercial e visão completa do cliente. A pergunta da tela é só um exemplo.</aside>
 </section>
 
-<section class="slide" data-file="14_impacto.md" data-folder="E_caso_real" data-section="E. Caso real" data-time="30 s" data-zen="1">
+<section class="slide" data-file="26_analy_resultados.md" data-folder="G_caso_real_analy" data-section="G. Caso real: Analy" data-time="2 min">
+  <div class="s-file">// 26_analy_resultados.md</div>
+  <h1>O que mudou na prática</h1>
+  <div class="body">
+    <div class="g3 stg" style="--step:350ms">
+      <div class="card tall"><div class="big" data-count="20">20%</div><p style="margin-top:18px">a mais de produtividade operacional interna, em menos de seis meses de operação</p></div>
+      <div class="card tall"><div class="big" style="font-size:72px">2 dias → <span class="gr">40 s</span></div><p style="margin-top:18px">processo que levava até dois dias passou a ser concluído em segundos</p></div>
+      <div class="card tall"><div class="big yl">127</div><p style="margin-top:18px">agentes de IA ativos na Algar em agosto de 2026, em várias áreas</p></div>
+    </div>
+    <div class="card stg" style="--d:1500ms;margin-top:34px;border-color:var(--blue);padding:22px 28px">
+      <p style="font-size:30px;color:var(--fg)"><i class="codicon codicon-quote acc"></i> Agentes especialistas e data apps que <span class="rd">levariam meses</span> hoje ficam prontos em <span class="gr">semanas</span>.</p>
+      <p class="mu" style="font-size:20px;margin-top:8px">Experiência prática relatada pela organização</p>
+    </div>
+  </div>
+  <div class="foot">Números divulgados pela Algar à imprensa: TI Inside (13/04/2026) e Teletime (14/04/2026, “até dois dias”) · Mobile Time (20/08/2026, 127 agentes).</div>
+  <aside class="notes">(Pedro fala.) Segundo a Algar, a Analy aumentou em 20% a produtividade operacional interna em menos de seis meses de operação, e um processo que levava até dois dias passou a ser feito em cerca de 40 segundos. Em agosto, a empresa informou ter 127 agentes de IA ativos. São números divulgados pela própria empresa. Na prática do dia a dia: agentes especialistas e data apps que levariam meses hoje ficam prontos em semanas.</aside>
+</section>
+
+<section class="slide" data-file="27_principal_aprendizado.md" data-folder="G_caso_real_analy" data-section="G. Caso real: Analy" data-time="2 min">
+  <div class="s-file">// 27_principal_aprendizado.md</div>
+  <h1>O principal aprendizado</h1>
+  <div class="body">
+    <div class="g2" style="grid-template-columns:1.15fr .85fr;align-items:center;gap:40px">
+      <div class="venn stg" style="--step:500ms">
+        <div class="c c1"><small>conhecimento</small><b>Técnico</b><span>dados, código, IA</span></div>
+        <div class="c c2"><small>conhecimento de</small><b>Negócio</b><span>regras, contexto, pessoas</span></div>
+        <div class="mid">∞</div>
+      </div>
+      <ul class="l stg" style="--d:1600ms;--step:400ms;font-size:28px">
+        <li><i class="codicon codicon-law"></i><span>A <b>regra de negócio</b> é o que torna a resposta certa — a IA não adivinha.</span></li>
+        <li><i class="codicon codicon-comment-discussion"></i><span><b>Boa comunicação</b> com a área solicitante: entender a pergunta antes de construir.</span></li>
+        <li style="margin-bottom:0"><i class="codicon codicon-sparkle"></i><span>Técnico + negócio = <span class="acc">potencial infinito</span>.</span></li>
+      </ul>
+    </div>
+  </div>
+  <aside class="notes">(Pedro fala.) O principal aprendizado não foi sobre ferramenta. Foi a importância da regra de negócio e da boa comunicação com a área que pede. A IA não adivinha a regra: alguém precisa entendê-la e escrevê-la. Quando juntamos o conhecimento técnico com o conhecimento do negócio, o potencial é infinito. É isso que a SPEC de vocês vai fazer hoje.</aside>
+</section>
+
+<section class="slide" data-file="28_impacto.md" data-folder="G_caso_real_analy" data-section="G. Caso real: Analy" data-time="30 s" data-zen="1">
   <div class="impact">
     <div class="q"><span class="type" data-delay="300">Negar a IA é negar a ciência.</span></div>
     <div class="sub stg" style="--d:2600ms"><div>IA com método: especificar, verificar, assumir a responsabilidade.</div></div>
@@ -480,44 +838,52 @@ code{font-size:.9em;color:var(--type);background:#ffffff0d;padding:1px 8px;borde
   <aside class="notes">Deixe a frase respirar alguns segundos. “Negar a IA é negar a ciência.” Mas IA com método: especificar, verificar e assumir a responsabilidade pelo que entregamos.</aside>
 </section>
 
-<section class="slide" data-file="15_boas_praticas_e_riscos.md" data-folder="E_caso_real" data-section="E. Caso real" data-time="1 min">
-  <div class="s-file">// 15_boas_praticas_e_riscos.md</div>
+<section class="slide" data-file="29_boas_praticas_e_riscos.md" data-folder="G_caso_real_analy" data-section="G. Caso real: Analy" data-time="1 min">
+  <div class="s-file">// 29_boas_praticas_e_riscos.md</div>
   <h1>Boas práticas e riscos</h1>
-  <div class="g2 stg" style="--step:300ms;gap:24px">
-    <div class="card"><h3><i class="codicon codicon-eye"></i> Revise o que a IA gera</h3><p>Rode, teste e compare com os critérios da spec.</p></div>
-    <div class="card"><h3><i class="codicon codicon-shield"></i> Proteja dados sensíveis</h3><p>Nada de dados pessoais ou sigilosos em ferramentas não aprovadas.</p></div>
-    <div class="card"><h3><i class="codicon codicon-law"></i> Governança</h3><p>Siga as regras e as ferramentas aprovadas pela empresa.</p></div>
-    <div class="card"><h3><i class="codicon codicon-person"></i> Humano no controle</h3><p>A IA sugere e gera; a responsabilidade pela entrega é sua.</p></div>
+  <div class="body">
+    <div class="g2 stg" style="--step:300ms;gap:28px">
+      <div class="card"><h3><i class="codicon codicon-eye"></i> Revise o que a IA gera</h3><p>Rode, teste e compare com os critérios da spec.</p></div>
+      <div class="card"><h3><i class="codicon codicon-shield"></i> Proteja dados sensíveis</h3><p>Nada de dados pessoais ou sigilosos em ferramentas não aprovadas.</p></div>
+      <div class="card"><h3><i class="codicon codicon-law"></i> Governança</h3><p>Siga as regras e as ferramentas aprovadas pela empresa.</p></div>
+      <div class="card"><h3><i class="codicon codicon-person"></i> Humano no controle</h3><p>A IA sugere e gera; a responsabilidade pela entrega é sua.</p></div>
+    </div>
   </div>
   <aside class="notes">Quatro cuidados: revisar tudo o que a IA gera, rodando e comparando com os critérios; não expor dados pessoais ou sigilosos; seguir a governança da empresa; e lembrar que a responsabilidade pela entrega continua sendo de quem entrega.</aside>
 </section>
 
-<!-- ===================================================== F. HACKATHON -->
-<section class="slide" data-file="16_agora_e_com_voces.md" data-folder="F_hackathon" data-section="F. O hackathon" data-time="1 min">
-  <div class="s-file">// 16_agora_e_com_voces.md</div>
+<!-- ===================================================== H. HACKATHON -->
+<section class="slide" data-file="30_agora_e_com_voces.md" data-folder="H_hackathon" data-section="H. O hackathon" data-time="1 min">
+  <div class="s-file">// 30_agora_e_com_voces.md</div>
   <h1>Agora é com <span class="acc">vocês</span></h1>
-  <div class="term" style="margin-bottom:28px"><div class="th"><b>TERMINAL</b></div><div class="tl" style="padding-top:12px"><span class="pr">$</span> <span class="type" data-delay="200">git checkout -b hackathon</span></div></div>
-  <ul class="l stg" style="--d:1400ms;--step:380ms">
-    <li><i class="codicon codicon-organization"></i><span>Equipes montadas pela organização.</span></li>
-    <li><i class="codicon codicon-briefcase"></i><span>Cada equipe recebe uma <b>missão</b> de uma “área cliente”.</span></li>
-    <li><i class="codicon codicon-dashboard"></i><span>Entrega: o kit da equipe. A organização roda o agente de IA, que constrói o <b>painel</b> a partir da sua SPEC.</span></li>
-  </ul>
-  <aside class="notes">Agora é a vez de vocês. As equipes já foram montadas pela organização. Cada equipe recebe uma missão de uma área cliente e entrega o kit com os dados tratados e a SPEC. A organização roda o agente de IA com esse kit, e o painel gerado aparece no pitch.</aside>
-</section>
-
-<section class="slide" data-file="17_tres_papeis.md" data-folder="F_hackathon" data-section="F. O hackathon" data-time="1 min">
-  <div class="s-file">// 17_tres_papeis.md</div>
-  <h1>Três papéis</h1>
-  <div class="g3 stg" style="--step:360ms">
-    <div class="card"><h3><i class="codicon codicon-briefcase"></i> A área cliente</h3><p>Tem o problema de negócio e a base de dados. Sabe o que dói, mas não sabe o que os dados dizem.</p></div>
-    <div class="card" style="border-color:var(--blue)"><h3><i class="codicon codicon-person"></i> Você, analista</h3><p>Investiga a base, decide o tratamento e escreve a SPEC. As decisões são suas.</p></div>
-    <div class="card"><h3><i class="codicon codicon-hubot"></i> O agente de código</h3><p>Constrói a aplicação a partir da SPEC. Faz exatamente o que estiver escrito — nem mais, nem menos.</p></div>
+  <div class="body">
+    <div class="term" style="margin-bottom:34px"><div class="th"><b>TERMINAL</b></div><div class="tl" style="padding-top:12px"><span class="pr">$</span> <span class="type" data-delay="200">git checkout -b hackathon</span></div></div>
+    <ul class="l stg" style="--d:1400ms;--step:380ms">
+      <li><i class="codicon codicon-organization"></i><span>Equipes montadas pela organização.</span></li>
+      <li><i class="codicon codicon-briefcase"></i><span>Cada equipe recebe uma <b>missão</b> de uma “área cliente”.</span></li>
+      <li><i class="codicon codicon-file-zip"></i><span>Entrega: o <b>kit da equipe</b> (.zip), enviado pelo <b>WhatsApp</b> ao organizador.</span></li>
+      <li style="margin-bottom:0"><i class="codicon codicon-dashboard"></i><span>A organização roda o agente de IA, que constrói o <b>painel</b> a partir da sua SPEC.</span></li>
+    </ul>
   </div>
-  <aside class="notes">São três papéis, como no site. A área cliente tem o problema e a base. Vocês são os analistas: investigam, tratam e escrevem a SPEC. E o agente de código constrói exatamente o que estiver escrito, nem mais, nem menos.</aside>
+  <aside class="notes">Agora é a vez de vocês. As equipes já foram montadas pela organização. Cada equipe recebe uma missão de uma área cliente e, no fim, envia o kit com os dados tratados e a SPEC pelo WhatsApp para o organizador. A organização roda o agente de IA com esse kit, e o painel gerado aparece no pitch.</aside>
 </section>
 
-<section class="slide" data-file="0-1_inicio_e_missao.md" data-folder="F_hackathon/18_jornada" data-section="F. O hackathon" data-time="1 min">
-  <div class="s-file">// 18_jornada/0-1_inicio_e_missao.md</div>
+<section class="slide" data-file="31_tres_papeis.md" data-folder="H_hackathon" data-section="H. O hackathon" data-time="1 min">
+  <div class="s-file">// 31_tres_papeis.md</div>
+  <h1>Três papéis</h1>
+  <div class="body">
+    <div class="g3 stg" style="--step:360ms">
+      <div class="card tall"><h3><i class="codicon codicon-briefcase"></i> A área cliente</h3><p>Tem o problema de negócio e a base de dados. Sabe o que dói, mas não sabe o que os dados dizem.</p></div>
+      <div class="card tall" style="border-color:var(--blue)"><h3><i class="codicon codicon-person"></i> Você, analista</h3><p>Investiga a base, decide o tratamento e escreve a SPEC. As decisões são suas.</p></div>
+      <div class="card tall"><h3><i class="codicon codicon-hubot"></i> O agente de código</h3><p>Constrói a aplicação a partir da SPEC. Faz exatamente o que estiver escrito — nem mais, nem menos.</p></div>
+    </div>
+    <p class="stg" style="--d:1500ms;margin-top:40px;font-size:32px;text-align:center"><span>Você é a ponte entre o <b>negócio</b> e o <b>técnico</b>.</span></p>
+  </div>
+  <aside class="notes">São três papéis, como no site. A área cliente tem o problema e a base. Vocês são os analistas: investigam, tratam e escrevem a SPEC, sendo a ponte entre o negócio e o técnico, como no caso da Analy. E o agente de código constrói exatamente o que estiver escrito, nem mais, nem menos.</aside>
+</section>
+
+<section class="slide" data-file="0-1_inicio_e_missao.md" data-folder="H_hackathon/32_jornada" data-section="H. O hackathon" data-time="1 min">
+  <div class="s-file">// 32_jornada/0-1_inicio_e_missao.md</div>
   <div class="jstep">
     <div class="browser stg"><div class="bh"><i class="codicon codicon-globe"></i><span class="url">spec-ao-app.streamlit.app</span></div><img src="assets/img/01_missao_cards.webp" alt="Tela da etapa Missão com os três desafios"></div>
     <div>
@@ -533,8 +899,8 @@ code{font-size:.9em;color:var(--type);background:#ffffff0d;padding:1px 8px;borde
   <aside class="notes">No site, a primeira coisa é digitar o nome da equipe e clicar em Começar. Depois, cada equipe lê a solicitação da área cliente e aceita a missão. Lembrem: o pedido é o ponto de partida; vocês podem priorizar e ir além.</aside>
 </section>
 
-<section class="slide" data-file="2_diagnostico.md" data-folder="F_hackathon/18_jornada" data-section="F. O hackathon" data-time="1 min">
-  <div class="s-file">// 18_jornada/2_diagnostico.md</div>
+<section class="slide" data-file="2_diagnostico.md" data-folder="H_hackathon/32_jornada" data-section="H. O hackathon" data-time="1 min">
+  <div class="s-file">// 32_jornada/2_diagnostico.md</div>
   <div class="jstep">
     <div class="browser stg"><div class="bh"><i class="codicon codicon-globe"></i><span class="url">spec-ao-app.streamlit.app · Diagnóstico</span></div><img src="assets/img/02_diag_explorar.webp" alt="Explorador de colunas mostrando TotalCharges com 11 valores só com espaços"></div>
     <div>
@@ -550,9 +916,9 @@ code{font-size:.9em;color:var(--type);background:#ffffff0d;padding:1px 8px;borde
   <aside class="notes">No diagnóstico, investiguem a base antes de mexer. Usem o raio-x, o explorador e o roteiro de perguntas. No exemplo, a coluna TotalCharges está como texto e tem 11 células só com espaços: um problema escondido. Anotem tudo, porque as anotações orientam a pipeline.</aside>
 </section>
 
-<section class="slide" data-file="3_pipeline.py" data-folder="F_hackathon/18_jornada" data-section="F. O hackathon" data-time="1,5 min"
+<section class="slide" data-file="3_pipeline.py" data-folder="H_hackathon/32_jornada" data-section="H. O hackathon" data-time="1,5 min"
   data-notify="Atenção: há blocos-armadilha de propósito. O app não avisa qual é qual." data-notify-delay="3000">
-  <div class="s-file">// 18_jornada/3_pipeline.py</div>
+  <div class="s-file">// 32_jornada/3_pipeline.py</div>
   <div class="jstep">
     <div>
       <div class="browser stg"><div class="bh"><i class="codicon codicon-globe"></i><span class="url">spec-ao-app.streamlit.app · Pipeline</span></div><img src="assets/img/03_pipe_fluxo.webp" alt="Pipeline com blocos aplicados no fluxo"></div>
@@ -570,8 +936,8 @@ code{font-size:.9em;color:var(--type);background:#ffffff0d;padding:1px 8px;borde
   <aside class="notes">Na pipeline vocês montam o tratamento bloco a bloco, com blocos prontos ou personalizados, e podem reordenar e remover. Cada bloco mostra o código pandas que executa. Atenção: há armadilhas de propósito e o app não avisa qual é qual. Escrevam o porquê de cada passo.</aside>
 </section>
 
-<section class="slide" data-file="4_revisao.md" data-folder="F_hackathon/18_jornada" data-section="F. O hackathon" data-time="1 min">
-  <div class="s-file">// 18_jornada/4_revisao.md</div>
+<section class="slide" data-file="4_revisao.md" data-folder="H_hackathon/32_jornada" data-section="H. O hackathon" data-time="1 min">
+  <div class="s-file">// 32_jornada/4_revisao.md</div>
   <div class="jstep">
     <div class="browser stg"><div class="bh"><i class="codicon codicon-globe"></i><span class="url">spec-ao-app.streamlit.app · Revisão</span></div><img src="assets/img/04_revisao.webp" alt="Revisão com o antes e depois da base"></div>
     <div>
@@ -586,8 +952,8 @@ code{font-size:.9em;color:var(--type);background:#ffffff0d;padding:1px 8px;borde
   <aside class="notes">Na revisão, comparem a base original com a tratada: linhas, colunas, vazios e tipos. Não há nota nem certo e errado aqui; é o momento de decidir se o resultado é o que vocês queriam e, se não for, voltar ao fluxo.</aside>
 </section>
 
-<section class="slide" data-file="5_spec.md" data-folder="F_hackathon/18_jornada" data-section="F. O hackathon" data-time="1,5 min">
-  <div class="s-file">// 18_jornada/5_spec.md</div>
+<section class="slide" data-file="5_spec.md" data-folder="H_hackathon/32_jornada" data-section="H. O hackathon" data-time="1,5 min">
+  <div class="s-file">// 32_jornada/5_spec.md</div>
   <div class="jstep">
     <div class="browser stg"><div class="bh"><i class="codicon codicon-globe"></i><span class="url">spec-ao-app.streamlit.app · SPEC</span></div><img src="assets/img/05_spec_criterios.webp" alt="Assistente da SPEC no passo de critérios de aceitação com a prévia ao lado"></div>
     <div>
@@ -603,79 +969,96 @@ code{font-size:.9em;color:var(--type);background:#ffffff0d;padding:1px 8px;borde
   <aside class="notes">Na SPEC, vocês escrevem: o problema, para quem, o escopo, as regras e os critérios de aceitação. Os campos começam vazios, com perguntas-guia. A prévia do arquivo é montada ao lado e, se travarem, há um exemplo de outro contexto e um esqueleto com lacunas.</aside>
 </section>
 
-<section class="slide" data-file="6_exportar.md" data-folder="F_hackathon/18_jornada" data-section="F. O hackathon" data-time="1 min">
-  <div class="s-file">// 18_jornada/6_exportar.md</div>
+<section class="slide" data-file="6_exportar.md" data-folder="H_hackathon/32_jornada" data-section="H. O hackathon" data-time="1 min">
+  <div class="s-file">// 32_jornada/6_exportar.md</div>
   <div class="jstep">
-    <div class="browser stg"><div class="bh"><i class="codicon codicon-globe"></i><span class="url">spec-ao-app.streamlit.app · Exportar</span></div><img src="assets/img/06_exportar.webp" alt="Tela de exportação com o kit da equipe"></div>
+    <div class="browser stg"><div class="bh"><i class="codicon codicon-globe"></i><span class="url">spec-ao-app.streamlit.app · Exportar</span></div><img src="assets/img/06_exportar.webp" alt="Tela de exportação com as instruções de envio do kit pelo WhatsApp"></div>
     <div>
       <div class="badge"><i class="codicon codicon-package"></i> 6 · Exportar</div>
-      <h1 style="font-size:50px">Baixe o kit da equipe</h1>
+      <h1 style="font-size:50px">Baixe e envie o kit</h1>
       <ul class="l stg" style="--d:500ms;--step:350ms;font-size:27px">
-        <li><i class="codicon codicon-file-zip"></i><span><code>dados_tratados.csv</code>, planilha <code>.xlsx</code> e <code>SPEC.md</code> — entregue à organização.</span></li>
-        <li><i class="codicon codicon-save"></i><span>Dica: “Salvar ou retomar progresso”.</span></li>
-        <li><i class="codicon codicon-book"></i><span>Dica: Glossário na barra lateral.</span></li>
+        <li><i class="codicon codicon-file-zip"></i><span>Baixe o <code>kit_sua_equipe.zip</code> (CSV, planilha e SPEC).</span></li>
+        <li><i class="codicon codicon-comment"></i><span>Envie o .zip <b>pelo WhatsApp</b> ao organizador, como documento, com o nome da equipe.</span></li>
+        <li><i class="codicon codicon-save"></i><span>Dica: “Salvar ou retomar progresso” na barra lateral.</span></li>
       </ul>
     </div>
   </div>
-  <aside class="notes">No fim, baixem o kit da equipe — a base tratada em CSV, uma planilha para o Excel e a SPEC — e entreguem à organização. Duas dicas: salvem o progresso de vez em quando pela barra lateral, para não perder nada se a página recarregar, e usem o glossário quando aparecer um termo novo.</aside>
+  <aside class="notes">No fim, baixem o kit da equipe — a base tratada em CSV, uma planilha para o Excel e a SPEC — e enviem o arquivo .zip pelo WhatsApp para o organizador, como documento, escrevendo o nome da equipe na mensagem. Não precisa extrair nem renomear nada. E salvem o progresso de vez em quando pela barra lateral.</aside>
 </section>
 
-<section class="slide" data-file="24_do_kit_ao_painel.sh" data-folder="F_hackathon" data-section="F. O hackathon" data-time="1,5 min">
-  <div class="s-file">// 24_do_kit_ao_painel.sh</div>
+<section class="slide" data-file="38_do_kit_ao_painel.sh" data-folder="H_hackathon" data-section="H. O hackathon" data-time="1,5 min">
+  <div class="s-file">// 38_do_kit_ao_painel.sh</div>
   <h1>Do kit ao painel</h1>
-  <p style="margin:-10px 0 22px;color:var(--fg2)">A organização roda o agente de IA com o kit de cada equipe.</p>
-  <div class="g2" style="grid-template-columns:1.3fr .7fr;align-items:start;gap:28px">
-    <div class="term" style="font-size:22px"><div class="th"><b>TERMINAL</b><span>máquina da organização · agente de código</span></div>
-      <div class="stg" style="--step:650ms;padding-top:10px">
-        <div class="tl"><span class="pr">$</span> unzip kit_equipe_exemplo.zip -d painel &amp;&amp; cd painel</div>
-        <div class="tl"><span class="pr">&gt;</span> Leia o arquivo SPEC.md e construa a aplicação…</div>
-        <div class="tl dim">● lendo SPEC.md — 7 seções, critérios de aceitação</div>
-        <div class="tl dim">● lendo dados_tratados.csv — 7.043 linhas</div>
-        <div class="tl dim">● criando app.py…</div>
-        <div class="tl ok">✓ streamlit run app.py → localhost:8501</div>
-      </div>
-      <div class="bar" style="--d:2.6s;--dur:1.8s"><i></i></div>
+  <div class="body">
+    <div class="flow stg" style="--step:300ms;margin-top:0">
+      <div class="st"><i class="codicon codicon-organization"></i>Equipe<br><span class="mu" style="font-size:18px">baixa o kit</span></div><div class="ar">→</div>
+      <div class="st"><i class="codicon codicon-comment"></i>WhatsApp<br><span class="mu" style="font-size:18px">.zip como documento</span></div><div class="ar">→</div>
+      <div class="st"><i class="codicon codicon-person"></i>Organização<br><span class="mu" style="font-size:18px">mesmo prompt para todos</span></div><div class="ar">→</div>
+      <div class="st"><i class="codicon codicon-hubot"></i>Agente<br><span class="mu" style="font-size:18px">lê SPEC + CSV</span></div><div class="ar">→</div>
+      <div class="st"><i class="codicon codicon-dashboard"></i>Painel<br><span class="mu" style="font-size:18px">no pitch</span></div>
     </div>
-    <div class="stg" style="--d:4600ms">
-      <div class="dash">
-        <div class="kpi">Taxa geral de cancelamento<b>26,5%</b></div>
-        <div style="font-size:18px;color:#5b6275;margin-top:12px">por tipo de contrato</div>
-        <div class="row"><span>Mensal</span><i style="width:171px"></i>42,7%</div>
-        <div class="row"><span>Anual</span><i style="width:45px"></i>11,3%</div>
-        <div class="row"><span>Bianual</span><i style="width:11px"></i>2,8%</div>
+    <div class="g2" style="grid-template-columns:1.3fr .7fr;align-items:start;gap:28px">
+      <div class="term" style="font-size:22px"><div class="th"><b>TERMINAL</b><span>máquina da organização · agente de código</span></div>
+        <div class="stg" style="--d:1700ms;--step:600ms;padding-top:10px">
+          <div class="tl"><span class="pr">$</span> unzip kit_equipe_exemplo.zip -d painel &amp;&amp; cd painel</div>
+          <div class="tl"><span class="pr">&gt;</span> Leia o arquivo SPEC.md e construa a aplicação…</div>
+          <div class="tl dim">● lendo SPEC.md — 7 seções, critérios de aceitação</div>
+          <div class="tl dim">● lendo dados_tratados.csv — 7.043 linhas</div>
+          <div class="tl ok">✓ streamlit run app.py → localhost:8501</div>
+        </div>
+        <div class="bar" style="--d:4.4s;--dur:1.6s"><i></i></div>
+      </div>
+      <div class="stg" style="--d:5600ms">
+        <div class="dash">
+          <div class="kpi">Taxa geral de cancelamento<b>26,5%</b></div>
+          <div style="font-size:18px;color:#5b6275;margin-top:12px">por tipo de contrato</div>
+          <div class="row"><span>Mensal</span><i style="width:171px"></i>42,7%</div>
+          <div class="row"><span>Anual</span><i style="width:45px"></i>11,3%</div>
+          <div class="row"><span>Bianual</span><i style="width:11px"></i>2,8%</div>
+        </div>
       </div>
     </div>
   </div>
   <div class="foot">Números calculados da base Telco do hackathon (7.043 clientes). Painel ilustrativo.</div>
-  <aside class="notes">Cada equipe entrega o kit à organização, que roda o agente de código na própria máquina com o prompt padrão. O agente lê a SPEC e os dados e constrói o painel — por isso a qualidade da SPEC decide o resultado. Aqui, um exemplo com números reais da base de telecom: taxa geral de 26,5% e muito mais cancelamento no contrato mensal.</aside>
+  <aside class="notes">O caminho do kit: a equipe baixa o kit e manda o .zip pelo WhatsApp ao organizador. A organização roda o agente de código, com o mesmo prompt para todas as equipes. O agente lê a SPEC e os dados e constrói o painel, que aparece no pitch. Como o prompt é igual para todos, a qualidade da SPEC decide o resultado. Aqui, um exemplo com números reais da base de telecom: taxa geral de 26,5% e muito mais cancelamento no contrato mensal.</aside>
 </section>
 
-<section class="slide" data-file="25_criterios_avaliacao.json" data-folder="F_hackathon" data-section="F. O hackathon" data-time="1 min">
-  <div class="s-file">// 25_criterios_avaliacao.json</div>
+<section class="slide" data-file="39_criterios_avaliacao.json" data-folder="H_hackathon" data-section="H. O hackathon" data-time="1 min">
+  <div class="s-file">// 39_criterios_avaliacao.json</div>
   <h1>Como vamos avaliar</h1>
-  <div class="code stg" style="--step:350ms;font-size:27px"><span class="ln">{</span><span class="ln">  <span class="v">"resultado_vs_missao"</span>: <span class="n">25</span>,  <span class="c">// o painel atende à proposta da missão?</span></span><span class="ln">  <span class="v">"tratamento_de_dados"</span>: <span class="n">25</span>,  <span class="c">// as decisões de tratamento são coerentes?</span></span><span class="ln">  <span class="v">"clareza_da_spec"</span>:     <span class="n">25</span>,  <span class="c">// a SPEC é clara e verificável?</span></span><span class="ln">  <span class="v">"pitch"</span>:               <span class="n">25</span>   <span class="c">// a equipe conta bem a história?</span></span><span class="ln">}</span></div>
-  <p style="margin-top:24px">Os quatro critérios têm o <span class="acc">mesmo peso: 25% cada</span>.</p>
+  <div class="body">
+    <div class="code stg" style="--step:350ms;font-size:28px;line-height:1.75"><span class="ln">{</span><span class="ln">  <span class="v">"resultado_vs_missao"</span>: <span class="n">25</span>,  <span class="c">// o painel atende à proposta da missão?</span></span><span class="ln">  <span class="v">"tratamento_de_dados"</span>: <span class="n">25</span>,  <span class="c">// as decisões de tratamento são coerentes?</span></span><span class="ln">  <span class="v">"clareza_da_spec"</span>:     <span class="n">25</span>,  <span class="c">// a SPEC é clara e verificável?</span></span><span class="ln">  <span class="v">"pitch"</span>:               <span class="n">25</span>   <span class="c">// a equipe conta bem a história?</span></span><span class="ln">}</span></div>
+    <p style="margin-top:34px;font-size:34px;text-align:center">Os quatro critérios têm o <span class="acc">mesmo peso: 25% cada</span>.</p>
+  </div>
   <aside class="notes">Vamos avaliar quatro coisas, cada uma valendo 25%: o resultado comparado com a proposta da missão, a coerência das decisões de tratamento de dados, a clareza da SPEC e o pitch.</aside>
 </section>
 
-<section class="slide" data-file="26_regras_e_dicas.md" data-folder="F_hackathon" data-section="F. O hackathon" data-time="1 min">
-  <div class="s-file">// 26_regras_e_dicas.md</div>
+<section class="slide" data-file="40_regras_e_dicas.md" data-folder="H_hackathon" data-section="H. O hackathon" data-time="1 min">
+  <div class="s-file">// 40_regras_e_dicas.md</div>
   <h1>Regras da noite e dicas</h1>
-  <ul class="l stg" style="--step:330ms">
-    <li><i class="codicon codicon-watch"></i><span>Desenvolvimento das <b>20h30</b> às <b>21h40</b>.</span></li>
-    <li><i class="codicon codicon-megaphone"></i><span>Pitch de até <b>3 minutos</b>: problema → dados → decisões → demo → impacto.</span></li>
-    <li><i class="codicon codicon-file-zip"></i><span>Entregue o kit (.zip) à organização, que roda o agente.</span></li>
-    <li><i class="codicon codicon-save"></i><span>Salve o rascunho de vez em quando.</span></li>
-    <li><i class="codicon codicon-comment-discussion"></i><span>Travou? Chame alguém da organização.</span></li>
-  </ul>
-  <aside class="notes">Regras rápidas: o desenvolvimento vai das 20h30 às 21h40; no fim, cada equipe entrega o kit à organização, que roda o agente e gera o painel. O pitch tem até 3 minutos seguindo o roteiro problema, dados, decisões, demonstração e impacto. Salvem o rascunho no site e chamem a organização sempre que travarem.</aside>
+  <div class="body">
+    <div class="g2" style="grid-template-columns:1.2fr .8fr;align-items:center;gap:40px">
+      <ul class="l stg" style="--step:330ms">
+        <li><i class="codicon codicon-watch"></i><span>Desenvolvimento das <b>20h30</b> às <b>21h40</b>.</span></li>
+        <li><i class="codicon codicon-comment"></i><span>Envie o kit (.zip) <b>pelo WhatsApp</b> ao organizador até <b>21h40</b>, com o nome da equipe.</span></li>
+        <li><i class="codicon codicon-megaphone"></i><span>Pitch de até <b>3 minutos</b>.</span></li>
+        <li><i class="codicon codicon-save"></i><span>Salve o rascunho de vez em quando.</span></li>
+        <li style="margin-bottom:0"><i class="codicon codicon-comment-discussion"></i><span>Travou? Chame alguém da organização.</span></li>
+      </ul>
+      <div class="card stg" style="--d:1800ms">
+        <h3><i class="codicon codicon-megaphone"></i> Roteiro do pitch</h3>
+        <div class="code" style="font-size:24px;margin-top:12px;line-height:1.7;background:transparent;border:0;padding:0"><span class="ln"><span class="n">1</span> problema</span><span class="ln"><span class="n">2</span> dados</span><span class="ln"><span class="n">3</span> decisões</span><span class="ln"><span class="n">4</span> demonstração</span><span class="ln"><span class="n">5</span> impacto</span></div>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">Regras rápidas: o desenvolvimento vai das 20h30 às 21h40; até lá, cada equipe envia o kit pelo WhatsApp ao organizador, com o nome da equipe na mensagem. O pitch tem até 3 minutos seguindo o roteiro problema, dados, decisões, demonstração e impacto. Salvem o rascunho no site e chamem a organização sempre que travarem.</aside>
 </section>
 
-<section class="slide" data-file="27_bora_construir.md" data-folder="F_hackathon" data-section="F. O hackathon" data-time="30 s">
-  <div class="s-file">// 27_bora_construir.md</div>
+<section class="slide" data-file="41_bora_construir.md" data-folder="H_hackathon" data-section="H. O hackathon" data-time="30 s">
+  <div class="s-file">// 41_bora_construir.md</div>
   <div class="g2" style="grid-template-columns:1.4fr 1fr;align-items:center;flex:1">
     <div>
-      <div style="font-size:104px;font-weight:700;letter-spacing:-.03em;line-height:1;white-space:nowrap"><span class="type" data-delay="200">Bora construir?</span></div>
+      <div style="font-size:96px;font-weight:700;letter-spacing:-.03em;line-height:1;white-space:nowrap"><span class="type" data-delay="200" style="white-space:nowrap">Bora construir?</span></div>
       <div class="mono acc" style="font-size:34px;margin:30px 0">spec-ao-app.streamlit.app</div>
       <div class="stg" style="--d:1500ms;font-size:24px;color:var(--fg2);line-height:1.5">
         <div>ACE em Inteligência de Negócios · Gestão da Informação · FAGEN – UFU · Prof. José Eduardo</div>
@@ -687,40 +1070,70 @@ code{font-size:.9em;color:var(--type);background:#ffffff0d;padding:1px 8px;borde
   <aside class="notes">É isso! Abram o site pelo QR Code, juntem-se às equipes e bora construir. A organização está circulando para ajudar. Boa noite e bom hackathon!</aside>
 </section>
 
-<!-- ===================================================== G. REFERÊNCIAS -->
-<section class="slide" data-file="28_referencias_e_creditos.md" data-folder="G_referencias" data-section="G. Referências" data-time="—">
-  <div class="s-file">// 28_referencias_e_creditos.md</div>
-  <h1 style="font-size:46px;margin-bottom:16px">Referências e créditos</h1>
-  <div class="g2" style="gap:40px;font-size:18.5px;line-height:1.5;color:var(--fg2)">
+<!-- ===================================================== I. REFERÊNCIAS -->
+<section class="slide" data-file="42_referencias.md" data-folder="I_referencias" data-section="I. Referências" data-time="—">
+  <div class="s-file">// 42_referencias.md</div>
+  <h1 style="font-size:46px;margin-bottom:16px">Referências <span class="mu" style="font-weight:500;font-size:28px">(consultadas em 26/11/2026)</span></h1>
+  <div class="g2 refs" style="gap:40px">
     <div>
-      <div class="acc mono" style="margin-bottom:6px">REFERÊNCIAS (consultadas em 26/11/2026)</div>
-      <div>Stack Overflow. Developer Survey 2026 — AI. survey.stackoverflow.co/2026/ai</div>
-      <div>Stack Overflow Blog. “The results of the 2026 Developer Survey are here!” (06/10/2026)</div>
-      <div>MIT Technology Review. “What is vibe coding, exactly?” (16/04/2025)</div>
-      <div>IBM. “What is vibe coding?” ibm.com/think/topics/vibe-coding</div>
-      <div>GitHub. Spec Kit. github.github.com/spec-kit</div>
-      <div>GitHub Blog. “Spec-driven development with AI: get started with a new open source toolkit”</div>
-      <div>Kiro (AWS). kiro.dev · InfoQ, “AWS Kiro spec-driven agent” (ago/2025)</div>
-      <div>AGENTS.md. agents.md</div>
-      <div>Claude Code Docs. “How Claude remembers your project”. code.claude.com/docs/en/memory</div>
-      <div>Cursor Docs. Rules. cursor.com/docs/rules</div>
-      <div>Snowflake. “Snowflake Unveils Cortex Code, An AI Coding Agent…” (03/02/2026)</div>
-      <div>Snowflake Docs. Cortex Code in Snowsight — GA (09/03/2026)</div>
+      <div class="acc mono">HISTÓRIA E MÉTODOS</div>
+      <div>Torvalds, L. Mensagem “What would you like to see most in minix?”, comp.os.minix, 25/08/1991</div>
+      <div>Torvalds, L.; Diamond, D. Just for Fun. HarperBusiness, 2001</div>
+      <div>TOP500. Estatísticas por sistema operacional, top500.org (listas desde nov/2017)</div>
+      <div>Android Open Source Project. Kernel, source.android.com</div>
+      <div>Chacon, S.; Straub, B. Pro Git, “A Short History of Git”, git-scm.com</div>
+      <div>Royce, W. W. Managing the Development of Large Software Systems. IEEE WESCON, 1970</div>
+      <div>Manifesto para Desenvolvimento Ágil de Software, 2001, agilemanifesto.org/iso/ptbr</div>
+      <div>Beck, K. Test-Driven Development: By Example. Addison-Wesley, 2002</div>
+      <div>North, D. Introducing BDD. Better Software, mar/2006 · Fowler, M. GivenWhenThen e TestDrivenDevelopment, martinfowler.com/bliki</div>
+      <div>GitHub Blog. Introducing GitHub Copilot (29/06/2021)</div>
+      <div class="acc mono" style="margin-top:12px">DADOS</div>
+      <div>Bricklin, D. VisiCalc, bricklin.com/visicalc.htm · Microsoft, Excel 1.0 para Macintosh (1985)</div>
+      <div>Microsoft Power BI Blog. Disponibilidade geral (24/07/2015) · TechCrunch. Streamlit (01/10/2019)</div>
     </div>
     <div>
-      <div class="acc mono" style="margin-bottom:6px">CRÉDITOS DE RECURSOS</div>
+      <div class="acc mono">IA E SDD</div>
+      <div>Stack Overflow. Developer Survey 2026 — AI, survey.stackoverflow.co/2026/ai (06/10/2026)</div>
+      <div>MIT Technology Review. What is vibe coding, exactly? (16/04/2025) · IBM. What is vibe coding?</div>
+      <div>GitHub. Spec Kit, github.github.com/spec-kit · GitHub Blog. Spec-driven development with AI</div>
+      <div>Kiro (AWS), kiro.dev · AGENTS.md, agents.md</div>
+      <div>Claude Code Docs, code.claude.com/docs/en/memory · Cursor Docs, cursor.com/docs/rules</div>
+      <div class="acc mono" style="margin-top:12px">CASO ANALY (ALGAR)</div>
+      <div>TI Inside. Algar aumenta produtividade em 20% com a agente de IA “Analy” (13/04/2026)</div>
+      <div>Teletime. Algar avança em IA e renova canal de ofertas B2B (14/04/2026)</div>
+      <div>Inforchannel (10/04/2026) · Baguete. Algar desenvolve agente com Snowflake</div>
+      <div>Mobile Time. Algar possui 127 agentes (20/08/2026)</div>
+    </div>
+  </div>
+  <aside class="notes">Slide de referências, para consulta. Não precisa ser apresentado.</aside>
+</section>
+
+<section class="slide" data-file="43_creditos.md" data-folder="I_referencias" data-section="I. Referências" data-time="—">
+  <div class="s-file">// 43_creditos.md</div>
+  <h1 style="font-size:46px;margin-bottom:16px">Créditos de recursos</h1>
+  <div class="g2 refs" style="gap:40px">
+    <div>
+      <div class="acc mono">IMAGENS</div>
+      <div>Foto de Linus Torvalds: Alex Dawson (Flickr), Perth, jan/2003 — CC BY-SA 2.0 (creativecommons.org/licenses/by-sa/2.0), via Wikimedia Commons, arquivo “Linus Torvalds, 2002, Australian Linux conference.jpg”; recortada</div>
+      <div>Capturas de tela: site do hackathon, spec-ao-app.streamlit.app</div>
+      <div>Dados do painel de exemplo: base Telco Customer Churn (IBM, via Kaggle) usada no hackathon</div>
+      <div class="acc mono" style="margin-top:12px">FONTES, ÍCONES E CÓDIGO</div>
       <div>Fontes Inter e JetBrains Mono — SIL Open Font License 1.1 (via Fontsource)</div>
       <div>Ícones Codicons (Microsoft) — CC BY 4.0</div>
       <div>Logos GitHub, AWS, Snowflake, Streamlit e pandas — Simple Icons, CC0 1.0; marcas dos respectivos donos, usadas só para identificar as ferramentas</div>
       <div>QR Code gerado localmente com qrcode-generator (Kazuhiko Arase) — licença MIT</div>
-      <div>Capturas de tela: site do hackathon, spec-ao-app.streamlit.app</div>
-      <div>Dados do painel de exemplo: base Telco Customer Churn (IBM, via Kaggle) usada no hackathon</div>
-      <div>Sem fotos de banco de imagens nesta versão</div>
-      <div class="acc mono" style="margin:14px 0 6px">ATALHOS</div>
-      <div><span class="mono">→ / espaço</span> avançar · <span class="mono">←</span> voltar · <span class="mono">Ctrl+P</span> ir para slide · <span class="mono">F</span> tela cheia · <span class="mono">S</span> notas · <span class="mono">E</span> explorador</div>
+    </div>
+    <div>
+      <div class="acc mono">ATALHOS DA APRESENTAÇÃO</div>
+      <div><span class="mono">→ / espaço</span> avançar · <span class="mono">←</span> voltar</div>
+      <div><span class="mono">Ctrl+P</span> ir para um slide pelo nome</div>
+      <div><span class="mono">F</span> tela cheia · <span class="mono">S</span> notas do apresentador</div>
+      <div><span class="mono">E</span> mostrar/ocultar o explorador · <span class="mono">Home / End</span> início e fim</div>
+      <div class="acc mono" style="margin-top:12px">OBSERVAÇÃO</div>
+      <div>Os números do caso Analy foram divulgados pela própria Algar à imprensa. Exemplos marcados como “ilustrativos” não são dados reais.</div>
     </div>
   </div>
-  <aside class="notes">Slide de referências e créditos, para consulta. Não precisa ser apresentado.</aside>
+  <aside class="notes">Créditos das imagens, fontes e ícones, e os atalhos da apresentação. Não precisa ser apresentado.</aside>
 </section>
         </div>
         <div class="minimap" id="minimap"></div>
@@ -765,8 +1178,8 @@ code{font-size:.9em;color:var(--type);background:#ffffff0d;padding:1px 8px;borde
 
   /* ---------- dados auxiliares ---------- */
   const ext = f => (f.split(".").pop() || "md");
-  const rotuloExt = { md: "M↓", py: "py", sh: "$_", diff: "±", json: "{}", tree: "⌥" };
-  const linguagem = { md: "Markdown", py: "Python", sh: "Shell Script", diff: "Diff", json: "JSON", tree: "Plain Text" };
+  const rotuloExt = { md: "M↓", py: "py", sh: "$_", diff: "±", json: "{}", tree: "⌥", feature: "◆" };
+  const linguagem = { md: "Markdown", py: "Python", sh: "Shell Script", diff: "Diff", json: "JSON", tree: "Plain Text", feature: "Gherkin" };
   slides.forEach((s, i) => {
     s.dataset.n = i + 1;
     s.querySelectorAll(".type").forEach(el => el.dataset.full = el.textContent);
@@ -777,30 +1190,43 @@ code{font-size:.9em;color:var(--type);background:#ffffff0d;padding:1px 8px;borde
   const tree = document.getElementById("tree");
   tree.innerHTML = '<div class="root">DA-SPEC-AO-APP</div>';
   let pastaAtual = null, subAtual = null;
+  const pastas = {};
   slides.forEach((s, i) => {
     const [pasta, sub] = s.dataset.folder.split("/");
     if (pasta !== pastaAtual) {
       pastaAtual = pasta; subAtual = null;
-      tree.insertAdjacentHTML("beforeend", `<div class="folder"><i class="codicon codicon-chevron-down"></i>${pasta}</div>`);
+      const n = slides.filter(x => x.dataset.folder.split("/")[0] === pasta).length;
+      tree.insertAdjacentHTML("beforeend", `<div class="folder" data-pasta="${pasta}"><i class="codicon codicon-chevron-right"></i>${pasta}<span class="mu" style="margin-left:auto;font-size:13px">${n}</span></div>`);
+      const el = tree.lastElementChild;
+      pastas[pasta] = el;
+      el.onclick = () => ir(slides.findIndex(x => x.dataset.folder.split("/")[0] === pasta));
     }
     if (sub && sub !== subAtual) {
       subAtual = sub;
-      tree.insertAdjacentHTML("beforeend", `<div class="folder" style="padding-left:34px"><i class="codicon codicon-chevron-down"></i>${sub}</div>`);
+      tree.insertAdjacentHTML("beforeend", `<div class="folder sub-pasta" data-pasta="${pasta}" style="padding-left:34px"><i class="codicon codicon-chevron-down"></i>${sub}</div>`);
     }
     const e = ext(s.dataset.file);
     const div = document.createElement("div");
     div.className = "file" + (sub ? " sub" : "");
+    div.dataset.pasta = pasta;
     div.innerHTML = `<span class="ficon ${e}">${rotuloExt[e] || "•"}</span>${s.dataset.file}`;
     div.onclick = () => ir(i);
     tree.appendChild(div);
     s._arquivo = div;
   });
+  function abrirPasta(pasta) {
+    tree.querySelectorAll(".file, .sub-pasta").forEach(el => el.classList.toggle("hide", el.dataset.pasta !== pasta));
+    Object.entries(pastas).forEach(([nome, el]) => {
+      el.classList.toggle("cur", nome === pasta);
+      el.querySelector(".codicon").className = "codicon codicon-chevron-" + (nome === pasta ? "down" : "right");
+    });
+  }
 
   /* ---------- minimapa e gutter ---------- */
   const mm = document.getElementById("minimap");
   slides.forEach((s, i) => { const b = document.createElement("i"); b.title = s.dataset.file; b.onclick = () => ir(i); mm.appendChild(b); });
   const gutter = document.getElementById("gutter");
-  gutter.innerHTML = Array.from({ length: 28 }, (_, i) => `<div>${i + 1}</div>`).join("");
+  gutter.innerHTML = Array.from({ length: 29 }, (_, i) => `<div>${i + 1}</div>`).join("");
 
   /* ---------- QR Codes ---------- */
   document.querySelectorAll("[data-qr]").forEach(el => {
@@ -895,6 +1321,7 @@ code{font-size:.9em;color:var(--type);background:#ffffff0d;padding:1px 8px;borde
     const s = slides[i];
     // reinicia animações CSS
     s.classList.remove("active"); void s.offsetWidth; s.classList.add("active");
+    abrirPasta(s.dataset.folder.split("/")[0]);
     s._arquivo.classList.add("on");
     s._arquivo.scrollIntoView({ block: "nearest" });
     app.classList.toggle("zen", !!s.dataset.zen);
@@ -906,7 +1333,7 @@ code{font-size:.9em;color:var(--type);background:#ffffff0d;padding:1px 8px;borde
       + `<div class="tab on"><span class="ficon ${ext(s.dataset.file)}">${rotuloExt[ext(s.dataset.file)]}</span>${s.dataset.file}<i class="codicon codicon-close"></i></div>`;
     document.getElementById("crumbs").innerHTML = `da-spec-ao-app <i class="codicon codicon-chevron-right"></i> ${s.dataset.folder.replace("/", ' <i class="codicon codicon-chevron-right"></i> ')} <i class="codicon codicon-chevron-right"></i> <b>${s.dataset.file}</b>`;
     [...mm.children].forEach((b, k) => b.classList.toggle("on", k === i));
-    [...gutter.children].forEach((g, k) => g.classList.toggle("cur", k === (i % 28)));
+    [...gutter.children].forEach((g, k) => g.classList.toggle("cur", k === (i % 29)));
     document.getElementById("st-sec").innerHTML = `<i class="codicon codicon-symbol-file"></i> ${s.dataset.section}`;
     document.getElementById("st-slide").textContent = `Slide ${i + 1}/${slides.length}`;
     document.getElementById("st-ln").textContent = `Ln ${i + 1}, Col 1`;
@@ -1029,7 +1456,8 @@ code{font-size:.9em;color:var(--type);background:#ffffff0d;padding:1px 8px;borde
       pg.innerHTML = titulo
         + `<div class="tabs"><div class="tab on"><span class="ficon ${e}">${rotuloExt[e]}</span>${s.dataset.file}</div></div>`;
       const corpo = document.createElement("div");
-      corpo.style.cssText = "position:relative;overflow:hidden";
+      corpo.style.cssText = "position:relative;overflow:hidden;min-height:0;display:flex;flex-direction:column";
+      clone.style.flex = "1"; clone.style.minHeight = "0";
       corpo.appendChild(clone);
       pg.appendChild(corpo);
       pg.insertAdjacentHTML("beforeend", `<div class="status"><div class="it"><i class="codicon codicon-git-branch"></i> main</div><div class="it">${s.dataset.section}</div><div class="sp"></div><div class="it">Slide ${i + 1}/${slides.length}</div><div class="it">${linguagem[e] || "Markdown"}</div></div>`);
