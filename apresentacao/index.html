@@ -290,10 +290,9 @@ code{font-size:.9em;color:var(--type);background:#ffffff0d;padding:1px 8px;borde
 <section class="slide" data-file="02_agenda.tree" data-folder="A_abertura" data-section="A. Abertura" data-time="1 min">
   <div class="s-file">// 02_agenda.tree</div>
   <h1>Agenda da noite</h1>
-  <div class="code stg" style="--step:260ms;font-size:30px;line-height:1.65"><span class="ln"><span class="t">noite_26-11/</span></span><span class="ln">├── <span class="n">19h00</span>  abertura.md</span><span class="ln">├── <span class="n">19h10</span>  apresentacao_sdd.md          <span class="c"># o que vamos ver agora</span></span><span class="ln">├── <span class="n">19h45</span>  <span class="t">hackathon/</span>                   <span class="c"># missão → dados → SPEC → painel</span></span><span class="ln">├── <span class="n">21h45</span>  <span class="t">pitches/</span>                     <span class="c"># até 3 min por equipe</span></span><span class="ln">├── <span class="n">22h15</span>  premiacao.md</span><span class="ln">└── <span class="n">22h30</span>  encerramento</span>
+  <div class="code stg" style="--step:260ms;font-size:30px;line-height:1.65"><span class="ln"><span class="t">noite_26-11/</span></span><span class="ln">├── <span class="n">19h00</span>  abertura.md</span><span class="ln">├── <span class="n">19h10</span>  apresentacao_sdd.md          <span class="c"># o que vamos ver agora</span></span><span class="ln">├── <span class="n">20h30</span>  <span class="t">hackathon/</span>                   <span class="c"># missão → dados → SPEC → kit</span></span><span class="ln">├── <span class="n">21h40</span>  <span class="t">pitches/</span>                     <span class="c"># até 3 min por equipe</span></span><span class="ln">└── <span class="n">22h30</span>  encerramento</span>
   </div>
-  <div style="margin-top:22px"><span class="todo">[CONFIRMAR COM A EQUIPE] horários da agenda</span></div>
-  <aside class="notes">Mostre como a noite está organizada: cerca de 35 minutos de apresentação e o restante para o hackathon, pitches e premiação. Reforce que os pitches têm até 3 minutos. (Confirmar os horários com a equipe antes do evento.)</aside>
+  <aside class="notes">Mostre como a noite está organizada: abertura às 19h, apresentação a partir das 19h10, hackathon das 20h30 às 21h40, depois os pitches e o encerramento às 22h30. Reforce que os pitches têm até 3 minutos.</aside>
 </section>
 
 <!-- ===================================================== B. O CENÁRIO -->
@@ -501,9 +500,9 @@ code{font-size:.9em;color:var(--type);background:#ffffff0d;padding:1px 8px;borde
   <ul class="l stg" style="--d:1400ms;--step:380ms">
     <li><i class="codicon codicon-organization"></i><span>Equipes montadas pela organização.</span></li>
     <li><i class="codicon codicon-briefcase"></i><span>Cada equipe recebe uma <b>missão</b> de uma “área cliente”.</span></li>
-    <li><i class="codicon codicon-dashboard"></i><span>Entrega: um <b>painel</b> construído por um agente de IA a partir da sua SPEC.</span></li>
+    <li><i class="codicon codicon-dashboard"></i><span>Entrega: o kit da equipe. A organização roda o agente de IA, que constrói o <b>painel</b> a partir da sua SPEC.</span></li>
   </ul>
-  <aside class="notes">Agora é a vez de vocês. As equipes já foram montadas pela organização. Cada equipe recebe uma missão de uma área cliente e entrega um painel construído por um agente de IA, a partir da SPEC que vocês mesmos vão escrever.</aside>
+  <aside class="notes">Agora é a vez de vocês. As equipes já foram montadas pela organização. Cada equipe recebe uma missão de uma área cliente e entrega o kit com os dados tratados e a SPEC. A organização roda o agente de IA com esse kit, e o painel gerado aparece no pitch.</aside>
 </section>
 
 <section class="slide" data-file="17_tres_papeis.md" data-folder="F_hackathon" data-section="F. O hackathon" data-time="1 min">
@@ -612,20 +611,21 @@ code{font-size:.9em;color:var(--type);background:#ffffff0d;padding:1px 8px;borde
       <div class="badge"><i class="codicon codicon-package"></i> 6 · Exportar</div>
       <h1 style="font-size:50px">Baixe o kit da equipe</h1>
       <ul class="l stg" style="--d:500ms;--step:350ms;font-size:27px">
-        <li><i class="codicon codicon-file-zip"></i><span><code>dados_tratados.csv</code>, planilha <code>.xlsx</code> e <code>SPEC.md</code>.</span></li>
+        <li><i class="codicon codicon-file-zip"></i><span><code>dados_tratados.csv</code>, planilha <code>.xlsx</code> e <code>SPEC.md</code> — entregue à organização.</span></li>
         <li><i class="codicon codicon-save"></i><span>Dica: “Salvar ou retomar progresso”.</span></li>
         <li><i class="codicon codicon-book"></i><span>Dica: Glossário na barra lateral.</span></li>
       </ul>
     </div>
   </div>
-  <aside class="notes">No fim, baixem o kit da equipe: a base tratada em CSV, uma planilha para o Excel e a SPEC. Duas dicas: salvem o progresso de vez em quando pela barra lateral, para não perder nada se a página recarregar, e usem o glossário quando aparecer um termo novo.</aside>
+  <aside class="notes">No fim, baixem o kit da equipe — a base tratada em CSV, uma planilha para o Excel e a SPEC — e entreguem à organização. Duas dicas: salvem o progresso de vez em quando pela barra lateral, para não perder nada se a página recarregar, e usem o glossário quando aparecer um termo novo.</aside>
 </section>
 
 <section class="slide" data-file="24_do_kit_ao_painel.sh" data-folder="F_hackathon" data-section="F. O hackathon" data-time="1,5 min">
   <div class="s-file">// 24_do_kit_ao_painel.sh</div>
   <h1>Do kit ao painel</h1>
+  <p style="margin:-10px 0 22px;color:var(--fg2)">A organização roda o agente de IA com o kit de cada equipe.</p>
   <div class="g2" style="grid-template-columns:1.3fr .7fr;align-items:start;gap:28px">
-    <div class="term" style="font-size:22px"><div class="th"><b>TERMINAL</b><span>agente de código</span></div>
+    <div class="term" style="font-size:22px"><div class="th"><b>TERMINAL</b><span>máquina da organização · agente de código</span></div>
       <div class="stg" style="--step:650ms;padding-top:10px">
         <div class="tl"><span class="pr">$</span> unzip kit_equipe_exemplo.zip -d painel &amp;&amp; cd painel</div>
         <div class="tl"><span class="pr">&gt;</span> Leia o arquivo SPEC.md e construa a aplicação…</div>
@@ -647,27 +647,28 @@ code{font-size:.9em;color:var(--type);background:#ffffff0d;padding:1px 8px;borde
     </div>
   </div>
   <div class="foot">Números calculados da base Telco do hackathon (7.043 clientes). Painel ilustrativo.</div>
-  <aside class="notes">Com o kit em mãos, a equipe abre o agente de código na pasta e envia o prompt. O agente lê a SPEC e os dados e constrói o painel. Aqui, um exemplo com números reais da base de telecom: taxa geral de 26,5% e muito mais cancelamento no contrato mensal. Funciona com o assistente que a equipe preferir.</aside>
+  <aside class="notes">Cada equipe entrega o kit à organização, que roda o agente de código na própria máquina com o prompt padrão. O agente lê a SPEC e os dados e constrói o painel — por isso a qualidade da SPEC decide o resultado. Aqui, um exemplo com números reais da base de telecom: taxa geral de 26,5% e muito mais cancelamento no contrato mensal.</aside>
 </section>
 
 <section class="slide" data-file="25_criterios_avaliacao.json" data-folder="F_hackathon" data-section="F. O hackathon" data-time="1 min">
   <div class="s-file">// 25_criterios_avaliacao.json</div>
   <h1>Como vamos avaliar</h1>
-  <div class="code stg" style="--step:350ms;font-size:27px"><span class="ln">{</span><span class="ln">  <span class="v">"resultado_vs_missao"</span>:   <span class="s">"o painel atende à proposta da missão?"</span>,</span><span class="ln">  <span class="v">"tratamento_de_dados"</span>:   <span class="s">"as decisões de tratamento são coerentes?"</span>,</span><span class="ln">  <span class="v">"clareza_da_spec"</span>:       <span class="s">"a SPEC é clara e verificável?"</span>,</span><span class="ln">  <span class="v">"pitch"</span>:                 <span class="s">"a equipe conta bem a história?"</span></span><span class="ln">}</span></div>
-  <div style="margin-top:24px"><span class="todo">[CONFIRMAR PESOS COM A EQUIPE]</span></div>
-  <aside class="notes">Vamos avaliar quatro coisas: o resultado comparado com a proposta da missão, a coerência das decisões de tratamento de dados, a clareza da SPEC e o pitch. (Confirmar os pesos com a equipe antes do evento.)</aside>
+  <div class="code stg" style="--step:350ms;font-size:27px"><span class="ln">{</span><span class="ln">  <span class="v">"resultado_vs_missao"</span>: <span class="n">25</span>,  <span class="c">// o painel atende à proposta da missão?</span></span><span class="ln">  <span class="v">"tratamento_de_dados"</span>: <span class="n">25</span>,  <span class="c">// as decisões de tratamento são coerentes?</span></span><span class="ln">  <span class="v">"clareza_da_spec"</span>:     <span class="n">25</span>,  <span class="c">// a SPEC é clara e verificável?</span></span><span class="ln">  <span class="v">"pitch"</span>:               <span class="n">25</span>   <span class="c">// a equipe conta bem a história?</span></span><span class="ln">}</span></div>
+  <p style="margin-top:24px">Os quatro critérios têm o <span class="acc">mesmo peso: 25% cada</span>.</p>
+  <aside class="notes">Vamos avaliar quatro coisas, cada uma valendo 25%: o resultado comparado com a proposta da missão, a coerência das decisões de tratamento de dados, a clareza da SPEC e o pitch.</aside>
 </section>
 
 <section class="slide" data-file="26_regras_e_dicas.md" data-folder="F_hackathon" data-section="F. O hackathon" data-time="1 min">
   <div class="s-file">// 26_regras_e_dicas.md</div>
   <h1>Regras da noite e dicas</h1>
   <ul class="l stg" style="--step:330ms">
-    <li><i class="codicon codicon-watch"></i><span>Tempo de desenvolvimento até as <b>21h45</b> <span class="todo" style="font-size:18px">[CONFIRMAR]</span></span></li>
+    <li><i class="codicon codicon-watch"></i><span>Desenvolvimento das <b>20h30</b> às <b>21h40</b>.</span></li>
     <li><i class="codicon codicon-megaphone"></i><span>Pitch de até <b>3 minutos</b>: problema → dados → decisões → demo → impacto.</span></li>
+    <li><i class="codicon codicon-file-zip"></i><span>Entregue o kit (.zip) à organização, que roda o agente.</span></li>
     <li><i class="codicon codicon-save"></i><span>Salve o rascunho de vez em quando.</span></li>
     <li><i class="codicon codicon-comment-discussion"></i><span>Travou? Chame alguém da organização.</span></li>
   </ul>
-  <aside class="notes">Regras rápidas: o tempo de desenvolvimento vai até as 21h45 (confirmar), e o pitch tem até 3 minutos seguindo o roteiro problema, dados, decisões, demonstração e impacto. Salvem o rascunho no site e chamem a organização sempre que travarem.</aside>
+  <aside class="notes">Regras rápidas: o desenvolvimento vai das 20h30 às 21h40; no fim, cada equipe entrega o kit à organização, que roda o agente e gera o painel. O pitch tem até 3 minutos seguindo o roteiro problema, dados, decisões, demonstração e impacto. Salvem o rascunho no site e chamem a organização sempre que travarem.</aside>
 </section>
 
 <section class="slide" data-file="27_bora_construir.md" data-folder="F_hackathon" data-section="F. O hackathon" data-time="30 s">
