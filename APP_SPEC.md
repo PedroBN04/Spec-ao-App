@@ -25,7 +25,7 @@
 
 ## 1. Visão geral
 
-Aplicação web **didática** usada em um minicurso + hackathon de 3h30 (24/11/2026, até 25 participantes, maioria **sem experiência em programação**).
+Aplicação web **didática** usada em um minicurso + hackathon de 3h30 (26/11/2026, até 25 participantes, maioria **sem experiência em programação**).
 
 O participante:
 1. escolhe um desafio (tema + base de dados real);

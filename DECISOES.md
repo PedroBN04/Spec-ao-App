@@ -300,3 +300,6 @@ operações importa"). O app já usava `layout="wide"`; os cortes vinham da esca
     computador / Chat na web".
 97. **Botão "Código" no fluxo:** coluna alargada (2:5) para o rótulo não ser cortado ("Códi…") em telas
     estreitas.
+98. **Data e prazo do evento:** o evento é em 26/11/2026 (README, APP_SPEC e PLANO corrigidos). Os kits devem ser
+    enviados pelo WhatsApp até as 21h30 (etapa 6 e slides), para a organização gerar os painéis antes dos
+    pitches das 21h40.

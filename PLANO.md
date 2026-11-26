@@ -1,6 +1,6 @@
 # Plano — app "Da Spec ao App" (curadoria, arquitetura pedagógica e roadmap)
 
-Evento: 24/11/2026, 19h às 22h30, UFU Bloco 1F sala 256, até 25 participantes.
+Evento: 26/11/2026, 19h às 22h30, UFU Bloco 1F sala 256, até 25 participantes.
 Documento de apoio à equipe organizadora. A especificação para o Claude Code está em `APP_SPEC.md`.
 
 ---
@@ -79,9 +79,9 @@ Risco principal do deploy gratuito: ~1 GB de memória para todas as sessões. Po
 | Hoje 23/11, manhã | Criar repo; baixar as 3 bases em `data/raw/`; salvar `APP_SPEC.md` e `CLAUDE.md`; pedir ao Claude Code os marcos M1 e M2 | App navegando + diagnóstico do tema telco |
 | Hoje, tarde | M3 e M4 (tratamento em blocos + checklist) | Fluxo telco completo até o checklist |
 | Hoje, noite | M5 (spec + exportação) e teste de ponta a ponta com o telco | **Versão mínima utilizável** (1 tema) |
-| 24/11, manhã | M6 (hotel e noshow) e M7 (textos + deploy) | 3 temas no ar |
-| 24/11, até 16h | Ensaio em máquina Windows: 2 pessoas fazem a jornada inteira; levar os 2 arquivos ao Claude Code e verificar se ele constrói o app | Ajustes finais e **congelamento** do código |
-| 24/11, 18h30 | Abrir o link no laboratório e testar 5 máquinas | Pronto |
+| 26/11, manhã | M6 (hotel e noshow) e M7 (textos + deploy) | 3 temas no ar |
+| 26/11, até 16h | Ensaio em máquina Windows: 2 pessoas fazem a jornada inteira; levar os 2 arquivos ao Claude Code e verificar se ele constrói o app | Ajustes finais e **congelamento** do código |
+| 26/11, 18h30 | Abrir o link no laboratório e testar 5 máquinas | Pronto |
 
 Se o tempo apertar: entregar **só o tema telco** completo (é a base da proposta aprovada) e deixar hotel e noshow como aprofundamento.
 

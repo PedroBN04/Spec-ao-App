@@ -89,7 +89,7 @@ def render() -> None:
         st.markdown(
             f"1. Baixe o kit acima (`kit_{slug}.zip`). **Não precisa extrair nem renomear nada.**\n"
             "2. Envie o arquivo `.zip` no **WhatsApp** para o organizador do hackathon "
-            "(como documento, não como foto).\n"
+            "(como documento, não como foto), **até as 21h30**.\n"
             f"3. Na mensagem, escreva o nome da equipe: **{st.session_state.equipe or 'sua equipe'}**.\n"
             "4. Pronto. A organização entrega o kit a um agente de IA, que constrói o painel seguindo a sua SPEC."
         )
