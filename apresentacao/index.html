@@ -1,0 +1,1047 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Da Spec ao App — Abertura</title>
+<link rel="stylesheet" href="assets/icons/codicon.css">
+<style>
+/* ============================================================
+   Fontes locais (funcionam offline)
+   ============================================================ */
+@font-face{font-family:"Inter";font-weight:400;font-display:swap;src:url(assets/fonts/inter-latin-400-normal.woff2) format("woff2")}
+@font-face{font-family:"Inter";font-weight:500;font-display:swap;src:url(assets/fonts/inter-latin-500-normal.woff2) format("woff2")}
+@font-face{font-family:"Inter";font-weight:600;font-display:swap;src:url(assets/fonts/inter-latin-600-normal.woff2) format("woff2")}
+@font-face{font-family:"Inter";font-weight:700;font-display:swap;src:url(assets/fonts/inter-latin-700-normal.woff2) format("woff2")}
+@font-face{font-family:"Inter";font-weight:400;font-display:swap;src:url(assets/fonts/inter-latin-ext-400-normal.woff2) format("woff2");unicode-range:U+0100-02AF,U+1E00-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Inter";font-weight:600;font-display:swap;src:url(assets/fonts/inter-latin-ext-600-normal.woff2) format("woff2");unicode-range:U+0100-02AF,U+1E00-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Inter";font-weight:700;font-display:swap;src:url(assets/fonts/inter-latin-ext-700-normal.woff2) format("woff2");unicode-range:U+0100-02AF,U+1E00-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"JetBrains Mono";font-weight:400;font-display:swap;src:url(assets/fonts/jetbrains-mono-latin-400-normal.woff2) format("woff2")}
+@font-face{font-family:"JetBrains Mono";font-weight:500;font-display:swap;src:url(assets/fonts/jetbrains-mono-latin-500-normal.woff2) format("woff2")}
+@font-face{font-family:"JetBrains Mono";font-weight:700;font-display:swap;src:url(assets/fonts/jetbrains-mono-latin-700-normal.woff2) format("woff2")}
+@font-face{font-family:"JetBrains Mono";font-weight:400;font-display:swap;src:url(assets/fonts/jetbrains-mono-latin-ext-400-normal.woff2) format("woff2");unicode-range:U+0100-02AF,U+1E00-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+
+/* ============================================================
+   Tema "Dark Modern" (com contraste reforçado para projetor)
+   ============================================================ */
+:root{
+  --bg:#1f1f1f; --bg2:#181818; --bg3:#252526; --line:#2b2b2b; --line2:#3c3c3c;
+  --fg:#f0f0f0; --fg2:#c8c8c8; --mut:#9d9d9d;
+  --blue:#0e8ef0; --blue2:#4fc1ff; --yellow:#f2cc60; --green:#3fb950; --red:#f85149; --purple:#c586c0;
+  --kw:#569cd6; --str:#ce9178; --fn:#dcdcaa; --com:#6a9955; --num:#b5cea8; --type:#4ec9b0; --var:#9cdcfe;
+  --mono:"JetBrains Mono",Consolas,"Cascadia Mono",monospace; --sans:"Inter","Segoe UI",system-ui,sans-serif;
+  --side:300px; --s:1;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#0c0c0c;overflow:hidden;color:var(--fg);font-family:var(--sans)}
+#app{position:absolute;left:50%;top:50%;width:1920px;height:1080px;transform:translate(-50%,-50%) scale(var(--s));
+  display:grid;grid-template-rows:44px 1fr 38px;background:var(--bg);box-shadow:0 30px 80px #000a;border-radius:10px;overflow:hidden}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+
+/* Barra de título */
+.titlebar{display:grid;grid-template-columns:240px 1fr 240px;align-items:center;background:var(--bg2);border-bottom:1px solid var(--line);font-size:17px;color:var(--fg2)}
+.dots{display:flex;gap:10px;padding-left:18px}.dots i{width:14px;height:14px;border-radius:50%;display:block}
+.dots i:nth-child(1){background:#ff5f57}.dots i:nth-child(2){background:#febc2e}.dots i:nth-child(3){background:#28c840}
+.menu{display:flex;gap:18px;justify-content:center;align-items:center}
+.menu span{color:var(--mut)}.menu .title{color:var(--fg2);margin-left:22px;padding:4px 120px;border:1px solid var(--line2);border-radius:6px;background:#202020;font-size:16px}
+.tb-right{display:flex;justify-content:flex-end;gap:16px;padding-right:18px;color:var(--mut);font-size:18px}
+
+/* Corpo */
+.main{display:grid;grid-template-columns:64px var(--side) 1fr;min-height:0;transition:grid-template-columns .35s ease}
+.activity{background:var(--bg2);border-right:1px solid var(--line);display:flex;flex-direction:column;align-items:center;gap:6px;padding-top:10px}
+.activity .codicon{font-size:30px;color:#868686;padding:12px 0;width:100%;text-align:center;border-left:2px solid transparent}
+.activity .on{color:var(--fg);border-left-color:var(--blue)}.activity .bottom{margin-top:auto}
+.sidebar{background:var(--bg2);border-right:1px solid var(--line);overflow:hidden;display:flex;flex-direction:column;min-width:0}
+.sb-title{font-size:15px;letter-spacing:.08em;color:var(--mut);padding:16px 20px 10px;display:flex;justify-content:space-between}
+.tree{overflow:auto;padding-bottom:20px;font-size:18px;scrollbar-width:none}
+.tree .root{font-weight:700;font-size:15px;letter-spacing:.06em;color:var(--fg2);padding:6px 14px}
+.tree .folder{display:flex;align-items:center;gap:6px;padding:5px 14px;color:var(--fg2);font-family:var(--mono);font-size:16px}
+.tree .file{display:flex;align-items:center;gap:8px;padding:4px 14px 4px 38px;color:#bdbdbd;font-family:var(--mono);font-size:15.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;border:1px solid transparent}
+.tree .file:hover{background:#2a2d2e}
+.tree .file.on{background:#04395e;color:#fff;border-color:var(--blue)}
+.tree .file.sub{padding-left:58px}
+.ficon{font-size:11px;font-weight:700;width:22px;flex:0 0 22px;text-align:center;border-radius:3px;font-family:var(--mono);line-height:16px}
+.ficon.md{color:#519aba}.ficon.py{color:#f2cc60}.ficon.sh{color:#89e051}.ficon.diff{color:#e37933}.ficon.json{color:#cbcb41}.ficon.tree{color:#a074c4}
+
+/* Editor */
+.editor{display:grid;grid-template-rows:50px 36px 1fr;min-width:0;min-height:0;background:var(--bg)}
+.tabs{display:flex;background:var(--bg2);border-bottom:1px solid var(--line);overflow:hidden}
+.tab{display:flex;align-items:center;gap:10px;padding:0 22px;font-family:var(--mono);font-size:17px;color:var(--mut);border-right:1px solid var(--line);white-space:nowrap}
+.tab.on{background:var(--bg);color:var(--fg);border-top:2px solid var(--blue);animation:tabIn .3s ease}
+.tab .codicon{font-size:15px}
+@keyframes tabIn{from{opacity:.2;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.crumbs{display:flex;align-items:center;gap:8px;padding:0 24px;font-family:var(--mono);font-size:16px;color:var(--mut);border-bottom:1px solid var(--line)}
+.crumbs b{color:var(--fg2);font-weight:500}
+.ebody{display:grid;grid-template-columns:74px 1fr 92px;min-height:0;position:relative}
+.gutter{font-family:var(--mono);font-size:16px;color:#5a5a5a;text-align:right;padding:28px 16px 0 0;line-height:31.6px;overflow:hidden;user-select:none}
+.gutter .cur{color:#cccccc}
+.canvas{position:relative;overflow:hidden}
+.minimap{border-left:1px solid var(--line);padding:14px 10px;display:flex;flex-direction:column;gap:5px;position:relative;background:#1b1b1b}
+.minimap i{display:block;height:20px;border-radius:2px;background:linear-gradient(90deg,#3a3d41 0 60%,transparent 60%);opacity:.7;cursor:pointer}
+.minimap i:nth-child(3n){background:linear-gradient(90deg,#3a3d41 0 80%,transparent 80%)}
+.minimap i:nth-child(4n+1){background:linear-gradient(90deg,#264f78 0 45%,transparent 45%)}
+.minimap i.on{outline:2px solid var(--blue);background:#3b4a5a;opacity:1}
+
+/* Barra de status */
+.status{display:flex;align-items:center;background:#0e639c;color:#fff;font-size:17px;padding:0 6px}
+.status .it{display:flex;align-items:center;gap:7px;padding:0 12px;height:100%}
+.status .it .codicon{font-size:17px}
+.status .rem{background:#16825d;height:100%}
+.status .sp{flex:1}
+
+/* ============================================================
+   Slides
+   ============================================================ */
+.slide{position:absolute;inset:0;padding:30px 70px 40px 34px;display:none;flex-direction:column;font-size:30px;line-height:1.42}
+.slide.active{display:flex;animation:openFile .35s ease}
+@keyframes openFile{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:none}}
+.notes{display:none}
+.slide .codicon{font-size:1em;vertical-align:-.12em}
+.s-file{font-family:var(--mono);font-size:21px;color:var(--com);margin-bottom:8px}
+h1{font-size:58px;line-height:1.12;font-weight:700;letter-spacing:-.01em;margin-bottom:26px}
+h1 .acc,.acc{color:var(--blue2)} .yl{color:var(--yellow)} .gr{color:var(--green)} .rd{color:var(--red)} .mu{color:var(--mut)}
+.s-body{flex:1;min-height:0;font-size:30px;line-height:1.42}
+.s-body p{margin-bottom:16px}
+.foot{font-size:17px;color:var(--mut);font-family:var(--mono);margin-top:10px;border-top:1px solid var(--line);padding-top:10px}
+.foot a{color:var(--mut)}
+.mono{font-family:var(--mono)}
+ul.l{list-style:none}
+ul.l li{display:flex;gap:16px;align-items:flex-start;margin-bottom:16px}
+ul.l li .codicon{font-size:32px;color:var(--blue2);margin-top:4px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:36px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
+.card{background:var(--bg3);border:1px solid var(--line2);border-radius:12px;padding:26px}
+.card h3{font-size:30px;margin-bottom:10px;display:flex;align-items:center;gap:12px}
+.card p{font-size:25px;color:var(--fg2);line-height:1.38;margin:0}
+.card .codicon{font-size:36px;color:var(--blue2)}
+.pill{display:inline-block;font-family:var(--mono);font-size:19px;padding:3px 12px;border-radius:999px;background:#0e8ef022;color:var(--blue2);border:1px solid #0e8ef055}
+.todo{display:inline-block;font-family:var(--mono);font-size:22px;padding:4px 12px;border-radius:6px;background:#f2cc6022;color:var(--yellow);border:1px dashed var(--yellow)}
+.big{font-size:84px;font-weight:700;line-height:1;color:var(--blue2);font-family:var(--sans)}
+code,.code{font-family:var(--mono)}
+code{font-size:.9em;color:var(--type);background:#ffffff0d;padding:1px 8px;border-radius:5px}
+
+/* Bloco de código com destaque de sintaxe */
+.code{background:#181818;border:1px solid var(--line2);border-radius:10px;padding:22px 26px;font-size:25px;line-height:1.6;white-space:pre;overflow:hidden;color:#d4d4d4}
+.code .k{color:var(--kw)}.code .s{color:var(--str)}.code .f{color:var(--fn)}.code .c{color:var(--com)}.code .n{color:var(--num)}
+.code .t{color:var(--type)}.code .v{color:var(--var)}.code .h{color:var(--kw);font-weight:700}.code .p{color:var(--purple)}
+.code .ln{display:block}
+.diff .ln{padding-left:44px;position:relative;margin:0 -26px;padding-right:26px}
+.diff .ln::before{position:absolute;left:18px;color:var(--mut)}
+.diff .add{background:#2ea04322}.diff .add::before{content:"+";color:var(--green)}
+.diff .del{background:#f8514922;text-decoration:line-through;text-decoration-color:#f8514988}.diff .del::before{content:"−";color:var(--red)}
+.sq{text-decoration:underline wavy var(--red);text-underline-offset:6px}
+
+/* Terminal */
+.term{background:#0f0f0f;border:1px solid var(--line2);border-radius:10px;font-family:var(--mono);font-size:24px;line-height:1.55;padding:0 0 18px}
+.term .th{display:flex;gap:26px;padding:10px 22px;border-bottom:1px solid var(--line);font-size:17px;color:var(--mut);letter-spacing:.05em}
+.term .th b{color:var(--fg);border-bottom:2px solid var(--blue);padding-bottom:6px;font-weight:500}
+.term .tl{padding:0 22px;white-space:pre}
+.term .pr{color:var(--green)} .term .ok{color:var(--green)} .term .dim{color:var(--mut)}
+.bar{height:14px;background:#2a2a2a;border-radius:7px;overflow:hidden;margin:10px 22px 0}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--blue2));border-radius:7px}
+.slide.active .bar i{animation:build var(--dur,2.4s) ease-out var(--d,0s) forwards}
+@keyframes build{to{width:100%}}
+
+/* Animações de entrada em sequência */
+.stg>*{opacity:0}
+.slide.active .stg>*{animation:appear .5s ease forwards;animation-delay:calc(var(--i,0) * var(--step,220ms) + var(--d,0ms))}
+@keyframes appear{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.caret{display:inline-block;width:.55em;height:1.05em;background:var(--blue2);vertical-align:-.15em;margin-left:2px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.type{white-space:pre-wrap}
+
+/* Notificações (toasts) e commit de seção */
+#toasts{position:absolute;right:26px;bottom:56px;display:flex;flex-direction:column;gap:12px;z-index:20;pointer-events:none}
+.toast{width:560px;background:#252526;border:1px solid var(--line2);border-left:4px solid var(--blue);border-radius:8px;padding:18px 22px;box-shadow:0 10px 30px #0009;display:flex;gap:14px;font-size:23px;line-height:1.35;animation:toastIn .4s ease}
+.toast .codicon{font-size:26px;color:var(--blue2);margin-top:3px}
+.toast.out{animation:toastOut .4s ease forwards}
+@keyframes toastIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:none}}
+@keyframes toastOut{to{opacity:0;transform:translateX(40px)}}
+#commit{position:absolute;left:64px;right:0;bottom:38px;height:0;background:#141414;border-top:1px solid var(--line2);overflow:hidden;z-index:15;font-family:var(--mono);font-size:22px;transition:height .35s ease}
+#commit.on{height:150px}
+#commit .th{display:flex;gap:26px;padding:8px 24px;color:var(--mut);font-size:16px;border-bottom:1px solid var(--line)}
+#commit .th b{color:var(--fg);font-weight:500;border-bottom:2px solid var(--blue)}
+#commit pre{padding:10px 24px;line-height:1.5;color:var(--fg2)}
+
+/* Paleta de comandos */
+#palette{position:absolute;top:56px;left:50%;transform:translateX(-50%);width:820px;background:#252526;border:1px solid var(--line2);border-radius:10px;box-shadow:0 20px 60px #000c;z-index:30;display:none;overflow:hidden}
+#palette.on{display:block}
+#palette input{width:100%;font:22px var(--mono);color:var(--fg);background:#1e1e1e;border:0;border-bottom:1px solid var(--line2);padding:16px 20px;outline:2px solid var(--blue);outline-offset:-2px}
+#plist{max-height:560px;overflow:auto}
+#plist div{padding:10px 20px;font:20px var(--mono);color:var(--fg2);display:flex;gap:12px;cursor:pointer}
+#plist div .mu{margin-left:auto;font-size:17px}
+#plist div.sel{background:#04395e;color:#fff}
+
+/* Janela de navegador (capturas do site) */
+.browser{border:1px solid var(--line2);border-radius:10px;overflow:hidden;background:#111;box-shadow:0 12px 40px #0008}
+.browser .bh{display:flex;align-items:center;gap:12px;padding:9px 16px;background:#2a2a2a;font:17px var(--mono);color:var(--fg2)}
+.browser .bh .url{background:#1b1b1b;border-radius:6px;padding:4px 14px;flex:1;color:var(--fg2)}
+.browser img{display:block;width:100%}
+.jstep{display:grid;grid-template-columns:1.75fr 1fr;gap:34px;align-items:start}
+.badge{display:inline-flex;align-items:center;gap:8px;font:600 22px var(--mono);color:#fff;background:var(--blue);padding:6px 16px;border-radius:8px;margin-bottom:18px}
+
+/* Ciclo SDD */
+.cycle{position:relative;width:560px;height:560px;margin:0 auto}
+.cycle .ring{position:absolute;inset:60px;border:3px dashed #3c3c3c;border-radius:50%}
+.cycle .spin{position:absolute;inset:60px;border-radius:50%;border:3px solid transparent;border-top-color:var(--blue2);animation:spin 6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.node{position:absolute;width:230px;padding:16px 10px;text-align:center;background:var(--bg3);border:2px solid var(--line2);border-radius:12px;font:600 26px var(--sans)}
+.node small{display:block;font:400 18px var(--mono);color:var(--mut);margin-top:4px}
+.slide.active .node{animation:pulse 8s ease infinite;animation-delay:calc(var(--i)*2s)}
+@keyframes pulse{0%,22%{border-color:var(--blue2);box-shadow:0 0 0 6px #4fc1ff22}25%,100%{border-color:var(--line2);box-shadow:none}}
+
+/* Fluxo de dados (pipeline) */
+.flow{display:flex;align-items:center;gap:14px;margin:18px 0 28px}
+.flow .st{flex:1;background:var(--bg3);border:2px solid var(--line2);border-radius:12px;padding:20px 10px;text-align:center;font-size:23px;line-height:1.3}
+.flow .st .codicon{font-size:40px;color:var(--blue2);display:block;margin-bottom:8px}
+.flow .st img{height:40px;display:block;margin:0 auto 8px;filter:invert(1) brightness(.9)}
+.flow .ar{font-size:34px;color:var(--mut)}
+
+/* Painel simulado */
+.dash{background:#fff;color:#1f2433;border-radius:10px;padding:22px 26px;font-family:var(--sans)}
+.dash .kpi{font-size:20px;color:#5b6275}.dash .kpi b{display:block;font-size:46px;color:#4338ca}
+.dash .row{display:flex;align-items:center;gap:12px;font-size:19px;margin-top:10px}
+.dash .row span{width:110px}.dash .row i{height:26px;background:#4338ca;border-radius:4px;display:block}
+
+/* Modo Zen (slide de impacto) */
+#app.zen .main{grid-template-columns:0 0 1fr}
+#app.zen .gutter,#app.zen .minimap,#app.zen .tabs,#app.zen .crumbs{visibility:hidden}
+#app.zen .activity,#app.zen .sidebar{visibility:hidden}
+#app.side-off .main{grid-template-columns:64px 0 1fr}
+.impact{display:flex;flex-direction:column;justify-content:center;align-items:center;height:100%;text-align:center}
+.impact .q{font-size:104px;font-weight:700;line-height:1.1;letter-spacing:-.02em}
+.impact .sub{font-size:40px;color:var(--fg2);margin-top:40px;font-family:var(--mono)}
+
+.qr{background:#fff;padding:14px;border-radius:12px;display:inline-block;line-height:0}
+.qr svg{width:100%;height:100%}
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .stg>*{opacity:1!important}
+}
+/* Estado final (sem animação): usado ao pular animações e na impressão */
+.done .stg>*,.final .stg>*{opacity:1!important;animation:none!important}
+.done .bar i,.final .bar i{width:100%!important;animation:none!important}
+
+/* ============================================================
+   Impressão / PDF: uma página por slide, moldura estática
+   ============================================================ */
+#print{display:none}
+@media print{
+  @page{size:1920px 1080px;margin:0}
+  html,body{overflow:visible;height:auto;background:#1f1f1f}
+  #app,#toasts,#palette,#commit{display:none!important}
+  #print{display:block}
+  .page{width:1920px;height:1080px;position:relative;display:grid;grid-template-rows:44px 50px 1fr 38px;background:var(--bg);break-after:page;page-break-after:always;overflow:hidden}
+  .page .slide{display:flex!important;position:relative;inset:auto;animation:none}
+  .page .titlebar,.page .tabs,.page .status{display:flex}
+  .page .titlebar{display:grid}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="titlebar">
+    <div class="dots"><i></i><i></i><i></i></div>
+    <div class="menu"><span>Arquivo</span><span>Editar</span><span>Seleção</span><span>Ver</span><span>Ir</span><span>Executar</span><span>Terminal</span><span>Ajuda</span><span class="title"><i class="codicon codicon-search"></i>&nbsp; da-spec-ao-app</span></div>
+    <div class="tb-right"><i class="codicon codicon-layout"></i><i class="codicon codicon-split-horizontal"></i></div>
+  </div>
+  <div class="main">
+    <div class="activity">
+      <i class="codicon codicon-files on"></i><i class="codicon codicon-search"></i><i class="codicon codicon-source-control"></i>
+      <i class="codicon codicon-debug-alt"></i><i class="codicon codicon-extensions"></i>
+      <i class="codicon codicon-account bottom"></i><i class="codicon codicon-settings-gear"></i>
+    </div>
+    <div class="sidebar">
+      <div class="sb-title"><span>EXPLORADOR</span><i class="codicon codicon-ellipsis"></i></div>
+      <div class="tree" id="tree"></div>
+    </div>
+    <div class="editor">
+      <div class="tabs" id="tabs"></div>
+      <div class="crumbs" id="crumbs"></div>
+      <div class="ebody">
+        <div class="gutter" id="gutter"></div>
+        <div class="canvas" id="canvas">
+<!-- ===================================================== A. ABERTURA -->
+<section class="slide" data-file="01_capa.md" data-folder="A_abertura" data-section="A. Abertura" data-time="1 min">
+  <div class="s-file">// 01_capa.md</div>
+  <div class="g2" style="grid-template-columns:1.55fr 1fr;align-items:center;flex:1">
+    <div>
+      <div class="mono mu" style="font-size:22px;margin-bottom:14px">ACE · Inteligência de Negócios · Gestão da Informação · FAGEN – UFU</div>
+      <div style="font-size:98px;font-weight:700;letter-spacing:-.03em;line-height:1;white-space:nowrap"><span class="type" data-delay="200">Da Spec ao App</span></div>
+      <div class="acc" style="font-size:38px;margin:22px 0 34px;font-weight:500">Especifique, gere, verifique: dados e IA na prática</div>
+      <div class="stg" style="--d:1200ms;font-size:26px;line-height:1.5;color:var(--fg2)">
+        <div><i class="codicon codicon-person"></i> Prof. José Eduardo</div>
+        <div><i class="codicon codicon-organization"></i> Organização: Alexandre Marcelo Marques Filho, Gabriel Henrique Silva Ferreira, João Victor Tozoni, João Vitor Lima Magalhães e Pedro Humberto Bitencourt Nascimento</div>
+        <div><i class="codicon codicon-calendar"></i> 26/11/2026 (quinta-feira) · 19h às 22h30 · UFU, Bloco 1F, sala 256</div>
+      </div>
+    </div>
+    <div style="text-align:center">
+      <div class="qr" data-qr="https://spec-ao-app.streamlit.app/" style="width:360px;height:360px"></div>
+      <div class="mono" style="font-size:24px;margin-top:16px">spec-ao-app.streamlit.app</div>
+      <div class="pill" style="margin-top:14px"><i class="codicon codicon-milestone"></i> prêmios + certificado de participação</div>
+    </div>
+  </div>
+  <aside class="notes">Boa noite! Este é o “Da Spec ao App”, um minicurso seguido de hackathon da ACE de Inteligência de Negócios. Apresente o professor José Eduardo e a equipe organizadora. Peça para todos já abrirem o site pelo QR Code: vamos usá-lo daqui a pouco.</aside>
+</section>
+
+<section class="slide" data-file="02_agenda.tree" data-folder="A_abertura" data-section="A. Abertura" data-time="1 min">
+  <div class="s-file">// 02_agenda.tree</div>
+  <h1>Agenda da noite</h1>
+  <div class="code stg" style="--step:260ms;font-size:30px;line-height:1.65"><span class="ln"><span class="t">noite_26-11/</span></span><span class="ln">├── <span class="n">19h00</span>  abertura.md</span><span class="ln">├── <span class="n">19h10</span>  apresentacao_sdd.md          <span class="c"># o que vamos ver agora</span></span><span class="ln">├── <span class="n">19h45</span>  <span class="t">hackathon/</span>                   <span class="c"># missão → dados → SPEC → painel</span></span><span class="ln">├── <span class="n">21h45</span>  <span class="t">pitches/</span>                     <span class="c"># até 3 min por equipe</span></span><span class="ln">├── <span class="n">22h15</span>  premiacao.md</span><span class="ln">└── <span class="n">22h30</span>  encerramento</span>
+  </div>
+  <div style="margin-top:22px"><span class="todo">[CONFIRMAR COM A EQUIPE] horários da agenda</span></div>
+  <aside class="notes">Mostre como a noite está organizada: cerca de 35 minutos de apresentação e o restante para o hackathon, pitches e premiação. Reforce que os pitches têm até 3 minutos. (Confirmar os horários com a equipe antes do evento.)</aside>
+</section>
+
+<!-- ===================================================== B. O CENÁRIO -->
+<section class="slide" data-file="03_mercado_pede_agilidade.md" data-folder="B_cenario" data-section="B. O cenário" data-time="1,5 min"
+  data-notify="A área comercial abriu mais 3 pedidos de painel." data-notify-delay="2600">
+  <div class="s-file">// 03_mercado_pede_agilidade.md</div>
+  <h1>O mercado pede <span class="acc">agilidade</span></h1>
+  <div class="g2" style="grid-template-columns:1fr 1.05fr">
+    <ul class="l stg" style="--step:420ms">
+      <li><i class="codicon codicon-zap"></i><span>A área de negócio quer o painel “para ontem”.</span></li>
+      <li><i class="codicon codicon-history"></i><span>Os pedidos de dados chegam mais rápido do que o time consegue entregar.</span></li>
+      <li><i class="codicon codicon-question"></i><span>Cada pedido passa por entender, tratar dados, construir e conferir.</span></li>
+    </ul>
+    <div class="card stg" style="--step:330ms;--d:500ms;padding:20px 24px">
+      <div class="mono mu" style="font-size:19px;margin-bottom:6px">BACKLOG · área de dados</div>
+      <div class="mono" style="font-size:22px;padding:9px 0;border-bottom:1px solid var(--line2)"><span class="rd">●</span> Painel de cancelamentos por região</div>
+      <div class="mono" style="font-size:22px;padding:9px 0;border-bottom:1px solid var(--line2)"><span class="rd">●</span> Indicadores de vendas para a diretoria</div>
+      <div class="mono" style="font-size:22px;padding:9px 0;border-bottom:1px solid var(--line2)"><span class="yl">●</span> Relatório de estoque semanal</div>
+      <div class="mono" style="font-size:22px;padding:9px 0;border-bottom:1px solid var(--line2)"><span class="yl">●</span> Taxa de faltas por unidade</div>
+      <div class="mono" style="font-size:22px;padding:9px 0"><span class="mu">●</span> … e mais pedidos chegando</div>
+    </div>
+  </div>
+  <aside class="notes">Quem trabalha com dados conhece o cenário: a área de negócio quer o painel para ontem e a fila de pedidos só cresce. Cada pedido exige entender o problema, tratar os dados, construir e conferir. A pergunta da noite é: como entregar mais rápido sem entregar errado?</aside>
+</section>
+
+<section class="slide" data-file="04_ia_no_desenvolvimento.md" data-folder="B_cenario" data-section="B. O cenário" data-time="1,5 min">
+  <div class="s-file">// 04_ia_no_desenvolvimento.md</div>
+  <h1>A IA chegou ao desenvolvimento</h1>
+  <div class="g4 stg" style="--step:300ms">
+    <div class="card"><div class="big" data-count="66">66%</div><p style="margin-top:14px">usam assistentes ou agentes de código</p></div>
+    <div class="card"><div class="big" data-count="26">26%</div><p style="margin-top:14px">já usam fluxos automatizados com agentes</p></div>
+    <div class="card"><div class="big gr" data-count="48">48%</div><p style="margin-top:14px">confiam na resposta da IA quando conseguem verificá-la</p></div>
+    <div class="card"><div class="big yl" data-count="6.6" data-dec="1">6,6%</div><p style="margin-top:14px">confiam nela para decisões importantes</p></div>
+  </div>
+  <p style="margin-top:40px;font-size:34px">Usar IA virou rotina. <span class="acc">Confiar exige poder conferir.</span></p>
+  <div class="foot">Fonte: Stack Overflow Developer Survey 2026 — seção “AI” (survey.stackoverflow.co/2026/ai), resultados publicados em 06/10/2026.</div>
+  <aside class="notes">Segundo a pesquisa da Stack Overflow de 2026, dois em cada três desenvolvedores já usam assistentes ou agentes de código. Mas repare na confiança: quase metade confia quando consegue verificar, e só 6,6% confiam para decisões importantes. Guardem essa ideia: verificar é o que torna a IA útil.</aside>
+</section>
+
+<section class="slide" data-file="05_vibe_coding.diff" data-folder="B_cenario" data-section="B. O cenário" data-time="2 min"
+  data-notify="O app parece pronto… mas quem conferiu os números?" data-notify-delay="4200">
+  <div class="s-file">// 05_vibe_coding.diff</div>
+  <h1>O problema: <span class="rd">“vibe coding”</span></h1>
+  <div class="g2" style="grid-template-columns:.85fr 1.15fr">
+    <div>
+      <div class="mono mu" style="font-size:20px;margin-bottom:10px">PEDIDO VAGO</div>
+      <div class="term"><div class="th"><b>CHAT</b></div><div class="tl" style="white-space:pre-wrap;padding-top:14px"><span class="pr">&gt;</span> <span class="type" data-delay="300">faz um dashboard bonito de churn com esse csv</span></div></div>
+      <p style="margin-top:26px;font-size:28px">Termo popularizado em 2025: aceitar o código gerado sem olhar o que ele faz.</p>
+    </div>
+    <div>
+      <div class="mono mu" style="font-size:20px;margin-bottom:10px">RESULTADO QUE “PARECE CERTO”</div>
+      <div class="code stg" style="--d:1700ms;--step:380ms;font-size:23px"><span class="ln"><span class="v">taxa_churn</span> = <span class="sq">73,5%</span>        <span class="c"># contou quem NÃO cancelou</span></span><span class="ln"><span class="f">grafico</span>(<span class="s sq">"receita_anual"</span>)  <span class="c"># coluna que não existe</span></span><span class="ln"><span class="f">filtro</span>(<span class="s sq">"regiao"</span>)          <span class="c"># inventou um filtro</span></span><span class="ln"><span class="v">vazios</span> → <span class="sq">média</span>           <span class="c"># regra que ninguém pediu</span></span></div>
+      <div class="card stg" style="--d:3400ms;margin-top:18px;padding:16px 22px;font-size:22px;font-family:var(--mono)"><div><span class="rd">✕ 4 problemas</span> <span class="mu">— nenhum aparece na tela bonita</span></div></div>
+    </div>
+  </div>
+  <div class="foot">“Vibe coding”: termo cunhado por Andrej Karpathy em fev/2025 (MIT Technology Review, 16/04/2025; IBM, “What is vibe coding?”). Exemplo da direita ilustrativo.</div>
+  <aside class="notes">Vibe coding é pedir algo vago e aceitar o que vier, sem olhar o código. O resultado parece certo, mas a taxa pode estar invertida, o gráfico usa uma coluna que não existe e o agente inventa regras. O app bonito esconde os erros. O exemplo à direita é ilustrativo.</aside>
+</section>
+
+<!-- ===================================================== C. SDD E SPECS -->
+<section class="slide" data-file="06_o_que_e_sdd.md" data-folder="C_sdd" data-section="C. SDD e specs" data-time="1,5 min">
+  <div class="s-file">// 06_o_que_e_sdd.md</div>
+  <h1>Spec-Driven Development <span class="mu" style="font-weight:500">(SDD)</span></h1>
+  <div class="g2" style="grid-template-columns:1fr 1fr;align-items:center">
+    <div>
+      <p style="font-size:36px;line-height:1.35">A <span class="acc">especificação</span> é a fonte da verdade.<br>O código é <span class="yl">consequência</span>.</p>
+      <p style="margin-top:28px;color:var(--fg2)">Em vez de “pedir para a IA”: especificar, gerar e verificar — e voltar para a spec quando algo muda.</p>
+    </div>
+    <div class="cycle">
+      <div class="ring"></div><div class="spin"></div>
+      <div class="node" style="--i:0;left:165px;top:0">Especificar<small>SPEC.md</small></div>
+      <div class="node" style="--i:1;right:0;top:245px">Planejar<small>tarefas</small></div>
+      <div class="node" style="--i:2;left:165px;bottom:0">Gerar<small>agente de código</small></div>
+      <div class="node" style="--i:3;left:0;top:245px">Verificar<small>critérios</small></div>
+    </div>
+  </div>
+  <aside class="notes">No Spec-Driven Development, a especificação vem primeiro e é a fonte da verdade. O agente planeja e gera o código a partir dela, e nós verificamos com critérios claros. Se algo muda, mudamos a spec e geramos de novo: o ciclo gira.</aside>
+</section>
+
+<section class="slide" data-file="07_anatomia_da_spec.md" data-folder="C_sdd" data-section="C. SDD e specs" data-time="1,5 min">
+  <div class="s-file">// 07_anatomia_da_spec.md</div>
+  <h1>Anatomia de uma boa spec</h1>
+  <div class="g2" style="grid-template-columns:1.25fr .75fr">
+    <div class="code stg" style="--step:330ms;font-size:25px"><span class="ln"><span class="h"># SPEC — Painel de Cancelamentos</span></span><span class="ln"><span class="h">## 1. Contexto e problema</span>  <span class="c">por que existe</span></span><span class="ln"><span class="h">## 2. Usuário</span>              <span class="c">quem vai usar</span></span><span class="ln"><span class="h">## 3. Escopo</span>               <span class="c">entra × fica de fora</span></span><span class="ln"><span class="h">## 4. Dados</span>                <span class="c">dicionário de colunas</span></span><span class="ln"><span class="h">## 5. Regras de negócio</span>    <span class="c">fórmulas e definições</span></span><span class="ln"><span class="h">## 6. Restrições</span>           <span class="c">o que não pode fazer</span></span><span class="ln"><span class="h">## 7. Critérios de aceitação</span> <span class="c">como conferir</span></span></div>
+    <div class="stg" style="--d:2800ms">
+      <div class="card"><h3><i class="codicon codicon-lightbulb"></i> Dica</h3><p>Escreva para alguém que não conhece o seu negócio: o agente só sabe o que estiver no arquivo.</p></div>
+    </div>
+  </div>
+  <aside class="notes">Uma boa spec tem sete partes: contexto e problema, usuário, escopo com o que fica de fora, dicionário de dados, regras de negócio, restrições e critérios de aceitação. É exatamente a estrutura que vocês vão montar no site hoje. Escrevam pensando em alguém que não conhece o negócio.</aside>
+</section>
+
+<section class="slide" data-file="08_spec_reduz_alucinacao.md" data-folder="C_sdd" data-section="C. SDD e specs" data-time="1,5 min">
+  <div class="s-file">// 08_spec_reduz_alucinacao.md</div>
+  <h1>Cada seção fecha uma porta para a <span class="rd">invenção</span></h1>
+  <div class="g2" style="grid-template-columns:1fr 1fr">
+    <ul class="l stg" style="--step:360ms;font-size:28px">
+      <li><i class="codicon codicon-lock"></i><span><b>Escopo</b> → não cria funcionalidade extra</span></li>
+      <li><i class="codicon codicon-lock"></i><span><b>Dados</b> → não inventa coluna</span></li>
+      <li><i class="codicon codicon-lock"></i><span><b>Regras</b> → não inventa fórmula</span></li>
+      <li><i class="codicon codicon-lock"></i><span><b>Critérios</b> → dá para conferir o resultado</span></li>
+    </ul>
+    <div class="stg" style="--d:1600ms">
+      <div class="mono mu" style="font-size:20px;margin-bottom:10px">REGRA ESCRITA NA SPEC</div>
+      <div class="code" style="font-size:26px"><span class="v">taxa de churn</span> =
+    clientes com <span class="v">Churn</span> = <span class="n">1</span>
+    ÷ total de clientes do filtro</div>
+      <p style="margin-top:20px;font-size:27px;color:var(--fg2)">Sem essa linha, o agente escolhe sozinho como calcular.</p>
+    </div>
+  </div>
+  <aside class="notes">Alucinação é quando a IA preenche lacunas inventando. Cada seção da spec fecha uma dessas lacunas: escopo, dados, regras, critérios. Por exemplo, escrever a fórmula da taxa de churn impede que o agente escolha sozinho como calcular.</aside>
+</section>
+
+<section class="slide" data-file="09_criterio_de_aceitacao.diff" data-folder="C_sdd" data-section="C. SDD e specs" data-time="1 min">
+  <div class="s-file">// 09_criterio_de_aceitacao.diff</div>
+  <h1>Critério de aceitação: dá para conferir?</h1>
+  <div class="code diff stg" style="--step:500ms;font-size:28px;white-space:pre-wrap"><span class="ln del">O painel deve ficar bonito e intuitivo</span><span class="ln add">Sem filtros, o painel mostra a taxa geral calculada do CSV</span><span class="ln del">Os gráficos devem carregar rápido</span><span class="ln add">Ao filtrar por contrato, todos os gráficos se atualizam</span><span class="ln del">Mostrar os clientes importantes</span><span class="ln add">A lista mostra customerID, contrato e mensalidade, do maior para o menor</span></div>
+  <p style="margin-top:28px;font-size:32px">Verificável = alguém consegue responder <span class="gr">sim</span> ou <span class="rd">não</span>.</p>
+  <aside class="notes">Um critério de aceitação bom é aquele que dá para conferir com sim ou não. “Ficar bonito” não é verificável; “sem filtros, o painel mostra a taxa geral calculada do CSV” é. Na hora de avaliar o trabalho do agente, são esses critérios que vocês vão checar.</aside>
+</section>
+
+<section class="slide" data-file="10_sdd_no_mercado.md" data-folder="C_sdd" data-section="C. SDD e specs" data-time="1,5 min">
+  <div class="s-file">// 10_sdd_no_mercado.md</div>
+  <h1>SDD no mercado</h1>
+  <div class="g2 stg" style="--step:300ms;gap:24px">
+    <div class="card"><h3><img src="assets/icons/github.svg" alt="" style="height:34px;filter:invert(1)"> GitHub Spec Kit</h3><p>Kit open source para SDD: especificação → plano → tarefas. Funciona com Copilot, Claude Code, Gemini CLI e outros.</p></div>
+    <div class="card"><h3><img src="assets/icons/amazonwebservices.svg" alt="" style="height:30px;filter:invert(1)"> Kiro (AWS)</h3><p>Ambiente de desenvolvimento com specs: requisitos, design e tarefas antes do código.</p></div>
+    <div class="card"><h3><i class="codicon codicon-file-code"></i> AGENTS.md · CLAUDE.md</h3><p>Arquivos de instruções do projeto que os agentes leem no início de cada sessão.</p></div>
+    <div class="card"><h3><i class="codicon codicon-checklist"></i> Regras do Cursor</h3><p>Regras de projeto versionadas em <code>.cursor/rules</code>, aplicadas ao agente.</p></div>
+  </div>
+  <div class="foot">Fontes: github.github.com/spec-kit · github.blog (Spec-driven development with AI) · kiro.dev · agents.md · code.claude.com/docs/en/memory · cursor.com/docs/rules</div>
+  <aside class="notes">Isso não é teoria: o mercado já está adotando. O GitHub lançou o Spec Kit, open source; a AWS tem o Kiro, que trabalha com requisitos, design e tarefas; e agentes como Claude Code, Codex e Cursor leem arquivos de instruções como AGENTS.md, CLAUDE.md e regras de projeto. A spec virou parte do repositório.</aside>
+</section>
+
+<!-- ===================================================== D. DADOS + SDD -->
+<section class="slide" data-file="11_dados_e_sdd.py" data-folder="D_dados" data-section="D. Dados + SDD" data-time="1,5 min">
+  <div class="s-file">// 11_dados_e_sdd.py</div>
+  <h1>Na área de dados: <span class="acc">dados tratados + spec clara</span></h1>
+  <div class="flow stg" style="--step:420ms">
+    <div class="st"><i class="codicon codicon-database"></i>Base bruta</div><div class="ar">→</div>
+    <div class="st"><img src="assets/icons/pandas.svg" alt="">Tratamento</div><div class="ar">→</div>
+    <div class="st"><i class="codicon codicon-file-code"></i>CSV + SPEC</div><div class="ar">→</div>
+    <div class="st"><i class="codicon codicon-hubot"></i>Agente de código</div><div class="ar">→</div>
+    <div class="st"><img src="assets/icons/streamlit.svg" alt="">Painel</div>
+  </div>
+  <div class="term"><div class="th"><b>TERMINAL</b><span>build</span></div>
+    <div class="tl stg" style="--d:2200ms;--step:500ms;padding-top:12px"><div><span class="pr">$</span> construir painel --spec SPEC.md --dados dados_tratados.csv</div><div class="dim">gerando app a partir da especificação…</div></div>
+    <div class="bar" style="--d:3.2s"><i></i></div>
+  </div>
+  <p style="margin-top:22px">= dashboards e data apps <span class="acc">mais rápidos</span> e <span class="gr">confiáveis</span>.</p>
+  <aside class="notes">Na área de dados, o SDD encaixa naturalmente: a base bruta passa por um tratamento, vira um CSV confiável acompanhado da spec, e o agente constrói o painel. Dados bem tratados mais uma spec clara resultam num app em que dá para confiar. É exatamente o caminho do hackathon.</aside>
+</section>
+
+<section class="slide" data-file="12_qualidade_de_dados.py" data-folder="D_dados" data-section="D. Dados + SDD" data-time="1,5 min"
+  data-notify="O agente não questiona os seus dados: ele confia no CSV." data-notify-delay="3400">
+  <div class="s-file">// 12_qualidade_de_dados.py</div>
+  <h1>Com IA, qualidade de dados importa <span class="yl">ainda mais</span></h1>
+  <div class="code stg" style="--step:600ms;font-size:25px"><span class="ln"><span class="c"># armadilha 1 — preencher vazios com a média</span></span><span class="ln"><span class="v">df</span>[<span class="s">"total"</span>] = <span class="v">df</span>[<span class="s">"total"</span>].<span class="f">fillna</span>(<span class="v">df</span>[<span class="s">"total"</span>].<span class="f">mean</span>())   <span class="rd"># cliente novo “pagou” 2 mil</span></span><span class="ln"><span class="c"># armadilha 2 — vazamento de dados</span></span><span class="ln"><span class="v">df</span>[<span class="s">"taxa_pgto"</span>] = churn médio por forma de pagamento   <span class="rd"># usa a própria resposta</span></span><span class="ln"><span class="c"># armadilha 3 — apagar “outliers”</span></span><span class="ln"><span class="v">df</span> = <span class="v">df</span>[<span class="v">z</span>.<span class="f">abs</span>() &lt;= <span class="n">1.5</span>]   <span class="rd"># apaga clientes reais</span></span></div>
+  <p style="margin-top:22px">Erro nos dados vira erro no painel — com cara de certo.</p>
+  <aside class="notes">O agente confia no CSV que recebe. Se preenchemos vazios com a média, um cliente que acabou de chegar parece ter pagado dois mil. Se criamos uma coluna calculada a partir da resposta, temos vazamento de dados. Se apagamos “outliers”, podemos apagar clientes reais. Vocês vão encontrar armadilhas como essas no hackathon.</aside>
+</section>
+
+<!-- ===================================================== E. CASO REAL -->
+<section class="slide" data-file="13_caso_algar_snowflake.md" data-folder="E_caso_real" data-section="E. Caso real" data-time="3 min">
+  <div class="s-file">// 13_caso_algar_snowflake.md</div>
+  <h1>Caso real: data apps na Algar</h1>
+  <div class="g2" style="grid-template-columns:1fr 1fr;gap:30px">
+    <div class="card stg"><h3><img src="assets/icons/snowflake.svg" alt="" style="height:38px;filter:invert(58%) sepia(80%) saturate(2000%) hue-rotate(170deg)"> Snowflake Cortex Code</h3>
+      <p>Agente de IA de programação da Snowflake que trabalha dentro da plataforma e entende o contexto dos dados da empresa.</p></div>
+    <div class="stg" style="--d:600ms;--step:350ms;display:flex;flex-direction:column;gap:16px">
+      <div><span class="todo">[PEDRO: exemplo de projeto]</span></div>
+      <div><span class="todo">[PEDRO: tempo antes × depois]</span></div>
+      <div><span class="todo">[PEDRO: aprendizado]</span></div>
+    </div>
+  </div>
+  <p style="margin-top:30px">Ferramentas como essa tornam o desenvolvimento <span class="acc">mais ágil</span> — e são apoiadas dentro da empresa.</p>
+  <div class="foot">Fonte: Snowflake, comunicado “Snowflake Unveils Cortex Code, An AI Coding Agent…” (03/02/2026), snowflake.com/en/news/press-releases.</div>
+  <aside class="notes">(Pedro fala.) O Cortex Code é o agente de programação da Snowflake, anunciado em fevereiro de 2026, que trabalha dentro da plataforma e entende o contexto dos dados. Conte o exemplo de projeto, o tempo antes e depois e o principal aprendizado. Feche com a ideia de que essas ferramentas são apoiadas dentro da empresa.</aside>
+</section>
+
+<section class="slide" data-file="14_impacto.md" data-folder="E_caso_real" data-section="E. Caso real" data-time="30 s" data-zen="1">
+  <div class="impact">
+    <div class="q"><span class="type" data-delay="300">Negar a IA é negar a ciência.</span></div>
+    <div class="sub stg" style="--d:2600ms"><div>IA com método: especificar, verificar, assumir a responsabilidade.</div></div>
+  </div>
+  <aside class="notes">Deixe a frase respirar alguns segundos. “Negar a IA é negar a ciência.” Mas IA com método: especificar, verificar e assumir a responsabilidade pelo que entregamos.</aside>
+</section>
+
+<section class="slide" data-file="15_boas_praticas_e_riscos.md" data-folder="E_caso_real" data-section="E. Caso real" data-time="1 min">
+  <div class="s-file">// 15_boas_praticas_e_riscos.md</div>
+  <h1>Boas práticas e riscos</h1>
+  <div class="g2 stg" style="--step:300ms;gap:24px">
+    <div class="card"><h3><i class="codicon codicon-eye"></i> Revise o que a IA gera</h3><p>Rode, teste e compare com os critérios da spec.</p></div>
+    <div class="card"><h3><i class="codicon codicon-shield"></i> Proteja dados sensíveis</h3><p>Nada de dados pessoais ou sigilosos em ferramentas não aprovadas.</p></div>
+    <div class="card"><h3><i class="codicon codicon-law"></i> Governança</h3><p>Siga as regras e as ferramentas aprovadas pela empresa.</p></div>
+    <div class="card"><h3><i class="codicon codicon-person"></i> Humano no controle</h3><p>A IA sugere e gera; a responsabilidade pela entrega é sua.</p></div>
+  </div>
+  <aside class="notes">Quatro cuidados: revisar tudo o que a IA gera, rodando e comparando com os critérios; não expor dados pessoais ou sigilosos; seguir a governança da empresa; e lembrar que a responsabilidade pela entrega continua sendo de quem entrega.</aside>
+</section>
+
+<!-- ===================================================== F. HACKATHON -->
+<section class="slide" data-file="16_agora_e_com_voces.md" data-folder="F_hackathon" data-section="F. O hackathon" data-time="1 min">
+  <div class="s-file">// 16_agora_e_com_voces.md</div>
+  <h1>Agora é com <span class="acc">vocês</span></h1>
+  <div class="term" style="margin-bottom:28px"><div class="th"><b>TERMINAL</b></div><div class="tl" style="padding-top:12px"><span class="pr">$</span> <span class="type" data-delay="200">git checkout -b hackathon</span></div></div>
+  <ul class="l stg" style="--d:1400ms;--step:380ms">
+    <li><i class="codicon codicon-organization"></i><span>Equipes montadas pela organização.</span></li>
+    <li><i class="codicon codicon-briefcase"></i><span>Cada equipe recebe uma <b>missão</b> de uma “área cliente”.</span></li>
+    <li><i class="codicon codicon-dashboard"></i><span>Entrega: um <b>painel</b> construído por um agente de IA a partir da sua SPEC.</span></li>
+  </ul>
+  <aside class="notes">Agora é a vez de vocês. As equipes já foram montadas pela organização. Cada equipe recebe uma missão de uma área cliente e entrega um painel construído por um agente de IA, a partir da SPEC que vocês mesmos vão escrever.</aside>
+</section>
+
+<section class="slide" data-file="17_tres_papeis.md" data-folder="F_hackathon" data-section="F. O hackathon" data-time="1 min">
+  <div class="s-file">// 17_tres_papeis.md</div>
+  <h1>Três papéis</h1>
+  <div class="g3 stg" style="--step:360ms">
+    <div class="card"><h3><i class="codicon codicon-briefcase"></i> A área cliente</h3><p>Tem o problema de negócio e a base de dados. Sabe o que dói, mas não sabe o que os dados dizem.</p></div>
+    <div class="card" style="border-color:var(--blue)"><h3><i class="codicon codicon-person"></i> Você, analista</h3><p>Investiga a base, decide o tratamento e escreve a SPEC. As decisões são suas.</p></div>
+    <div class="card"><h3><i class="codicon codicon-hubot"></i> O agente de código</h3><p>Constrói a aplicação a partir da SPEC. Faz exatamente o que estiver escrito — nem mais, nem menos.</p></div>
+  </div>
+  <aside class="notes">São três papéis, como no site. A área cliente tem o problema e a base. Vocês são os analistas: investigam, tratam e escrevem a SPEC. E o agente de código constrói exatamente o que estiver escrito, nem mais, nem menos.</aside>
+</section>
+
+<section class="slide" data-file="0-1_inicio_e_missao.md" data-folder="F_hackathon/18_jornada" data-section="F. O hackathon" data-time="1 min">
+  <div class="s-file">// 18_jornada/0-1_inicio_e_missao.md</div>
+  <div class="jstep">
+    <div class="browser stg"><div class="bh"><i class="codicon codicon-globe"></i><span class="url">spec-ao-app.streamlit.app</span></div><img src="assets/img/01_missao_cards.webp" alt="Tela da etapa Missão com os três desafios"></div>
+    <div>
+      <div class="badge"><i class="codicon codicon-play"></i> 0 · Início → 1 · Missão</div>
+      <h1 style="font-size:50px">Equipe e missão</h1>
+      <ul class="l stg" style="--d:500ms;--step:350ms;font-size:28px">
+        <li><i class="codicon codicon-edit"></i><span>Digite o nome da equipe e clique em <b>Começar</b>.</span></li>
+        <li><i class="codicon codicon-briefcase"></i><span>Leia a solicitação da área cliente e aceite a missão.</span></li>
+        <li><i class="codicon codicon-rocket"></i><span>Dá para ir além do que foi pedido.</span></li>
+      </ul>
+    </div>
+  </div>
+  <aside class="notes">No site, a primeira coisa é digitar o nome da equipe e clicar em Começar. Depois, cada equipe lê a solicitação da área cliente e aceita a missão. Lembrem: o pedido é o ponto de partida; vocês podem priorizar e ir além.</aside>
+</section>
+
+<section class="slide" data-file="2_diagnostico.md" data-folder="F_hackathon/18_jornada" data-section="F. O hackathon" data-time="1 min">
+  <div class="s-file">// 18_jornada/2_diagnostico.md</div>
+  <div class="jstep">
+    <div class="browser stg"><div class="bh"><i class="codicon codicon-globe"></i><span class="url">spec-ao-app.streamlit.app · Diagnóstico</span></div><img src="assets/img/02_diag_explorar.webp" alt="Explorador de colunas mostrando TotalCharges com 11 valores só com espaços"></div>
+    <div>
+      <div class="badge"><i class="codicon codicon-search"></i> 2 · Diagnóstico</div>
+      <h1 style="font-size:50px">Investigue antes de mexer</h1>
+      <ul class="l stg" style="--d:500ms;--step:350ms;font-size:28px">
+        <li><i class="codicon codicon-graph"></i><span>Raio-X, explorador de colunas e roteiro de perguntas.</span></li>
+        <li><i class="codicon codicon-edit"></i><span>Exemplo: <code>TotalCharges</code> é texto e tem 11 células só com espaços.</span></li>
+        <li><i class="codicon codicon-note"></i><span>Anote o que encontrar.</span></li>
+      </ul>
+    </div>
+  </div>
+  <aside class="notes">No diagnóstico, investiguem a base antes de mexer. Usem o raio-x, o explorador e o roteiro de perguntas. No exemplo, a coluna TotalCharges está como texto e tem 11 células só com espaços: um problema escondido. Anotem tudo, porque as anotações orientam a pipeline.</aside>
+</section>
+
+<section class="slide" data-file="3_pipeline.py" data-folder="F_hackathon/18_jornada" data-section="F. O hackathon" data-time="1,5 min"
+  data-notify="Atenção: há blocos-armadilha de propósito. O app não avisa qual é qual." data-notify-delay="3000">
+  <div class="s-file">// 18_jornada/3_pipeline.py</div>
+  <div class="jstep">
+    <div>
+      <div class="browser stg"><div class="bh"><i class="codicon codicon-globe"></i><span class="url">spec-ao-app.streamlit.app · Pipeline</span></div><img src="assets/img/03_pipe_fluxo.webp" alt="Pipeline com blocos aplicados no fluxo"></div>
+    </div>
+    <div>
+      <div class="badge"><i class="codicon codicon-run-all"></i> 3 · Pipeline</div>
+      <h1 style="font-size:50px">Monte bloco a bloco</h1>
+      <ul class="l stg" style="--d:500ms;--step:350ms;font-size:27px">
+        <li><i class="codicon codicon-layers"></i><span>Blocos prontos e blocos personalizados.</span></li>
+        <li><i class="codicon codicon-warning"></i><span>Há armadilhas de propósito.</span></li>
+      </ul>
+      <div class="code stg" style="--d:1500ms;--step:250ms;font-size:20px;margin-top:6px"><span class="ln c"># cada bloco mostra o código pandas</span><span class="ln"><span class="v">df</span>[<span class="s">"TotalCharges"</span>] = <span class="v">pd</span>.<span class="f">to_numeric</span>(</span><span class="ln">  <span class="v">df</span>[<span class="s">"TotalCharges"</span>].<span class="f">astype</span>(<span class="t">str</span>).<span class="v">str</span>.<span class="f">strip</span>(),</span><span class="ln">  <span class="v">errors</span>=<span class="s">"coerce"</span>)</span></div>
+    </div>
+  </div>
+  <aside class="notes">Na pipeline vocês montam o tratamento bloco a bloco, com blocos prontos ou personalizados, e podem reordenar e remover. Cada bloco mostra o código pandas que executa. Atenção: há armadilhas de propósito e o app não avisa qual é qual. Escrevam o porquê de cada passo.</aside>
+</section>
+
+<section class="slide" data-file="4_revisao.md" data-folder="F_hackathon/18_jornada" data-section="F. O hackathon" data-time="1 min">
+  <div class="s-file">// 18_jornada/4_revisao.md</div>
+  <div class="jstep">
+    <div class="browser stg"><div class="bh"><i class="codicon codicon-globe"></i><span class="url">spec-ao-app.streamlit.app · Revisão</span></div><img src="assets/img/04_revisao.webp" alt="Revisão com o antes e depois da base"></div>
+    <div>
+      <div class="badge"><i class="codicon codicon-diff"></i> 4 · Revisão</div>
+      <h1 style="font-size:50px">Compare antes × depois</h1>
+      <ul class="l stg" style="--d:500ms;--step:350ms;font-size:28px">
+        <li><i class="codicon codicon-split-horizontal"></i><span>Linhas, colunas, vazios e tipos da base original e da tratada.</span></li>
+        <li><i class="codicon codicon-discard"></i><span>Não gostou? Volte ao fluxo e ajuste.</span></li>
+      </ul>
+    </div>
+  </div>
+  <aside class="notes">Na revisão, comparem a base original com a tratada: linhas, colunas, vazios e tipos. Não há nota nem certo e errado aqui; é o momento de decidir se o resultado é o que vocês queriam e, se não for, voltar ao fluxo.</aside>
+</section>
+
+<section class="slide" data-file="5_spec.md" data-folder="F_hackathon/18_jornada" data-section="F. O hackathon" data-time="1,5 min">
+  <div class="s-file">// 18_jornada/5_spec.md</div>
+  <div class="jstep">
+    <div class="browser stg"><div class="bh"><i class="codicon codicon-globe"></i><span class="url">spec-ao-app.streamlit.app · SPEC</span></div><img src="assets/img/05_spec_criterios.webp" alt="Assistente da SPEC no passo de critérios de aceitação com a prévia ao lado"></div>
+    <div>
+      <div class="badge"><i class="codicon codicon-book"></i> 5 · SPEC</div>
+      <h1 style="font-size:50px">Escreva a especificação</h1>
+      <ul class="l stg" style="--d:500ms;--step:350ms;font-size:28px">
+        <li><i class="codicon codicon-question"></i><span>8 passos com perguntas-guia; os campos começam vazios.</span></li>
+        <li><i class="codicon codicon-preview"></i><span>A prévia do SPEC.md é montada ao lado.</span></li>
+        <li><i class="codicon codicon-lightbulb"></i><span>Travou? Use o exemplo ou o esqueleto com lacunas.</span></li>
+      </ul>
+    </div>
+  </div>
+  <aside class="notes">Na SPEC, vocês escrevem: o problema, para quem, o escopo, as regras e os critérios de aceitação. Os campos começam vazios, com perguntas-guia. A prévia do arquivo é montada ao lado e, se travarem, há um exemplo de outro contexto e um esqueleto com lacunas.</aside>
+</section>
+
+<section class="slide" data-file="6_exportar.md" data-folder="F_hackathon/18_jornada" data-section="F. O hackathon" data-time="1 min">
+  <div class="s-file">// 18_jornada/6_exportar.md</div>
+  <div class="jstep">
+    <div class="browser stg"><div class="bh"><i class="codicon codicon-globe"></i><span class="url">spec-ao-app.streamlit.app · Exportar</span></div><img src="assets/img/06_exportar.webp" alt="Tela de exportação com o kit da equipe"></div>
+    <div>
+      <div class="badge"><i class="codicon codicon-package"></i> 6 · Exportar</div>
+      <h1 style="font-size:50px">Baixe o kit da equipe</h1>
+      <ul class="l stg" style="--d:500ms;--step:350ms;font-size:27px">
+        <li><i class="codicon codicon-file-zip"></i><span><code>dados_tratados.csv</code>, planilha <code>.xlsx</code> e <code>SPEC.md</code>.</span></li>
+        <li><i class="codicon codicon-save"></i><span>Dica: “Salvar ou retomar progresso”.</span></li>
+        <li><i class="codicon codicon-book"></i><span>Dica: Glossário na barra lateral.</span></li>
+      </ul>
+    </div>
+  </div>
+  <aside class="notes">No fim, baixem o kit da equipe: a base tratada em CSV, uma planilha para o Excel e a SPEC. Duas dicas: salvem o progresso de vez em quando pela barra lateral, para não perder nada se a página recarregar, e usem o glossário quando aparecer um termo novo.</aside>
+</section>
+
+<section class="slide" data-file="24_do_kit_ao_painel.sh" data-folder="F_hackathon" data-section="F. O hackathon" data-time="1,5 min">
+  <div class="s-file">// 24_do_kit_ao_painel.sh</div>
+  <h1>Do kit ao painel</h1>
+  <div class="g2" style="grid-template-columns:1.3fr .7fr;align-items:start;gap:28px">
+    <div class="term" style="font-size:22px"><div class="th"><b>TERMINAL</b><span>agente de código</span></div>
+      <div class="stg" style="--step:650ms;padding-top:10px">
+        <div class="tl"><span class="pr">$</span> unzip kit_equipe_exemplo.zip -d painel &amp;&amp; cd painel</div>
+        <div class="tl"><span class="pr">&gt;</span> Leia o arquivo SPEC.md e construa a aplicação…</div>
+        <div class="tl dim">● lendo SPEC.md — 7 seções, critérios de aceitação</div>
+        <div class="tl dim">● lendo dados_tratados.csv — 7.043 linhas</div>
+        <div class="tl dim">● criando app.py…</div>
+        <div class="tl ok">✓ streamlit run app.py → localhost:8501</div>
+      </div>
+      <div class="bar" style="--d:2.6s;--dur:1.8s"><i></i></div>
+    </div>
+    <div class="stg" style="--d:4600ms">
+      <div class="dash">
+        <div class="kpi">Taxa geral de cancelamento<b>26,5%</b></div>
+        <div style="font-size:18px;color:#5b6275;margin-top:12px">por tipo de contrato</div>
+        <div class="row"><span>Mensal</span><i style="width:171px"></i>42,7%</div>
+        <div class="row"><span>Anual</span><i style="width:45px"></i>11,3%</div>
+        <div class="row"><span>Bianual</span><i style="width:11px"></i>2,8%</div>
+      </div>
+    </div>
+  </div>
+  <div class="foot">Números calculados da base Telco do hackathon (7.043 clientes). Painel ilustrativo.</div>
+  <aside class="notes">Com o kit em mãos, a equipe abre o agente de código na pasta e envia o prompt. O agente lê a SPEC e os dados e constrói o painel. Aqui, um exemplo com números reais da base de telecom: taxa geral de 26,5% e muito mais cancelamento no contrato mensal. Funciona com o assistente que a equipe preferir.</aside>
+</section>
+
+<section class="slide" data-file="25_criterios_avaliacao.json" data-folder="F_hackathon" data-section="F. O hackathon" data-time="1 min">
+  <div class="s-file">// 25_criterios_avaliacao.json</div>
+  <h1>Como vamos avaliar</h1>
+  <div class="code stg" style="--step:350ms;font-size:27px"><span class="ln">{</span><span class="ln">  <span class="v">"resultado_vs_missao"</span>:   <span class="s">"o painel atende à proposta da missão?"</span>,</span><span class="ln">  <span class="v">"tratamento_de_dados"</span>:   <span class="s">"as decisões de tratamento são coerentes?"</span>,</span><span class="ln">  <span class="v">"clareza_da_spec"</span>:       <span class="s">"a SPEC é clara e verificável?"</span>,</span><span class="ln">  <span class="v">"pitch"</span>:                 <span class="s">"a equipe conta bem a história?"</span></span><span class="ln">}</span></div>
+  <div style="margin-top:24px"><span class="todo">[CONFIRMAR PESOS COM A EQUIPE]</span></div>
+  <aside class="notes">Vamos avaliar quatro coisas: o resultado comparado com a proposta da missão, a coerência das decisões de tratamento de dados, a clareza da SPEC e o pitch. (Confirmar os pesos com a equipe antes do evento.)</aside>
+</section>
+
+<section class="slide" data-file="26_regras_e_dicas.md" data-folder="F_hackathon" data-section="F. O hackathon" data-time="1 min">
+  <div class="s-file">// 26_regras_e_dicas.md</div>
+  <h1>Regras da noite e dicas</h1>
+  <ul class="l stg" style="--step:330ms">
+    <li><i class="codicon codicon-watch"></i><span>Tempo de desenvolvimento até as <b>21h45</b> <span class="todo" style="font-size:18px">[CONFIRMAR]</span></span></li>
+    <li><i class="codicon codicon-megaphone"></i><span>Pitch de até <b>3 minutos</b>: problema → dados → decisões → demo → impacto.</span></li>
+    <li><i class="codicon codicon-save"></i><span>Salve o rascunho de vez em quando.</span></li>
+    <li><i class="codicon codicon-comment-discussion"></i><span>Travou? Chame alguém da organização.</span></li>
+  </ul>
+  <aside class="notes">Regras rápidas: o tempo de desenvolvimento vai até as 21h45 (confirmar), e o pitch tem até 3 minutos seguindo o roteiro problema, dados, decisões, demonstração e impacto. Salvem o rascunho no site e chamem a organização sempre que travarem.</aside>
+</section>
+
+<section class="slide" data-file="27_bora_construir.md" data-folder="F_hackathon" data-section="F. O hackathon" data-time="30 s">
+  <div class="s-file">// 27_bora_construir.md</div>
+  <div class="g2" style="grid-template-columns:1.4fr 1fr;align-items:center;flex:1">
+    <div>
+      <div style="font-size:104px;font-weight:700;letter-spacing:-.03em;line-height:1;white-space:nowrap"><span class="type" data-delay="200">Bora construir?</span></div>
+      <div class="mono acc" style="font-size:34px;margin:30px 0">spec-ao-app.streamlit.app</div>
+      <div class="stg" style="--d:1500ms;font-size:24px;color:var(--fg2);line-height:1.5">
+        <div>ACE em Inteligência de Negócios · Gestão da Informação · FAGEN – UFU · Prof. José Eduardo</div>
+        <div>Alexandre Marcelo Marques Filho · Gabriel Henrique Silva Ferreira · João Victor Tozoni · João Vitor Lima Magalhães · Pedro Humberto Bitencourt Nascimento</div>
+      </div>
+    </div>
+    <div style="text-align:center"><div class="qr" data-qr="https://spec-ao-app.streamlit.app/" style="width:380px;height:380px"></div></div>
+  </div>
+  <aside class="notes">É isso! Abram o site pelo QR Code, juntem-se às equipes e bora construir. A organização está circulando para ajudar. Boa noite e bom hackathon!</aside>
+</section>
+
+<!-- ===================================================== G. REFERÊNCIAS -->
+<section class="slide" data-file="28_referencias_e_creditos.md" data-folder="G_referencias" data-section="G. Referências" data-time="—">
+  <div class="s-file">// 28_referencias_e_creditos.md</div>
+  <h1 style="font-size:46px;margin-bottom:16px">Referências e créditos</h1>
+  <div class="g2" style="gap:40px;font-size:18.5px;line-height:1.5;color:var(--fg2)">
+    <div>
+      <div class="acc mono" style="margin-bottom:6px">REFERÊNCIAS (consultadas em 26/11/2026)</div>
+      <div>Stack Overflow. Developer Survey 2026 — AI. survey.stackoverflow.co/2026/ai</div>
+      <div>Stack Overflow Blog. “The results of the 2026 Developer Survey are here!” (06/10/2026)</div>
+      <div>MIT Technology Review. “What is vibe coding, exactly?” (16/04/2025)</div>
+      <div>IBM. “What is vibe coding?” ibm.com/think/topics/vibe-coding</div>
+      <div>GitHub. Spec Kit. github.github.com/spec-kit</div>
+      <div>GitHub Blog. “Spec-driven development with AI: get started with a new open source toolkit”</div>
+      <div>Kiro (AWS). kiro.dev · InfoQ, “AWS Kiro spec-driven agent” (ago/2025)</div>
+      <div>AGENTS.md. agents.md</div>
+      <div>Claude Code Docs. “How Claude remembers your project”. code.claude.com/docs/en/memory</div>
+      <div>Cursor Docs. Rules. cursor.com/docs/rules</div>
+      <div>Snowflake. “Snowflake Unveils Cortex Code, An AI Coding Agent…” (03/02/2026)</div>
+      <div>Snowflake Docs. Cortex Code in Snowsight — GA (09/03/2026)</div>
+    </div>
+    <div>
+      <div class="acc mono" style="margin-bottom:6px">CRÉDITOS DE RECURSOS</div>
+      <div>Fontes Inter e JetBrains Mono — SIL Open Font License 1.1 (via Fontsource)</div>
+      <div>Ícones Codicons (Microsoft) — CC BY 4.0</div>
+      <div>Logos GitHub, AWS, Snowflake, Streamlit e pandas — Simple Icons, CC0 1.0; marcas dos respectivos donos, usadas só para identificar as ferramentas</div>
+      <div>QR Code gerado localmente com qrcode-generator (Kazuhiko Arase) — licença MIT</div>
+      <div>Capturas de tela: site do hackathon, spec-ao-app.streamlit.app</div>
+      <div>Dados do painel de exemplo: base Telco Customer Churn (IBM, via Kaggle) usada no hackathon</div>
+      <div>Sem fotos de banco de imagens nesta versão</div>
+      <div class="acc mono" style="margin:14px 0 6px">ATALHOS</div>
+      <div><span class="mono">→ / espaço</span> avançar · <span class="mono">←</span> voltar · <span class="mono">Ctrl+P</span> ir para slide · <span class="mono">F</span> tela cheia · <span class="mono">S</span> notas · <span class="mono">E</span> explorador</div>
+    </div>
+  </div>
+  <aside class="notes">Slide de referências e créditos, para consulta. Não precisa ser apresentado.</aside>
+</section>
+        </div>
+        <div class="minimap" id="minimap"></div>
+      </div>
+    </div>
+  </div>
+  <div class="status">
+    <div class="it rem"><i class="codicon codicon-remote"></i></div>
+    <div class="it"><i class="codicon codicon-git-branch"></i> main</div>
+    <div class="it"><i class="codicon codicon-sync"></i></div>
+    <div class="it"><i class="codicon codicon-error"></i> 0 <i class="codicon codicon-warning"></i> 0</div>
+    <div class="it" id="st-sec"></div>
+    <div class="sp"></div>
+    <div class="it" id="st-slide"></div>
+    <div class="it" id="st-ln"></div>
+    <div class="it">UTF-8</div>
+    <div class="it" id="st-lang"></div>
+    <div class="it"><i class="codicon codicon-watch"></i> <span id="st-clock"></span></div>
+    <div class="it"><i class="codicon codicon-bell"></i></div>
+  </div>
+  <div id="toasts"></div>
+  <div id="commit"><div class="th"><b>TERMINAL</b><span>SAÍDA</span><span>PROBLEMAS</span></div><pre id="commit-txt"></pre></div>
+  <div id="palette"><input id="pinput" placeholder="Ir para o slide… (digite o nome)" autocomplete="off"><div id="plist"></div></div>
+</div>
+<div id="print"></div>
+
+<script src="assets/js/qrcode.js"></script>
+<script>
+(() => {
+  "use strict";
+  const app = document.getElementById("app");
+  const slides = [...document.querySelectorAll("#canvas .slide")];
+  const reduz = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let atual = -1, timers = [], notasWin = null, inicioNotas = null;
+
+  /* ---------- escala 1920×1080 → janela ---------- */
+  function escalar() {
+    const s = Math.min(innerWidth / 1920, innerHeight / 1080);
+    document.documentElement.style.setProperty("--s", s);
+  }
+  addEventListener("resize", escalar); escalar();
+
+  /* ---------- dados auxiliares ---------- */
+  const ext = f => (f.split(".").pop() || "md");
+  const rotuloExt = { md: "M↓", py: "py", sh: "$_", diff: "±", json: "{}", tree: "⌥" };
+  const linguagem = { md: "Markdown", py: "Python", sh: "Shell Script", diff: "Diff", json: "JSON", tree: "Plain Text" };
+  slides.forEach((s, i) => {
+    s.dataset.n = i + 1;
+    s.querySelectorAll(".type").forEach(el => el.dataset.full = el.textContent);
+    s.querySelectorAll(".stg").forEach(g => [...g.children].forEach((c, k) => c.style.setProperty("--i", k)));
+  });
+
+  /* ---------- explorador ---------- */
+  const tree = document.getElementById("tree");
+  tree.innerHTML = '<div class="root">DA-SPEC-AO-APP</div>';
+  let pastaAtual = null, subAtual = null;
+  slides.forEach((s, i) => {
+    const [pasta, sub] = s.dataset.folder.split("/");
+    if (pasta !== pastaAtual) {
+      pastaAtual = pasta; subAtual = null;
+      tree.insertAdjacentHTML("beforeend", `<div class="folder"><i class="codicon codicon-chevron-down"></i>${pasta}</div>`);
+    }
+    if (sub && sub !== subAtual) {
+      subAtual = sub;
+      tree.insertAdjacentHTML("beforeend", `<div class="folder" style="padding-left:34px"><i class="codicon codicon-chevron-down"></i>${sub}</div>`);
+    }
+    const e = ext(s.dataset.file);
+    const div = document.createElement("div");
+    div.className = "file" + (sub ? " sub" : "");
+    div.innerHTML = `<span class="ficon ${e}">${rotuloExt[e] || "•"}</span>${s.dataset.file}`;
+    div.onclick = () => ir(i);
+    tree.appendChild(div);
+    s._arquivo = div;
+  });
+
+  /* ---------- minimapa e gutter ---------- */
+  const mm = document.getElementById("minimap");
+  slides.forEach((s, i) => { const b = document.createElement("i"); b.title = s.dataset.file; b.onclick = () => ir(i); mm.appendChild(b); });
+  const gutter = document.getElementById("gutter");
+  gutter.innerHTML = Array.from({ length: 28 }, (_, i) => `<div>${i + 1}</div>`).join("");
+
+  /* ---------- QR Codes ---------- */
+  document.querySelectorAll("[data-qr]").forEach(el => {
+    try {
+      const q = qrcode(0, "M"); q.addData(el.dataset.qr); q.make();
+      el.innerHTML = q.createSvgTag({ cellSize: 8, margin: 2, scalable: true });
+    } catch (err) { el.textContent = el.dataset.qr; }
+  });
+
+  /* ---------- relógio ---------- */
+  const relogio = () => {
+    const d = new Date();
+    document.getElementById("st-clock").textContent = d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+  };
+  relogio(); setInterval(relogio, 15000);
+
+  /* ---------- animações ---------- */
+  function limparTimers() { timers.forEach(clearTimeout); timers = []; }
+  function later(fn, ms) { timers.push(setTimeout(fn, ms)); }
+
+  function digitar(el, atraso) {
+    const texto = el.dataset.full;
+    if (reduz) { el.textContent = texto; return 0; }
+    el.textContent = "";
+    const caret = document.createElement("span"); caret.className = "caret";
+    let i = 0; const vel = 42;
+    later(() => {
+      el.appendChild(caret);
+      const passo = () => {
+        if (i >= texto.length) { later(() => caret.remove(), 1600); return; }
+        caret.before(texto[i++]); later(passo, vel);
+      };
+      passo();
+    }, atraso);
+    return atraso + texto.length * vel;
+  }
+
+  function contar(el) {
+    const alvo = parseFloat(el.dataset.count), dec = +(el.dataset.dec || 0);
+    const fmt = v => v.toFixed(dec).replace(".", ",") + "%";
+    if (reduz) { el.textContent = fmt(alvo); return; }
+    const t0 = performance.now(), dur = 1200;
+    el.textContent = fmt(0);
+    const quadro = t => {
+      const p = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - p, 3);
+      el.textContent = fmt(alvo * e);
+      if (p < 1 && el.closest(".slide.active")) requestAnimationFrame(quadro); else el.textContent = fmt(alvo);
+    };
+    later(() => requestAnimationFrame(quadro), 600);
+  }
+
+  function notificar(texto, icone = "info") {
+    const box = document.getElementById("toasts");
+    const t = document.createElement("div");
+    t.className = "toast"; t.innerHTML = `<i class="codicon codicon-${icone}"></i><div>${texto}</div>`;
+    box.appendChild(t);
+    later(() => { t.classList.add("out"); setTimeout(() => t.remove(), 450); }, 6500);
+  }
+
+  function commitSecao(secao) {
+    if (reduz) return;
+    const hash = Math.random().toString(16).slice(2, 9);
+    const el = document.getElementById("commit"), txt = document.getElementById("commit-txt");
+    txt.innerHTML = `<span style="color:var(--green)">$</span> git commit -m "seção: ${secao}"\n<span style="color:var(--mut)">[main ${hash}] ${secao} — pronto para apresentar</span>`;
+    el.classList.add("on");
+    later(() => el.classList.remove("on"), 2300);
+  }
+
+  function animar(s) {
+    s.classList.remove("done");
+    s.querySelectorAll(".type").forEach(el => digitar(el, +(el.dataset.delay || 0)));
+    s.querySelectorAll("[data-count]").forEach(contar);
+    if (s.dataset.notify) later(() => notificar(s.dataset.notify, "lightbulb"), +(s.dataset.notifyDelay || 2000));
+  }
+
+  function finalizar(s) {
+    limparTimers();
+    s.classList.add("done");
+    s.querySelectorAll(".type").forEach(el => el.textContent = el.dataset.full);
+    s.querySelectorAll("[data-count]").forEach(el => el.textContent = (+el.dataset.count).toFixed(+(el.dataset.dec || 0)).replace(".", ",") + "%");
+    document.querySelectorAll(".caret").forEach(c => c.remove());
+  }
+
+  /* ---------- navegação ---------- */
+  function ir(i, viaHash) {
+    i = Math.max(0, Math.min(slides.length - 1, i));
+    if (i === atual) return;
+    const anterior = slides[atual];
+    limparTimers();
+    document.getElementById("toasts").innerHTML = "";
+    if (anterior) { anterior.classList.remove("active"); anterior._arquivo.classList.remove("on"); }
+    const s = slides[i];
+    // reinicia animações CSS
+    s.classList.remove("active"); void s.offsetWidth; s.classList.add("active");
+    s._arquivo.classList.add("on");
+    s._arquivo.scrollIntoView({ block: "nearest" });
+    app.classList.toggle("zen", !!s.dataset.zen);
+    if (anterior && anterior.dataset.section !== s.dataset.section && i > atual) commitSecao(s.dataset.section);
+    // abas: arquivo anterior + atual
+    const tabs = document.getElementById("tabs");
+    const prev = anterior && anterior !== s ? anterior.dataset.file : null;
+    tabs.innerHTML = (prev ? `<div class="tab"><span class="ficon ${ext(prev)}">${rotuloExt[ext(prev)]}</span>${prev}</div>` : "")
+      + `<div class="tab on"><span class="ficon ${ext(s.dataset.file)}">${rotuloExt[ext(s.dataset.file)]}</span>${s.dataset.file}<i class="codicon codicon-close"></i></div>`;
+    document.getElementById("crumbs").innerHTML = `da-spec-ao-app <i class="codicon codicon-chevron-right"></i> ${s.dataset.folder.replace("/", ' <i class="codicon codicon-chevron-right"></i> ')} <i class="codicon codicon-chevron-right"></i> <b>${s.dataset.file}</b>`;
+    [...mm.children].forEach((b, k) => b.classList.toggle("on", k === i));
+    [...gutter.children].forEach((g, k) => g.classList.toggle("cur", k === (i % 28)));
+    document.getElementById("st-sec").innerHTML = `<i class="codicon codicon-symbol-file"></i> ${s.dataset.section}`;
+    document.getElementById("st-slide").textContent = `Slide ${i + 1}/${slides.length}`;
+    document.getElementById("st-ln").textContent = `Ln ${i + 1}, Col 1`;
+    document.getElementById("st-lang").textContent = linguagem[ext(s.dataset.file)] || "Markdown";
+    atual = i;
+    if (!viaHash) history.replaceState(null, "", "#" + (i + 1));
+    animar(s);
+    atualizarNotas();
+  }
+
+  function proximo() {
+    const s = slides[atual];
+    if (timers.length && !s.classList.contains("done") && s.querySelector(".type, [data-count]") && animando()) { finalizar(s); return; }
+    ir(atual + 1);
+  }
+  function animando() { return [...slides[atual].querySelectorAll(".type")].some(el => el.textContent.replace(/\s/g, "").length < el.dataset.full.replace(/\s/g, "").length); }
+
+  /* ---------- paleta de comandos (Ctrl+P) ---------- */
+  const pal = document.getElementById("palette"), pin = document.getElementById("pinput"), plist = document.getElementById("plist");
+  let psel = 0, pitens = [];
+  function abrirPaleta() { pal.classList.add("on"); pin.value = ""; filtrar(); pin.focus(); }
+  function fecharPaleta() { pal.classList.remove("on"); pin.blur(); }
+  function normal(t) { return t.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase(); }
+  function filtrar() {
+    const q = normal(pin.value.trim());
+    pitens = slides.map((s, i) => ({ i, nome: s.dataset.file, sec: s.dataset.section, txt: normal(s.dataset.file + " " + (s.querySelector("h1")?.textContent || "") + " " + s.dataset.section) }))
+      .filter(o => !q || q.split(/\s+/).every(p => o.txt.includes(p)));
+    psel = 0; desenharLista();
+  }
+  function desenharLista() {
+    plist.innerHTML = pitens.map((o, k) => `<div class="${k === psel ? "sel" : ""}" data-i="${o.i}"><span class="ficon ${ext(o.nome)}">${rotuloExt[ext(o.nome)]}</span>${o.nome}<span class="mu">${o.i + 1} · ${o.sec}</span></div>`).join("");
+    plist.querySelectorAll("div").forEach(d => d.onclick = () => { fecharPaleta(); ir(+d.dataset.i); });
+    plist.querySelector(".sel")?.scrollIntoView({ block: "nearest" });
+  }
+  pin.addEventListener("input", filtrar);
+  pin.addEventListener("keydown", e => {
+    if (e.key === "ArrowDown") { psel = Math.min(pitens.length - 1, psel + 1); desenharLista(); e.preventDefault(); }
+    else if (e.key === "ArrowUp") { psel = Math.max(0, psel - 1); desenharLista(); e.preventDefault(); }
+    else if (e.key === "Enter") { const o = pitens[psel]; fecharPaleta(); if (o) ir(o.i); e.preventDefault(); }
+    else if (e.key === "Escape") { fecharPaleta(); e.preventDefault(); }
+    e.stopPropagation();
+  });
+
+  /* ---------- notas do apresentador (S) ---------- */
+  function abrirNotas() {
+    if (notasWin && !notasWin.closed) { notasWin.focus(); return; }
+    notasWin = window.open("", "notas_da_spec_ao_app", "width=1100,height=760");
+    if (!notasWin) { notificar("O navegador bloqueou a janela de notas. Permita pop-ups para este arquivo.", "warning"); return; }
+    inicioNotas = inicioNotas || Date.now();
+    const d = notasWin.document;
+    d.open();
+    d.write(`<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Notas — Da Spec ao App</title>
+      <style>body{margin:0;background:#1f1f1f;color:#f0f0f0;font-family:Inter,"Segoe UI",sans-serif;padding:28px 34px}
+      .top{display:flex;justify-content:space-between;font-family:Consolas,monospace;color:#9d9d9d;font-size:20px}
+      #t{font-size:34px;font-weight:700;margin:16px 0 6px}#f{font-family:Consolas,monospace;color:#6a9955;font-size:18px}
+      #n{font-size:30px;line-height:1.5;margin:22px 0;background:#252526;border:1px solid #3c3c3c;border-radius:10px;padding:24px}
+      #p{color:#9d9d9d;font-size:20px}#crono{color:#4fc1ff;font-size:26px}b{color:#f2cc60}
+      .ajuda{color:#6a6a6a;font-size:16px;margin-top:20px}</style></head><body>
+      <div class="top"><span id="pos"></span><span id="crono"></span><span id="hora"></span></div>
+      <div id="f"></div><div id="t"></div><div id="n"></div><div id="p"></div>
+      <div class="ajuda">→ / espaço: avançar · ←: voltar (funciona nesta janela também)</div></body></html>`);
+    d.close();
+    d.addEventListener("keydown", tecla);
+    setInterval(() => atualizarNotas(true), 1000);
+    atualizarNotas();
+  }
+  function atualizarNotas(soRelogio) {
+    if (!notasWin || notasWin.closed) return;
+    const d = notasWin.document, $ = id => d.getElementById(id);
+    if (!$("crono")) return;
+    const seg = Math.floor((Date.now() - inicioNotas) / 1000);
+    $("crono").textContent = `⏱ ${String(Math.floor(seg / 60)).padStart(2, "0")}:${String(seg % 60).padStart(2, "0")}`;
+    $("hora").textContent = new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+    if (soRelogio) return;
+    const s = slides[atual], prox = slides[atual + 1];
+    $("pos").textContent = `Slide ${atual + 1}/${slides.length} · ${s.dataset.section}`;
+    $("f").textContent = s.dataset.folder + "/" + s.dataset.file;
+    const tituloEl = s.querySelector("h1") || s.querySelector(".q");
+    const titulo = tituloEl ? [...tituloEl.querySelectorAll(".type")].reduce((t, el) => t.replace(el.textContent, el.dataset.full), tituloEl.textContent) : "";
+    $("t").textContent = (tituloEl?.querySelector(".type") ? tituloEl.querySelector(".type").dataset.full : titulo || s.dataset.file).trim();
+    $("n").innerHTML = (s.querySelector(".notes")?.innerHTML || "") + `<div style="margin-top:14px;font-size:22px;color:#9d9d9d">Tempo sugerido: <b>${s.dataset.time}</b></div>`;
+    $("p").textContent = prox ? "Próximo: " + prox.dataset.file : "Último slide";
+  }
+
+  /* ---------- teclado ---------- */
+  function tecla(e) {
+    if (pal.classList.contains("on")) return;
+    if ((e.ctrlKey || e.metaKey) && (e.key === "p" || e.key === "P")) { e.preventDefault(); abrirPaleta(); return; }
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    switch (e.key) {
+      case "ArrowRight": case "PageDown": case " ": case "Enter": e.preventDefault(); proximo(); break;
+      case "ArrowLeft": case "PageUp": case "Backspace": e.preventDefault(); ir(atual - 1); break;
+      case "Home": ir(0); break;
+      case "End": ir(slides.length - 1); break;
+      case "f": case "F":
+        if (!document.fullscreenElement) document.documentElement.requestFullscreen?.(); else document.exitFullscreen?.();
+        break;
+      case "s": case "S": abrirNotas(); break;
+      case "e": case "E": app.classList.toggle("side-off"); break;
+      case "Escape": fecharPaleta(); break;
+    }
+  }
+  document.addEventListener("keydown", tecla);
+  addEventListener("hashchange", () => { const n = parseInt(location.hash.slice(1)); if (n) ir(n - 1, true); });
+
+  /* ---------- impressão / PDF ---------- */
+  function montarImpressao() {
+    const raiz = document.getElementById("print");
+    raiz.innerHTML = "";
+    const titulo = document.querySelector(".titlebar").outerHTML;
+    slides.forEach((s, i) => {
+      const pg = document.createElement("div");
+      pg.className = "page";
+      const clone = s.cloneNode(true);
+      clone.classList.add("final"); clone.classList.remove("active", "done");
+      clone.querySelectorAll(".type").forEach(el => el.textContent = el.dataset.full);
+      clone.querySelectorAll("[data-count]").forEach(el => el.textContent = (+el.dataset.count).toFixed(+(el.dataset.dec || 0)).replace(".", ",") + "%");
+      clone.querySelectorAll(".caret").forEach(c => c.remove());
+      const e = ext(s.dataset.file);
+      pg.innerHTML = titulo
+        + `<div class="tabs"><div class="tab on"><span class="ficon ${e}">${rotuloExt[e]}</span>${s.dataset.file}</div></div>`;
+      const corpo = document.createElement("div");
+      corpo.style.cssText = "position:relative;overflow:hidden";
+      corpo.appendChild(clone);
+      pg.appendChild(corpo);
+      pg.insertAdjacentHTML("beforeend", `<div class="status"><div class="it"><i class="codicon codicon-git-branch"></i> main</div><div class="it">${s.dataset.section}</div><div class="sp"></div><div class="it">Slide ${i + 1}/${slides.length}</div><div class="it">${linguagem[e] || "Markdown"}</div></div>`);
+      raiz.appendChild(pg);
+    });
+  }
+  addEventListener("beforeprint", montarImpressao);
+
+  /* ---------- início ---------- */
+  const n = parseInt(location.hash.slice(1));
+  ir(n ? n - 1 : 0, true);
+  window.__slides = { ir, total: slides.length, atual: () => atual, finalizar: () => finalizar(slides[atual]), montarImpressao };
+})();
+</script>
+</body>
+</html>
