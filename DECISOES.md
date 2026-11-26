@@ -294,3 +294,9 @@ operações importa"). O app já usava `layout="wide"`; os cortes vinham da esca
     cortes em 1093×614 (1366 a 125%), 1280×720 e 1366×768.
 95. **Não feito (fora do alcance do app):** "Fork" e ícone do GitHub no topo são do Streamlit Community Cloud
     para repositórios públicos; nenhuma configuração do app os esconde. Só tornar o repositório privado.
+96. **Entrega do kit:** as equipes não rodam o agente de IA. Elas enviam o `kit_<equipe>.zip` pelo WhatsApp
+    ao organizador, que roda o agente com o mesmo prompt para todas (o prompt fica visível num expansor da
+    etapa 6, para as equipes saberem que tudo precisa estar na SPEC). Saíram as abas "Assistente no
+    computador / Chat na web".
+97. **Botão "Código" no fluxo:** coluna alargada (2:5) para o rótulo não ser cortado ("Códi…") em telas
+    estreitas.

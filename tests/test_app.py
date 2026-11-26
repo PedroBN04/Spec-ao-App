@@ -228,6 +228,7 @@ def test_jornada_completa_ate_gabarito(tema_id, blocos):
     _avancar(at)
     assert at.session_state.etapa == 6
     assert any("Leia o arquivo SPEC.md e construa" in c.value for c in at.code)
+    assert any("WhatsApp" in m.value for m in at.markdown)  # entrega do kit à organização
     assert not any(b.key == "nav_7" for b in at.button)  # gabarito só depois da exportação
     _botao(at, "Abrir revisão com o facilitador").click().run()
     _sem_erros(at)

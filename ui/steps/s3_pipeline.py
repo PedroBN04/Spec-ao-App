@@ -240,7 +240,7 @@ def _no(tema: Theme, n: int, passo, total: int) -> None:
         b3.button("", icon=":material/delete:", key=f"desfazer_{chave}", help="Remover do fluxo",
                   on_click=_remover, args=(tema, chave), type="tertiary")
         st.caption(_efeito(r))
-        c1, c2 = st.columns([1, 3], vertical_alignment="bottom")
+        c1, c2 = st.columns([2, 5], vertical_alignment="bottom")
         with c1.popover("Código", icon=":material/code:", width="stretch"):
             st.code(bloco.codigo, language="python", wrap_lines=True)
         if f"nota_{chave}" not in st.session_state:

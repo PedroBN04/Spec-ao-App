@@ -9,8 +9,8 @@ O participante atua como analista de dados: aceita uma **missão** (uma solicita
 investiga a base num **diagnóstico** guiado, monta uma **pipeline** de tratamento em blocos, no estilo de um
 fluxo do n8n (com blocos prontos e blocos configuráveis), **revisa** o resultado e escreve a **SPEC** por conta
 própria, com perguntas-guia. No fim, baixa um kit `.zip` com `dados_tratados.csv`, uma planilha
-`dados_tratados_excel.xlsx` (abre direto no Excel) e `SPEC.md`, que entrega a um assistente de IA (Claude
-Code, Cursor, Copilot, ChatGPT...) para construir o painel do hackathon. O progresso pode ser salvo e
+`dados_tratados_excel.xlsx` (abre direto no Excel) e `SPEC.md`, e envia o kit para a organização pelo WhatsApp. A organização entrega o kit a um agente de IA
+(sempre com o mesmo pedido) para construir o painel do hackathon. O progresso pode ser salvo e
 retomado com um rascunho `.json`, pela barra lateral. Depois da exportação, uma etapa de **revisão
 com o facilitador** mostra o gabarito: quais blocos eram boas práticas, armadilhas ou "depende".
 
