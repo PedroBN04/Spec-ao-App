@@ -49,7 +49,7 @@ Legenda: **Mensagem** = a ideia que o público precisa levar; **Fale** = sugest�
 - **Atenção:** dê 30–60 s para o QR Code. Pergunte se todos conseguiram abrir.
 
 **2 · Agenda** (1 min)
-- **Mensagem:** a noite tem duas partes — apresentação até 20h30, depois mão na massa.
+- **Mensagem:** a noite tem duas partes — apresentação até 20h30, depois mão na massa, com envio do kit até 21h30.
 - **Fale:** percorra os horários e leia o quadro “Você sai daqui sabendo”.
 - **Ponte:** “Para chegar lá, vamos seguir um mapa.”
 
@@ -213,7 +213,7 @@ Legenda: **Mensagem** = a ideia que o público precisa levar; **Fale** = sugest�
 ### H. O hackathon — 20h05 às 20h20
 
 **30 · Agora é com vocês** (1 min)
-- **Mensagem:** equipes prontas, missão, entrega do kit pelo WhatsApp.
+- **Mensagem:** equipes prontas, missão, entrega do kit pelo WhatsApp até 21h30.
 - **Fale:** “Cada equipe recebe uma missão de uma área cliente. No fim, vocês mandam o kit pelo WhatsApp para
   o organizador, e a organização roda o agente de IA.”
 
@@ -228,7 +228,7 @@ Legenda: **Mensagem** = a ideia que o público precisa levar; **Fale** = sugest�
   - **4 Revisão:** antes × depois; não gostou, volta ao fluxo.
   - **5 SPEC:** 8 passos com perguntas-guia; exemplo e esqueleto com lacunas para quem travar.
   - **6 Exportar:** baixar o `.zip` e **enviar pelo WhatsApp, como documento, com o nome da equipe**.
-    Lembrar do “Salvar ou retomar progresso”.
+    **Prazo: 21h30.** Lembrar do “Salvar ou retomar progresso”.
 
 **38 · Do kit ao painel** (1,5 min)
 - **Mensagem:** o prompt é o mesmo para todas as equipes — quem decide o resultado é a SPEC.
@@ -238,7 +238,7 @@ Legenda: **Mensagem** = a ideia que o público precisa levar; **Fale** = sugest�
 - **Mensagem:** 4 critérios, 25% cada: resultado vs. missão, tratamento, clareza da SPEC, pitch.
 
 **40 · Regras e dicas** (1 min)
-- **Mensagem:** 20h30–21h40; kit pelo WhatsApp até 21h40; pitch de até 3 min (problema → dados → decisões →
+- **Mensagem:** desenvolvimento das 20h30 às 21h30; kit pelo WhatsApp **até 21h30**; pitches a partir de 21h40; pitch de até 3 min (problema → dados → decisões →
   demonstração → impacto).
 - **Fale:** diga em voz alta **para qual número** enviar o kit (ver pendências).
 
@@ -261,13 +261,11 @@ slide 21 (linha do tempo dos dados) e passe mais rápido pelos slides 32–37 (a
 
 **Antes do evento**
 
-- [ ] **Fazer o merge do PR #5** na `main` — só depois disso o site publicado mostra a entrega pelo WhatsApp.
-- [ ] **Confirmar a data do evento**: os slides dizem **26/11/2026**; o README e a APP_SPEC dizem 24/11.
 - [ ] **Definir quem recebe os kits no WhatsApp** (número/nome) e combinar como avisar as equipes (falar no
       slide 40, escrever no quadro ou mandar no grupo do evento).
-- [ ] **Definir o tempo de geração dos painéis**: os kits chegam até 21h40 e os pitches começam 21h40. O agente
-      leva alguns minutos por equipe. Sugestões: pedir os kits às **21h30**, ou rodar os agentes em paralelo
-      (uma máquina por pessoa da organização), ou começar os pitches pelas equipes que entregaram primeiro.
+- [ ] **Geração dos painéis entre 21h30 e 21h40** (kits pedidos até 21h30): 10 minutos é pouco para rodar o
+      agente em série para todas as equipes. Combine rodar em paralelo (uma máquina por pessoa da
+      organização) e começar os pitches pelas equipes cujo painel ficou pronto primeiro.
 - [ ] **Testar a máquina da organização** que vai rodar o agente: agente instalado e logado, Python +
       Streamlit, e um teste completo com um kit de exemplo (baixar do site → enviar no WhatsApp → extrair →
       rodar o prompt → abrir o painel).

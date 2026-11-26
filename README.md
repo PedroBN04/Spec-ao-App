@@ -1,6 +1,6 @@
 # Da Spec ao App
 
-Laboratório guiado de dados e especificação, feito para o minicurso + hackathon de 24/11/2026.
+Laboratório guiado de dados e especificação, feito para o minicurso + hackathon de 26/11/2026.
 
 > **Projeto educacional, sem fins comerciais.** As bases de dados em `data/` são usadas apenas para fins
 > educativos, com atribuição às fontes (ver [Créditos e licenças das bases](#créditos-e-licenças-das-bases)).

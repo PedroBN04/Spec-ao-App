@@ -34,7 +34,7 @@ def _estado(passos, respostas=None, notas="", tema=TELCO, tema_id="telco"):
     assert [ex.uid(p) for p in pipe.passos] == [ex.uid(p) for p in passos]
     return sb.EstadoSpec(tema=tema, equipe="Equipe Ação", df=pipe.df, passos=pipe.passos, blocos=pipe.blocos,
                          resultados=pipe.resultados, respostas=respostas or _preenchidas(), notas_revisao=notas,
-                         data=date(2026, 11, 24))
+                         data=date(2026, 11, 26))
 
 
 def _secao(texto, titulo):
@@ -118,7 +118,7 @@ def test_template_cabecalho_e_secoes_em_ordem():
                      stack="Python", restricoes=[sb.RESTRICOES[0]], metrica_sucesso="Reduzir churn",
                      formato="Pitch", roteiro="Problema → demo", cuidados="X")
     texto = sb.montar_spec(_estado(["T01"], respostas=r, notas="ok"))
-    assert texto.startswith(f"# SPEC — Radar\nEquipe: Equipe Ação · Desafio: {TELCO.nome} · Gerado em 24/11/2026")
+    assert texto.startswith(f"# SPEC — Radar\nEquipe: Equipe Ação · Desafio: {TELCO.nome} · Gerado em 26/11/2026")
     titulos = ["## 1.", "## 2.", "### Entra nesta versão", "### Fora do escopo", "## 3. Dados", "### 3.1",
                "### 3.2", "### 3.3", "## 4.", "## 5.", "## 6.", "## 7.", "## 8.", "## 9."]
     pos = [texto.index(t) for t in titulos]
