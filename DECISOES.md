@@ -243,3 +243,54 @@ visual mais profissional. Decisões tomadas com a organização:
 80. **Itens da v1 substituídos:** a nota de qualidade, as justificativas obrigatórias do checklist, os selos
     durante o tratamento e os avisos de "colunas que parecem números" na tela deixam de existir na
     jornada (decisões 4, 26–33 e 36–38 valem só para o gabarito ou foram superadas).
+
+## Proposta de melhorias da equipe (aprovada pela organização)
+
+Avaliação completa feita antes de implementar. Dois itens da proposta foram mantidos como estão porque são
+intencionais na spec: o bloco N02 (`compareceu` com leitura invertida) é uma **armadilha** da seção 8.3, e o
+N14 (renomear para português) bloquear os demais blocos é o próprio ensinamento do bloco ("a ordem das
+operações importa"). O app já usava `layout="wide"`; os cortes vinham da escala de tela do Windows
+(125–150%) somada à barra lateral.
+
+81. **Exportação (P0.4):** kit `kit_<equipe>.zip` como botão principal, com `dados_tratados.csv` (vírgula,
+    para a IA), `dados_tratados_excel.xlsx` (planilha real, abre em colunas no Excel em português, números
+    como números) e `SPEC.md`, já com os nomes finais. Downloads avulsos ficam num expander. O kit é gerado
+    só no clique (o .xlsx do hotel leva ~7 s). Bases com mais de 3 milhões de células (ex.: depois do T11)
+    saem sem o .xlsx, com aviso. Dependências novas: `xlsxwriter` (gera) e `openpyxl` (testes leem).
+    Todas as tabelas sem coluna de índice.
+82. **Rascunho .json (P3.1):** "Salvar ou retomar progresso" na barra lateral. O arquivo guarda só dados
+    (nunca código), é validado ao retomar e a pipeline é reexecutada da base original. A barra lateral é
+    desenhada depois da etapa, para o rascunho já incluir o que acabou de ser digitado.
+83. **Início (P2.1):** nome da equipe num `st.form`; "Começar" funciona sem Enter e avisa se estiver vazio.
+84. **Missão (P2.2):** durante a confirmação de troca, a mensagem é "Confirme ou cancele a troca de missão".
+85. **Dependências (P2.3):** mensagens citam o nome do bloco, nunca o código (T01, N03...). Mover um passo para
+    uma posição inválida não muda nada (o passo e a justificativa ficam) e explica por quê. Textos de exemplo
+    dos campos em português ("Escolha uma opção").
+86. **Significado na SPEC (P2.4):** `Theme.significado_apos` dá o significado depois de conversões conhecidas do
+    catálogo (ex.: depois do T07, `Churn` = "1 = cancelou, 0 = continua"). Para blocos personalizados, o
+    significado avisa que os valores mudaram. Texto "para 1 hora" trocado por tempo flexível.
+87. **Linguagem (P1.1/P1.2):** termo em português primeiro e o técnico entre parênteses (churn, antecedência,
+    diária, overbooking, one-hot, z-score). A pipeline é explicada como linha de montagem/receita, com o n8n
+    como segundo exemplo. Glossário com 20 termos. Kaggle explicado. Instruções finais para qualquer
+    assistente de IA (no computador ou chat na web).
+88. **Diagnóstico (P1.3):** números no padrão brasileiro nas tabelas; gráficos sem a barra de ferramentas em
+    inglês e com vírgula decimal; uma frase explica cada aba do explorador.
+89. **Meio-termo da tradução (P0.3):** as bases continuam com os nomes e valores originais (o código dos 41
+    blocos da seção 8 depende deles). O app mostra o equivalente em português: coluna "Em português" no
+    Raio-X, nome em português no explorador e tradução dos valores na tabela "Valores mais frequentes"
+    (`core/themes/traducoes.py`).
+90. **Meio-termo dos vazios disfarçados (P1.3):** indicador factual "Células só com espaços" ao lado de
+    "Células vazias (nulos)", sem tom de alerta. `PatientId` continua como número decimal (defeito didático
+    tratado pelo N10).
+91. **Meio-termo das linhas repetidas (P1.4):** o efeito de cada passo mostra "linhas repetidas: 0 → 22"
+    (fato). A explicação da causa fica no gabarito. A contagem é desligada para bases com mais de 200 colunas
+    (no T11 levaria ~2 s por passo).
+92. **Meio-termo do rascunho guiado (P2.4):** botão "Usar esqueleto com lacunas" em cada passo da SPEC, com
+    frases genéricas e lacunas [entre colchetes], sem conteúdo de nenhum tema. Só preenche campos vazios.
+    Campo obrigatório com lacuna não preenchida conta como pendente.
+93. **Gabarito (P3.3):** quando o tema tem o próprio limite de colunas (telco: 50), o genérico (60) não aparece.
+94. **Layout estreito (P0.2):** biblioteca e fluxo em colunas iguais; rótulos curtos ("Código", "Próximo
+    passo", "Texto"); margem inferior maior para o selo do Streamlit Cloud não cobrir botões. Conferido sem
+    cortes em 1093×614 (1366 a 125%), 1280×720 e 1366×768.
+95. **Não feito (fora do alcance do app):** "Fork" e ícone do GitHub no topo são do Streamlit Community Cloud
+    para repositórios públicos; nenhuma configuração do app os esconde. Só tornar o repositório privado.

@@ -8,6 +8,7 @@ Não corrija, melhore nem "otimize" esses trechos. tests/test_blocks.py confere 
 import pandas as pd
 
 from core.models import Block, Check, Theme
+from core.themes.traducoes import NOMES_NOSHOW, SIGNIFICADO_APOS_NOSHOW, VALORES_NOSHOW
 
 BLOCOS = (
     Block(
@@ -319,6 +320,9 @@ THEME = Theme(
         "e esses horários poderiam atender outros pacientes. Queremos saber quem falta mais e em que "
         "situações, para priorizar lembretes. Os dados vieram direto do sistema de agendamento, sem tratamento."
     ),
+    nomes_pt=NOMES_NOSHOW,
+    valores_pt=VALORES_NOSHOW,
+    significado_apos=SIGNIFICADO_APOS_NOSHOW,
     alvos_aceitos=("faltou", "no_show_original"),
     vazamento_derivado=(),
     dicionario_extra={

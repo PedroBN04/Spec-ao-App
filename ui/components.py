@@ -27,21 +27,36 @@ ULTIMA_ETAPA_JORNADA = 6
 ETAPA_GABARITO = 7
 
 GLOSSARIO = {
-    "Base de dados": "A tabela com os dados do desafio: cada linha é um registro (cliente, reserva, consulta) "
-    "e cada coluna é uma informação sobre ele.",
-    "Alvo": "A coluna com o resultado que a área cliente quer entender (ex.: se o cliente cancelou).",
-    "Nulo / vazio": "Célula sem valor. Pode ser erro, informação que não existe ou algo com significado próprio.",
-    "Tipo": "Como o computador entende a coluna: texto, número inteiro, número decimal, data...",
-    "Pipeline": "A sequência de passos que transforma a base original na base tratada. Cada passo recebe a "
-    "tabela do passo anterior, faz uma coisa e entrega para o próximo.",
+    "Base de dados": "A tabela com os dados do desafio. Cada linha é um registro (um cliente, uma reserva, uma "
+    "consulta) e cada coluna é uma informação sobre ele.",
+    "Alvo": "A coluna com o resultado que a área cliente quer entender. Ex.: se o cliente cancelou.",
+    "Nulo / vazio": "Célula sem valor. Pode ser erro, informação que não existe ou algo com significado próprio. "
+    "Cuidado com \"vazios disfarçados\": células que têm só espaços em branco.",
+    "Tipo": "Como o computador lê a coluna: texto, número inteiro, número decimal, data... Um número lido como "
+    "texto não soma nem faz média.",
+    "Pipeline": "A sequência de passos que transforma a base bruta na base pronta, como uma linha de montagem ou "
+    "uma receita: cada passo recebe o resultado do anterior.",
     "Bloco / nó": "Um passo da pipeline. Pode ser um bloco pronto do catálogo ou um bloco que você configura.",
-    "pandas": "Biblioteca de Python para trabalhar com tabelas. O código de cada bloco é escrito com ela.",
+    "pandas": "Biblioteca da linguagem Python para trabalhar com tabelas. O código de cada bloco usa o pandas.",
     "Painel (dashboard)": "Aplicação com números, gráficos e filtros que ajuda alguém a tomar decisões.",
-    "SPEC": "Especificação: o documento que descreve o que construir, para quem, com quais regras e como "
-    "conferir se ficou certo.",
-    "Agente de código": "Assistente de IA que escreve programas a partir de instruções (ex.: Claude Code).",
-    "CSV": "Planilha salva como texto, com valores separados por vírgula. Abre no Excel.",
-    "Vazamento de dados": "Usar para prever um resultado uma informação que só existe depois desse resultado.",
+    "SPEC": "Especificação: o documento que diz o que construir, para quem, com quais regras e como conferir.",
+    "Agente de código": "Assistente de IA que escreve programas a partir de instruções (ex.: Claude Code, Cursor, "
+    "Copilot, ChatGPT).",
+    "CSV": "Tabela simples salva como texto, usada por programas e pela IA. Para abrir direto no Excel, use a "
+    "planilha .xlsx do kit da Etapa 6.",
+    "Vazamento de dados": "Dar \"a cola da prova\" para o cálculo: usar uma informação que só existe depois do "
+    "resultado acontecer.",
+    "Cancelamento de clientes (churn)": "Quando o cliente encerra o contrato. A taxa de churn é a porcentagem de "
+    "clientes que cancelaram.",
+    "Antecedência da reserva (lead time)": "Quantos dias antes da chegada a reserva foi feita.",
+    "Diária média (ADR)": "Quanto o hotel recebe, em média, por noite de uma reserva.",
+    "Venda acima da capacidade (overbooking)": "Vender mais quartos do que existem, contando com os cancelamentos.",
+    "Não comparecimento (no-show)": "Quando a pessoa tem horário marcado e não aparece.",
+    "Valores fora da curva (outliers)": "Valores muito diferentes dos demais. Podem ser erros ou casos reais "
+    "importantes. O z-score mede o quanto um valor se afasta da média.",
+    "Codificação 0/1 (one-hot)": "Transformar uma coluna de texto em várias colunas de Sim/Não (0 e 1), uma para "
+    "cada resposta possível.",
+    "Kaggle": "Site gratuito com bases de dados reais publicadas para estudo e competições.",
 }
 
 # Chaves de st.session_state que dependem do tema escolhido. Trocar de tema zera todas.
@@ -166,7 +181,7 @@ def tabela_amostra(df: pd.DataFrame, linhas: int = 20, altura: int | None = None
             "para a tela não travar. O arquivo exportado terá todas."
         )
         df = df.iloc[:, :MAX_COLUNAS_TABELA]
-    st.dataframe(df.head(linhas), width="stretch", height=altura or "auto")
+    st.dataframe(df.head(linhas), width="stretch", height=altura or "auto", hide_index=True)
 
 
 def campo_persistente(chave: str) -> str:
@@ -188,7 +203,10 @@ def salvar_campo(chave: str) -> None:
 CSS = """
 <style>
 [data-testid='InputInstructions']{display:none}
-.block-container{padding-top:4rem;max-width:1240px}
+.block-container{padding-top:4rem;padding-bottom:6rem;max-width:1240px}
+[data-testid='stFileUploaderDropzoneInstructions']{display:none}
+[data-testid='stFileUploaderDropzone'] button{font-size:0}
+[data-testid='stFileUploaderDropzone'] button::after{content:'Escolher arquivo';font-size:.875rem}
 [data-testid='stSidebar'] .stButton button{justify-content:flex-start !important;text-align:left}
 [data-testid='stSidebar'] .stButton button > div{justify-content:flex-start !important;width:100%}
 .st-key-previa h1{font-size:1.45rem}.st-key-previa h2{font-size:1.15rem}.st-key-previa h3{font-size:1rem}
@@ -256,10 +274,63 @@ def barra_lateral() -> None:
                 width="stretch",
             )
         st.divider()
+        _salvar_progresso()
         with st.expander("Glossário", icon=":material/menu_book:"):
             for termo, definicao in GLOSSARIO.items():
                 st.markdown(f"**{termo}** — {definicao}")
-        st.caption("Não recarregue a página antes de baixar os arquivos: o app não guarda nada no servidor.")
+        st.caption("O app não guarda nada no servidor. Salve um rascunho de vez em quando: se a página recarregar "
+                   "ou a internet cair, é só retomar.")
+
+
+def _restaurar() -> None:
+    from core import executor as ex
+    from core import rascunho
+
+    arquivo = st.session_state.get("upload_rascunho")
+    if arquivo is None:
+        return
+    try:
+        dados = rascunho.ler(arquivo.getvalue())
+    except rascunho.RascunhoInvalido as erro:
+        st.session_state.aviso_rascunho = ("error", str(erro))
+        return
+    for chave in [k for k in st.session_state if str(k).startswith(("w_", "nv_", "nota_", "spec_nav_"))]:
+        del st.session_state[chave]
+    for chave in CHAVES_DO_TEMA:
+        st.session_state[chave] = _inicial(chave)
+    for chave, valor in dados.items():
+        if chave != "passos":
+            st.session_state[chave] = valor
+    st.session_state.tema_pendente = None
+    if dados["tema_id"]:
+        tema = REGISTRY[dados["tema_id"]]
+        pipe = ex.reexecutar(carregar_base(tema), tema, dados["passos"])
+        st.session_state.passos = pipe.passos
+        st.session_state.resultados = pipe.resultados
+        st.session_state.blocos = pipe.blocos
+        st.session_state.df_atual = pipe.df if pipe.passos else None
+        st.session_state.prox_uid = max(dados["prox_uid"], len(dados["passos"]) + 1)
+    st.session_state.aviso_rascunho = ("success", "Rascunho retomado. Você está na última etapa em que parou.")
+
+
+def _salvar_progresso() -> None:
+    from core import exporter, rascunho
+
+    with st.expander("Salvar ou retomar progresso", icon=":material/save:"):
+        estado = {c: st.session_state.get(c) for c in rascunho.CAMPOS}
+        st.download_button(
+            "Salvar rascunho (.json)",
+            data=rascunho.gerar(estado),
+            file_name=f"rascunho_{exporter.slug_equipe(st.session_state.equipe or 'equipe')}.json",
+            mime="application/json",
+            icon=":material/download:",
+            width="stretch",
+            on_click="ignore",
+        )
+        st.file_uploader("Retomar rascunho (.json)", type=["json"], key="upload_rascunho", on_change=_restaurar)
+        aviso = st.session_state.pop("aviso_rascunho", None)
+        if aviso:
+            getattr(st, aviso[0])(aviso[1])
 
 
 def dica(texto: str, titulo: str = "Por que isso importa?") -> None:

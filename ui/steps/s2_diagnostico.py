@@ -6,11 +6,13 @@ from core import diagnostics as dg
 from ui.components import cabecalho, campo_persistente, carregar_base, dica, fmt_int, rodape, salvar_campo, tema_atual
 
 MIN_ANOTACAO = 30
+# Gráficos: números no padrão brasileiro e sem a barra de ferramentas (em inglês) do Plotly.
+CONFIG_GRAFICO = {"displayModeBar": False, "locale": "pt-BR"}
 
 
 @st.cache_data(show_spinner="Analisando a base...")
-def _resumo(tema_id: str, _df: pd.DataFrame, dicionario: dict):
-    return dg.metricas(_df), dg.raio_x_v2(_df, dicionario)
+def _resumo(tema_id: str, _df: pd.DataFrame, dicionario: dict, nomes_pt: dict):
+    return dg.metricas(_df), dg.raio_x_v2(_df, dicionario, nomes_pt)
 
 
 def _grafico_distribuicao(df: pd.DataFrame, coluna: str):
@@ -24,14 +26,14 @@ def _grafico_distribuicao(df: pd.DataFrame, coluna: str):
                      text=dist.iloc[::-1]["%"].map(lambda p: f"{p:.1f}%".replace(".", ",")),
                      labels={"valor": coluna, "quantidade": "Quantidade de linhas"})
         fig.update_layout(yaxis_type="category")
-    fig.update_layout(height=340, margin=dict(t=10, b=10, l=10, r=10))
+    fig.update_layout(height=340, margin=dict(t=10, b=10, l=10, r=10), separators=",.")
     return fig
 
 
 def _grafico_alvo(tabela: pd.DataFrame, coluna: str, rotulo: str):
     fig = px.bar(tabela, x=coluna, y="taxa", text=tabela["taxa"].map(lambda v: f"{v * 100:.1f}%".replace(".", ",")),
                  hover_data={"linhas": True}, labels={"taxa": rotulo.replace("`", ""), coluna: coluna})
-    fig.update_layout(height=340, margin=dict(t=10, b=10, l=10, r=10), xaxis_type="category")
+    fig.update_layout(height=340, margin=dict(t=10, b=10, l=10, r=10), xaxis_type="category", separators=",.")
     fig.update_yaxes(tickformat=".0%")
     return fig
 
@@ -43,7 +45,7 @@ def render() -> None:
         rodape(pode_avancar=False)
         return
     df = carregar_base(tema)
-    met, tabela = _resumo(tema.id, df, tema.dicionario)
+    met, tabela = _resumo(tema.id, df, tema.dicionario, tema.nomes_pt)
 
     cabecalho(
         "Diagnóstico da base",
@@ -51,14 +53,18 @@ def render() -> None:
         "orienta a sua pipeline.",
     )
 
-    c = st.columns(5)
-    c[0].metric("Linhas", fmt_int(met["linhas"]), help="Cada linha é um registro.")
-    c[1].metric("Colunas", met["colunas"], help="Cada coluna é uma informação sobre o registro.")
-    c[2].metric("Células vazias", f"{met['pct_nulos']:.1f}%".replace(".", ","),
-                help="Porcentagem de células sem valor, considerando a tabela inteira.")
-    c[3].metric("Linhas repetidas", fmt_int(met["duplicadas"]), help="Linhas iguais a outra em todas as colunas.")
-    c[4].metric("Numéricas / texto", f"{met['numericas']} / {met['texto']}",
-                help="Quantas colunas o computador leu como número e quantas como texto.")
+    linha1 = st.columns(3)
+    linha1[0].metric("Linhas", fmt_int(met["linhas"]), help="Cada linha é um registro.")
+    linha1[1].metric("Colunas", met["colunas"], help="Cada coluna é uma informação sobre o registro.")
+    linha1[2].metric("Colunas numéricas / de texto", f"{met['numericas']} / {met['texto']}",
+                     help="Quantas colunas o computador leu como número e quantas como texto.")
+    linha2 = st.columns(3)
+    linha2[0].metric("Células vazias (nulos)", f"{met['pct_nulos']:.1f}%".replace(".", ","),
+                     help="Porcentagem de células sem nenhum valor, considerando a tabela inteira.")
+    linha2[1].metric("Células só com espaços", fmt_int(met["espacos"]),
+                     help="Células de texto que parecem preenchidas, mas só têm espaços em branco. "
+                     "Elas não entram na contagem de nulos.")
+    linha2[2].metric("Linhas repetidas", fmt_int(met["duplicadas"]), help="Linhas iguais a outra em todas as colunas.")
 
     with st.container(border=True):
         st.markdown("**Roteiro de investigação**")
@@ -70,9 +76,11 @@ def render() -> None:
 
     st.subheader("Raio-X das colunas", anchor=False)
     st.dataframe(tabela, hide_index=True, width="stretch", height=420,
-                 column_config={"Significado": st.column_config.TextColumn(width="large"),
-                                "% vazios": st.column_config.NumberColumn(format="%.1f")})
-    st.caption("Significado = documentação da base publicada no Kaggle. Tipo = como o computador leu a coluna.")
+                 column_config={"Coluna": st.column_config.TextColumn(pinned=True),
+                                "Significado": st.column_config.TextColumn(width="large")})
+    st.caption("Em português = nome equivalente da coluna. Significado = documentação original da base (publicada "
+               "no Kaggle, um site gratuito com bases de dados reais para estudo). Tipo = como o computador leu a "
+               "coluna.")
 
     st.subheader("Explorar uma coluna", anchor=False)
     colunas = list(df.columns)
@@ -82,14 +90,19 @@ def render() -> None:
     a, b = st.columns([1, 2], gap="large")
     with a, st.container(border=True):
         st.markdown(f"**`{coluna}`**")
+        if tema.nomes_pt.get(coluna):
+            st.caption(f"Em português: `{tema.nomes_pt[coluna]}`")
         if tema.dicionario.get(coluna):
             st.caption(tema.dicionario[coluna])
         for k, v in dg.estatisticas(serie).items():
             st.markdown(f"<span class='muted'>{k}</span> &nbsp; **{v}**", unsafe_allow_html=True)
     with b:
+        st.caption("**Distribuição:** como os valores se espalham. **Relação com o alvo:** como o resultado "
+                   "(ex.: cancelou, faltou) varia conforme esta coluna. **Valores mais frequentes:** as respostas "
+                   "que mais aparecem e o que significam.")
         aba1, aba2, aba3 = st.tabs(["Distribuição", "Relação com o alvo", "Valores mais frequentes"])
         with aba1:
-            st.plotly_chart(_grafico_distribuicao(df, coluna), width="stretch", key="g_dist")
+            st.plotly_chart(_grafico_distribuicao(df, coluna), width="stretch", key="g_dist", config=CONFIG_GRAFICO)
         with aba2:
             rel = dg.relacao_com_alvo(df, coluna, tema.alvo)
             if rel is None:
@@ -97,12 +110,12 @@ def render() -> None:
             else:
                 tab, rotulo = rel
                 st.caption(f"Para cada valor (ou faixa) de `{coluna}`: {rotulo}. Passe o mouse para ver quantas linhas.")
-                st.plotly_chart(_grafico_alvo(tab, coluna, rotulo), width="stretch", key="g_alvo")
+                st.plotly_chart(_grafico_alvo(tab, coluna, rotulo), width="stretch", key="g_alvo", config=CONFIG_GRAFICO)
         with aba3:
-            st.dataframe(dg.distribuicao(serie, top=20), hide_index=True, width="stretch", height=340)
+            st.dataframe(dg.tabela_frequentes(serie, tema.valores_pt), hide_index=True, width="stretch", height=340)
 
     st.subheader("Amostra da base", anchor=False)
-    st.dataframe(df.head(20), width="stretch")
+    st.dataframe(df.head(20), width="stretch", hide_index=True)
 
     st.subheader("Suas anotações", anchor=False)
     st.text_area(

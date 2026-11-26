@@ -72,6 +72,11 @@ class Theme:
     area_cliente: str = ""
     solicitante: str = ""
     missao: str = ""
+    # Exibição em português (as bases continuam com nomes/valores originais; ver traducoes.py).
+    nomes_pt: dict[str, str] = field(default_factory=dict)
+    valores_pt: dict[str, str] = field(default_factory=dict)
+    # Significado de colunas depois de conversões do catálogo: {id_bloco: {coluna: texto}}.
+    significado_apos: dict[str, dict[str, str]] = field(default_factory=dict)
 
     def bloco(self, block_id: str) -> Block:
         for b in self.blocos:
@@ -93,6 +98,9 @@ class StepResult:
     colunas_removidas: list[str]
     tipos_alterados: dict[str, tuple[str, str]]
     erro: str | None = None
+    # Linhas repetidas antes/depois (None quando a base é larga demais para contar rápido).
+    repetidas_antes: int | None = None
+    repetidas_depois: int | None = None
 
 
 @dataclass

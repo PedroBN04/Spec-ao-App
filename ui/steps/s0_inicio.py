@@ -1,6 +1,6 @@
 import streamlit as st
 
-from ui.components import cabecalho, campo_persistente, rodape, salvar_campo
+from ui.components import cabecalho, ir_para
 
 JORNADA = [
     ("Missão", "Uma área da empresa (a área cliente) pede ajuda com um problema. Você escolhe qual missão aceitar."),
@@ -10,6 +10,15 @@ JORNADA = [
     ("SPEC", "Você escreve a especificação: o que construir, para quem, com quais regras e como conferir."),
     ("Exportar", "Você baixa a base tratada e a SPEC, que um agente de IA usa para construir o painel."),
 ]
+
+
+def _comecar() -> None:
+    nome = (st.session_state.get("form_equipe") or "").strip()
+    if not nome:
+        st.session_state.equipe_vazia = True
+        return
+    st.session_state.equipe = nome
+    ir_para(1)
 
 
 def render() -> None:
@@ -42,7 +51,8 @@ def render() -> None:
     a, b = st.columns(2)
     with a, st.container(border=True):
         st.markdown("**`dados_tratados.csv`**")
-        st.caption("A base depois da sua pipeline de tratamento. CSV é uma planilha salva como texto.")
+        st.caption("A base depois da sua pipeline de tratamento, numa tabela simples em texto (CSV) que a IA lê. "
+                   "O kit final também traz uma planilha .xlsx que abre direto no Excel.")
     with b, st.container(border=True):
         st.markdown("**`SPEC.md`**")
         st.caption("A especificação escrita por você: problema, escopo, dados, regras e critérios de aceitação.")
@@ -53,19 +63,21 @@ def render() -> None:
     st.caption("Tempo estimado: cerca de 60 minutos. Termos novos estão explicados no Glossário, na barra lateral.")
 
     st.subheader("Sua equipe", anchor=False)
-    st.text_input(
-        "Nome da equipe",
-        key=campo_persistente("equipe"),
-        on_change=salvar_campo,
-        args=("equipe",),
-        placeholder="Ex.: Equipe Alfa",
-        help="Aparece no nome dos arquivos e na SPEC. Digite e tecle Enter.",
-        max_chars=40,
-    )
-    salvar_campo("equipe")
+    with st.form("form_inicio", border=False):
+        st.text_input(
+            "Nome da equipe",
+            value=st.session_state.equipe,
+            key="form_equipe",
+            placeholder="Ex.: Equipe Alfa",
+            help="Aparece no nome dos arquivos e na SPEC.",
+            max_chars=40,
+        )
+        _, direita = st.columns([4, 1])
+        direita.form_submit_button("Começar", type="primary", icon=":material/arrow_forward:",
+                                   icon_position="right", on_click=_comecar, width="stretch")
+    if st.session_state.pop("equipe_vazia", False):
+        st.warning("Digite um nome para sua equipe antes de começar.", icon=":material/edit:")
     st.caption(
-        "O app não guarda nada no servidor: se a página for recarregada, a jornada recomeça do zero. "
-        "Baixe os arquivos no final."
+        "O app não guarda nada no servidor. Use \"Salvar ou retomar progresso\", na barra lateral, para não "
+        "perder o trabalho se a página recarregar."
     )
-    rodape(pode_avancar=bool(st.session_state.equipe.strip()), motivo="Digite o nome da equipe para começar.",
-           rotulo_avancar="Começar")

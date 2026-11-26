@@ -77,7 +77,15 @@ def _remover(tema: Theme, chave: str) -> None:
 
 
 def _mover(tema: Theme, chave: str, desloc: int) -> None:
-    _rodar(tema, ex.mover(st.session_state.passos, chave, desloc))
+    """Só muda a ordem se todos os passos continuarem válidos; senão avisa e mantém o fluxo como estava."""
+    nova = ex.mover(st.session_state.passos, chave, desloc)
+    teste = ex.reexecutar(carregar_base(tema), tema, nova)
+    if teste.removidos:
+        afetado, motivo = teste.removidos[0]
+        titulo = _titulo(next(p for p in st.session_state.passos if ex.uid(p) == afetado))
+        avisar("warning", f"A ordem não foi alterada: nessa posição, \"{titulo}\" não funcionaria. {motivo}")
+        return
+    _rodar(tema, nova)
 
 
 def _salvar_nota(chave: str) -> None:
@@ -109,7 +117,7 @@ def _catalogo(tema: Theme) -> None:
                     st.markdown(f"**{bloco.titulo}**")
                     st.caption(bloco.explicacao)
                     c1, c2 = st.columns(2)
-                    with c1.popover("Ver código", icon=":material/code:", width="stretch"):
+                    with c1.popover("Código", icon=":material/code:", width="stretch"):
                         st.code(bloco.codigo, language="python", wrap_lines=True)
                     c2.button(
                         "No fluxo" if no_fluxo else "Adicionar",
@@ -135,48 +143,49 @@ def _params_livres(acao: str, df) -> dict:
 
     p: dict = {}
     if acao in ("remover_colunas",):
-        p["colunas"] = st.multiselect("Colunas", cols, key="nv_colunas")
+        p["colunas"] = st.multiselect("Colunas", cols, key="nv_colunas", placeholder="Escolha uma ou mais opções")
     elif acao in ("remover_linhas_vazias", "remover_duplicados"):
-        p["colunas"] = st.multiselect("Comparar só estas colunas (deixe vazio para usar todas)", cols, key="nv_colunas_opc")
+        p["colunas"] = st.multiselect("Comparar só estas colunas (deixe vazio para usar todas)", cols,
+                                      key="nv_colunas_opc", placeholder="Escolha uma ou mais opções")
     elif acao == "preencher_vazios":
-        p["coluna"] = st.selectbox("Coluna", cols, format_func=vazios, key="nv_coluna_pv")
+        p["coluna"] = st.selectbox("Coluna", cols, format_func=vazios, key="nv_coluna_pv", placeholder="Escolha uma opção")
         p["metodo"] = st.radio("Preencher com", list(bl.METODOS), format_func=bl.METODOS.get, key="nv_metodo", horizontal=True)
         if p["metodo"] == "valor":
             p["valor"] = st.text_input("Valor", key="nv_valor_pv")
     elif acao == "converter_tipo":
-        p["coluna"] = st.selectbox("Coluna", cols, key="nv_coluna_ct")
+        p["coluna"] = st.selectbox("Coluna", cols, key="nv_coluna_ct", placeholder="Escolha uma opção")
         p["para"] = st.radio("Converter para", list(bl.TIPOS), format_func=bl.TIPOS.get, key="nv_para", horizontal=True)
     elif acao in ("filtrar_linhas", "criar_indicador"):
-        p["coluna"] = st.selectbox("Coluna", cols, key="nv_coluna_f")
+        p["coluna"] = st.selectbox("Coluna", cols, key="nv_coluna_f", placeholder="Escolha uma opção")
         a, b = st.columns(2)
-        p["operador"] = a.selectbox("Condição", list(bl.OPERADORES), format_func=bl.OPERADORES.get, key="nv_op")
+        p["operador"] = a.selectbox("Condição", list(bl.OPERADORES), format_func=bl.OPERADORES.get, key="nv_op", placeholder="Escolha uma opção")
         p["valor"] = b.text_input("Valor", key="nv_valor_f")
         if acao == "criar_indicador":
             p["nome"] = st.text_input("Nome da coluna nova", key="nv_nome_ind")
     elif acao == "substituir_valor":
-        p["coluna"] = st.selectbox("Coluna", cols, key="nv_coluna_sv")
+        p["coluna"] = st.selectbox("Coluna", cols, key="nv_coluna_sv", placeholder="Escolha uma opção")
         a, b = st.columns(2)
         p["de"] = a.text_input("Trocar o valor", key="nv_de")
         p["para"] = b.text_input("Por", key="nv_para_sv")
     elif acao == "criar_faixas":
-        p["coluna"] = st.selectbox("Coluna numérica", numericas, key="nv_coluna_cf")
+        p["coluna"] = st.selectbox("Coluna numérica", numericas, key="nv_coluna_cf", placeholder="Escolha uma opção")
         p["cortes"] = st.text_input("Limites das faixas, separados por espaço", key="nv_cortes", placeholder="Ex.: 0 12 24 48 72")
         p["nome"] = st.text_input("Nome da coluna nova", key="nv_nome_cf")
     elif acao == "calcular_coluna":
         a, b, c = st.columns([3, 2, 3])
-        p["coluna_a"] = a.selectbox("Coluna", numericas, key="nv_ca")
-        p["conta"] = b.selectbox("Conta", list(bl.CONTAS), format_func=bl.CONTAS.get, key="nv_conta")
-        p["coluna_b"] = c.selectbox("Coluna ", numericas, key="nv_cb")
+        p["coluna_a"] = a.selectbox("Coluna", numericas, key="nv_ca", placeholder="Escolha uma opção")
+        p["conta"] = b.selectbox("Conta", list(bl.CONTAS), format_func=bl.CONTAS.get, key="nv_conta", placeholder="Escolha uma opção")
+        p["coluna_b"] = c.selectbox("Coluna ", numericas, key="nv_cb", placeholder="Escolha uma opção")
         p["nome"] = st.text_input("Nome da coluna nova", key="nv_nome_cc")
     elif acao == "renomear_coluna":
-        p["coluna"] = st.selectbox("Coluna", cols, key="nv_coluna_rn")
+        p["coluna"] = st.selectbox("Coluna", cols, key="nv_coluna_rn", placeholder="Escolha uma opção")
         p["novo"] = st.text_input("Novo nome", key="nv_novo")
     return p
 
 
 def _personalizado(tema: Theme) -> None:
     st.caption("Monte um passo do seu jeito: escolha a ação e as colunas. O app gera o código pandas para você.")
-    acao = st.selectbox("Ação", [a.id for a in bl.ACOES], format_func=lambda a: bl.ACAO_POR_ID[a].rotulo, key="nv_acao")
+    acao = st.selectbox("Ação", [a.id for a in bl.ACOES], placeholder="Escolha uma opção", format_func=lambda a: bl.ACAO_POR_ID[a].rotulo, key="nv_acao")
     st.caption(bl.ACAO_POR_ID[acao].descricao)
     atual = df_atual(tema)
     params = _params_livres(acao, atual)
@@ -210,6 +219,8 @@ def _efeito(r: StepResult) -> str:
         partes.append(f"vazios: {fmt_int(r.nulos_antes)} → {fmt_int(r.nulos_depois)}")
     if r.tipos_alterados:
         partes.append("tipo alterado: " + ", ".join(f"`{c}`" for c in list(r.tipos_alterados)[:3]))
+    if r.repetidas_antes is not None and r.repetidas_antes != r.repetidas_depois:
+        partes.append(f"linhas repetidas: {fmt_int(r.repetidas_antes)} → {fmt_int(r.repetidas_depois)}")
     return " · ".join(partes) if partes else "Nenhuma mudança visível em linhas, colunas, vazios ou tipos."
 
 
@@ -274,10 +285,11 @@ def render() -> None:
     )
     with st.expander("O que é uma pipeline?", icon=":material/account_tree:", expanded=not st.session_state.passos):
         st.markdown(
-            "Uma **pipeline** é uma sequência de passos (nós) que a base percorre, da **entrada** até a "
-            "**saída**. Cada nó recebe a tabela do nó anterior, faz **uma** coisa (converter um tipo, preencher "
-            "vazios, remover linhas, criar uma coluna...) e entrega a tabela para o próximo — como um fluxo no "
-            "n8n.\n\n"
+            "Uma **pipeline** funciona como uma linha de montagem ou uma receita passo a passo: a base entra "
+            "bruta na **entrada**, passa por cada passo (nó) na ordem que você escolher e sai pronta na **saída**. "
+            "Cada nó recebe a tabela do nó anterior, faz **uma** coisa (converter um tipo, preencher vazios, "
+            "remover linhas, criar uma coluna...) e entrega a tabela para o próximo. Ferramentas de automação "
+            "como o n8n funcionam do mesmo jeito.\n\n"
             "- **A ordem importa:** um nó só enxerga o que os anteriores deixaram. Use as setas para reordenar.\n"
             "- **Nada é definitivo:** remova ou reordene nós quando quiser; o app refaz tudo a partir da base original.\n"
             "- **Você decide:** o app mostra o efeito de cada nó nos números, mas não diz se a decisão é certa. "
@@ -290,7 +302,7 @@ def render() -> None:
             st.text(st.session_state.notas_diag)
     mostrar_avisos()
 
-    esquerda, direita = st.columns([5, 7], gap="large")
+    esquerda, direita = st.columns([1, 1], gap="large")
     with esquerda:
         st.subheader("Biblioteca de nós", anchor=False)
         aba1, aba2 = st.tabs(["Blocos prontos", "Bloco personalizado"])

@@ -16,6 +16,7 @@ import pandas as pd
 from core.models import Block, StepResult, Theme
 
 LIMITE_REMOCAO_LINHAS = 0.20  # acima disso, a etapa 3 mostra st.error (seção 7.1)
+LIMITE_COLUNAS_REPETIDAS = 200  # acima disso não contamos linhas repetidas (lento demais, ex.: depois do T11)
 
 
 # ---------------------------------------------------------------------------
@@ -45,7 +46,10 @@ def medir(block_id: str, antes: pd.DataFrame, depois: pd.DataFrame) -> StepResul
         for c in colunas_antes
         if c in conjunto_depois and antes[c].dtype != depois[c].dtype
     }
+    contar = antes.shape[1] <= LIMITE_COLUNAS_REPETIDAS and depois.shape[1] <= LIMITE_COLUNAS_REPETIDAS
     return StepResult(
+        repetidas_antes=int(antes.duplicated().sum()) if contar else None,
+        repetidas_depois=int(depois.duplicated().sum()) if contar else None,
         block_id=block_id,
         linhas_antes=len(antes),
         linhas_depois=len(depois),
@@ -96,10 +100,13 @@ def motivo_desabilitado(
     colunas_originais: list[str] | None = None,
 ) -> str | None:
     """Explica por que o bloco não pode ser aplicado agora, ou None se pode."""
+    def nome(block_id: str) -> str:
+        return f"\"{tema.bloco(block_id).titulo}\""
+
     faltando_blocos = [b for b in bloco.requer_blocos if b not in aplicados]
     if faltando_blocos:
-        lista = " e ".join(faltando_blocos)
-        return f"Este bloco precisa que o bloco {lista} seja aplicado antes."
+        lista = " e ".join(nome(b) for b in faltando_blocos)
+        return f"Este bloco precisa que {lista} seja aplicado antes."
     for coluna in bloco.requer_colunas:
         if coluna in df.columns:
             continue
@@ -109,7 +116,7 @@ def motivo_desabilitado(
                 "(um passo anterior removeu ou renomeou essa coluna)."
             )
         criadores = blocos_que_criam(tema, coluna)
-        dica = f" Aplique antes o bloco {' ou '.join(criadores)}." if criadores else ""
+        dica = f" Aplique antes {' ou '.join(nome(b) for b in criadores)}." if criadores else ""
         return f"Este bloco precisa da coluna `{coluna}`.{dica}"
     return None
 
